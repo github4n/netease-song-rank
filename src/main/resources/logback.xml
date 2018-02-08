@@ -1,0 +1,5 @@
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <jmxConfigurator/>
+    <logger name="com.gospell.platform.oa.gos.timerserver.mapper" level="INFO"></logger>
+</configuration>
