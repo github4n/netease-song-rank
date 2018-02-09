@@ -5,8 +5,8 @@ DROP TABLE IF EXISTS `song_rank_job`;
 CREATE TABLE `song_rank_job` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `status` int(2) NOT NULL,
-  `job_name` varchar(255) DEFAULT NULL,
-  `job_group` varchar(100) DEFAULT NULL,
+  `job_name` varchar(50) DEFAULT NULL,
+  `job_group` varchar(20) DEFAULT NULL,
   `job_type` varchar(100) NOT NULL,
   `cron_expression` varchar(32) NOT NULL,
   `target_userid` varchar(32) NOT NULL,

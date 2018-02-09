@@ -12,7 +12,7 @@ spring:
         default-property-inclusion: non_null
     datasource:
         name: test
-        url: jdbc:mysql://mysqlserver:3306/song_rank?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowMultiQueries=true
+        url: jdbc:mysql://127.0.0.1:3306/song_rank?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowMultiQueries=true
         username: root
         password: 48STX2X
         # 使用druid数据源
