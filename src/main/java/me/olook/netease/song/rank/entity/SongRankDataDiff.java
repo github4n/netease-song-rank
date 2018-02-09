@@ -37,6 +37,10 @@ public class SongRankDataDiff {
     @Column(name = "change_time")
     private Date changeTime;
 
+    @ApiModelProperty(value = "目标用户昵称")
+    @Column(name = "target_nickname")
+    private String targetNickname;
+
     public Integer getId() {
         return id;
     }
@@ -85,6 +89,14 @@ public class SongRankDataDiff {
         this.changeTime = changeTime;
     }
 
+    public String getTargetNickname() {
+        return targetNickname;
+    }
+
+    public void setTargetNickname(String targetNickname) {
+        this.targetNickname = targetNickname;
+    }
+
     @Override
     public String toString() {
         return "SongRankDataDiff{" +
@@ -94,6 +106,7 @@ public class SongRankDataDiff {
                 ", song='" + song + '\'' +
                 ", singer='" + singer + '\'' +
                 ", changeTime=" + changeTime +
+                ", targetNickname='" + targetNickname + '\'' +
                 '}';
     }
 }

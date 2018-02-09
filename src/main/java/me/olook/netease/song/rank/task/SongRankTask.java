@@ -76,7 +76,6 @@ public class SongRankTask implements Job {
             wc.getOptions().setDoNotTrackEnabled(false);
             HtmlPage page = wc
                     .getPage("http://music.163.com/#/user/songs/rank?id="+currentJob.getTargetUserid());
-            System.out.println("-----------------------------------------------------------------------");
             HtmlPage framePage = (HtmlPage)page.getFrameByName("contentFrame").getEnclosedPage();
             //累计听歌
             DomNodeList<DomElement> count = framePage.getElementsByTagName("h4");
@@ -113,7 +112,10 @@ public class SongRankTask implements Job {
                 timerJobRecord.setNewData(1);
                 //旧记录不为空 非第一次记录数据 需记录变化
                 if (oldRecord != null) {
-                    recordDiffData(getOldDataList(oldRecord.getId()),songRankDataList,uuid);
+                    recordDiffData(getOldDataList(oldRecord.getId()),songRankDataList,uuid,currentJob.getTargetNickname());
+                    log.info(currentJob.getJobName()+" 数据变更");
+                }else{
+                    log.info(currentJob.getJobName()+" 初始数据");
                 }
                 songRankDataBiz.insertByBatch(songRankDataList);
             }
@@ -123,6 +125,7 @@ public class SongRankTask implements Job {
             timerJobRecord.setJobId(currentJob.getId());
             timerJobRecord.setEndTime(new Date());
             timerJobRecordBiz.insert(timerJobRecord);
+            log.info(currentJob.getJobName()+" 执行结束");
         }catch (IOException e){
             log.error(e.getMessage());
         }
@@ -133,10 +136,13 @@ public class SongRankTask implements Job {
     private List<SongRankData> getOldDataList(String oldJobRecordId){
         Example example = new Example(SongRankData.class);
         example.createCriteria().andEqualTo("jobRecordId",oldJobRecordId);
-        return songRankDataBiz.selectByExample(example);
+        log.debug("上次执行记录id:"+oldJobRecordId);
+        List<SongRankData> oldDataList = songRankDataBiz.selectByExample(example);
+        log.debug("旧排行数据:"+oldDataList);
+        return oldDataList;
     }
 
-    private  void recordDiffData(List<SongRankData> oldDataList, List<SongRankData> newDataList,String jobRecordId){
+    private  void recordDiffData(List<SongRankData> oldDataList, List<SongRankData> newDataList,String jobRecordId ,String targetNickname){
         Map<String,SongRankData> oldMap = new HashMap<String, SongRankData>(oldDataList.size());
         Map<String,SongRankData> newMap = new HashMap<String, SongRankData>(newDataList.size());
         for(SongRankData songRankData : oldDataList){
@@ -152,21 +158,25 @@ public class SongRankTask implements Job {
             if(oldMap.get(entry.getKey())==null){
                 SongRankDataDiff songRankDataDiff = new SongRankDataDiff();
                 songRankDataDiff.setJobRecordId(jobRecordId);
+                songRankDataDiff.setTargetNickname(targetNickname);
                 songRankDataDiff.setRankChange(-1);
                 songRankDataDiff.setSong(entry.getKey());
                 songRankDataDiff.setSinger(entry.getValue().getSinger());
+                songRankDataDiff.setChangeTime(new Date());
                 songRankDataDiffBiz.insert(songRankDataDiff);
             }
             //旧榜存在 排行不同 且新榜大于旧榜排序
             else{
                 Integer newRank = entry.getValue().getRank();
                 Integer oldRank = oldMap.get(entry.getKey()).getRank();
-                if(newRank>oldRank){
+                if(newRank<oldRank){
                     SongRankDataDiff songRankDataDiff = new SongRankDataDiff();
                     songRankDataDiff.setJobRecordId(jobRecordId);
-                    songRankDataDiff.setRankChange(newRank-oldRank);
+                    songRankDataDiff.setTargetNickname(targetNickname);
+                    songRankDataDiff.setRankChange(oldRank-newRank);
                     songRankDataDiff.setSong(entry.getKey());
                     songRankDataDiff.setSinger(entry.getValue().getSinger());
+                    songRankDataDiff.setChangeTime(new Date());
                     songRankDataDiffBiz.insert(songRankDataDiff);
                 }
             }
