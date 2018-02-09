@@ -9,8 +9,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.gospell.platform</groupId>
-    <artifactId>gos-timerserver</artifactId>
+    <groupId>me.olook.netease</groupId>
+    <artifactId>song-rank</artifactId>
     <packaging>jar</packaging>  
     <version>1.0.0</version> 
     
@@ -19,8 +19,8 @@
         <!-- MyBatis Generator -->
         <!-- Java接口和实体类 -->
         <targetJavaProject>${basedir}/src/main/java</targetJavaProject>
-        <targetMapperPackage>package com.gospell.platform.oa.biz.rbac.mapper</targetMapperPackage>
-        <targetModelPackage>package com.gospell.platform.oa.biz.rbac.entity</targetModelPackage>
+        <targetMapperPackage>package me.olook.netease.song.rank.mapper</targetMapperPackage>
+        <targetModelPackage>package me.olook.netease.song.rank.entity</targetModelPackage>
         <!-- XML生成路径 -->
         <targetResourcesProject>${basedir}/src/main/resources</targetResourcesProject>
         <targetXMLPackage>mapper</targetXMLPackage>
