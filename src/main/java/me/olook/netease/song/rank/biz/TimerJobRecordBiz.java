@@ -12,6 +12,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class TimerJobRecordBiz extends BaseBiz<TimerJobRecordMapper,TimerJobRecord>{
 
+    /**
+     * 查找最近一次改任务数据变更记录
+     * @param jobId
+     * @return
+     */
     public TimerJobRecord getLatestRecord(Integer jobId){
         return mapper.getLatestRecord(jobId);
     };

@@ -136,9 +136,9 @@ public class SongRankTask implements Job {
     private List<SongRankData> getOldDataList(String oldJobRecordId){
         Example example = new Example(SongRankData.class);
         example.createCriteria().andEqualTo("jobRecordId",oldJobRecordId);
-        log.debug("上次执行记录id:"+oldJobRecordId);
+        log.info("上次执行记录id:"+oldJobRecordId);
         List<SongRankData> oldDataList = songRankDataBiz.selectByExample(example);
-        log.debug("旧排行数据:"+oldDataList);
+        log.info("旧排行数据:"+oldDataList);
         return oldDataList;
     }
 

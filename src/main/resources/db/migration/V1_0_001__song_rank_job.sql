@@ -25,6 +25,6 @@ CREATE TABLE `song_rank_job` (
 -- ----------------------------
 -- Records of song_rank_job
 -- ----------------------------
--- INSERT INTO `song_rank_job` VALUES ('1', '1', '王跳跳的听歌排行爬虫', 'group1', '听歌排行爬取任务', '0 */1 * * * ?', '1301208430', '王跳跳4399', null, null, null, null, null, null, null);
+INSERT INTO `song_rank_job` VALUES ('1', '1', '王跳跳的听歌排行爬虫', 'group1', '听歌排行爬取任务', '0 */1 * * * ?', '1301208430', '王跳跳4399', null, null, null, null, null, null, null);
 INSERT INTO `song_rank_job` VALUES ('2', '1', 'red的听歌排行爬虫', 'group1', '听歌排行爬取任务', '0 */1 * * * ?', '33255454', '半赫', null, null, null, null, null, null, null);
 -- INSERT INTO `song_rank_job` VALUES ('3', '1', '千百个迷人愿望的听歌排行爬虫', 'group1', '听歌排行爬取任务', '0 */1 * * * ?', '70142586', '千百个迷人愿望', null, null, null, null, null, null, null);

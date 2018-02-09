@@ -3,7 +3,7 @@
 <mapper namespace="me.olook.netease.song.rank.mapper.TimerJobRecordMapper">
 
     <select id="getLatestRecord" resultType="me.olook.netease.song.rank.entity.TimerJobRecord">
-        SELECT * from song_rank_job_record where job_id = #{jobId}
+        SELECT * from song_rank_job_record where job_id = #{jobId} and new_data = '1'
         order by end_time desc
         limit 1
     </select>
