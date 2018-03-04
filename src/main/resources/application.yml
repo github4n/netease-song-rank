@@ -52,6 +52,11 @@ mybatis:
 
 server:
     port: 9800
+    ssl:
+        key-store: H:/red2us.keystore
+        key-store-password: 930910
+http:
+    port: 5201
     
 flyway:
     baselineOnMigrate: true
