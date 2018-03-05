@@ -16,6 +16,9 @@ import javax.persistence.Table;
 @Table(name = "song_rank_job")
 public class TimerJob extends BaseCreateAndUpdateEntity {
 
+    public final static Integer STATUS_RUN = 1;
+
+    public final static Integer STATUS_STOP = 0;
 
     @ApiModelProperty(value = "任务状态：0暂停 1运行")
     private Integer status;

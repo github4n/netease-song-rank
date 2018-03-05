@@ -1,8 +1,14 @@
 package me.olook.netease.song.rank.rest;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import me.olook.netease.song.rank.biz.UserRefJobBiz;
 import me.olook.netease.song.rank.config.WxAppProperties;
+import me.olook.netease.song.rank.dto.NeteaseUserDTO;
+import me.olook.netease.song.rank.entity.UserRefJob;
+import me.olook.netease.song.rank.util.NeteaseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 /**
  * @author zhaohw
@@ -23,18 +31,36 @@ import org.springframework.web.client.RestTemplate;
 public class WxServerController {
 
     @Autowired
-    RestTemplate restTemplate;
+    private RestTemplate restTemplate;
 
     @Autowired
-    WxAppProperties wxApp;
+    private WxAppProperties wxApp;
 
-    @ApiOperation(value = "获取openid")
-    @RequestMapping(value = "getOpenid",method = RequestMethod.GET)
+    @Autowired
+    private UserRefJobBiz userRefJobBiz;
+
+    @ApiOperation(value = "获取用户关联的任务")
+    @RequestMapping(value = "getUerJob",method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<String> add(String code){
+    public ResponseEntity<String> getUerJob(String code){
         String params = "?appid=" + wxApp.getAppId() + "&secret=" + wxApp.getAppSecret() + "&js_code=" + code + "&grant_type=" + wxApp.getGrantType();
         String url = "https://api.weixin.qq.com/sns/jscode2session"+params;
-        String json = restTemplate.getForEntity(url, String.class).getBody();
+        String wxJson = restTemplate.getForEntity(url, String.class).getBody();
+        JSONObject jsonObject = JSON.parseObject(wxJson);
+        String openid = jsonObject.get("openid").toString();
+        String sessionKey = jsonObject.get("session_key").toString();
+        System.out.println(openid);
+        List<UserRefJob> jobList = userRefJobBiz.getUserJobByOpenId(openid);
+        String json = JSONObject.toJSONString(jobList);
+        return ResponseEntity.status(200).body(json);
+    }
+
+    @ApiOperation(value = "获取网易云用户")
+    @RequestMapping(value = "getNeteaseUser",method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<String> getNeteaseUser(String keyWord){
+        List<NeteaseUserDTO> list = NeteaseUtil.searchUser(keyWord);
+        String json = JSONObject.toJSONString(list);
         System.out.println(json);
         return ResponseEntity.status(200).body(json);
     }
