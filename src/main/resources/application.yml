@@ -84,3 +84,7 @@ swagger:
         name: 定时任务服务
         description:  ·公用定时任务服务
         developer: zhw
+wxapp:
+    appId: wxd422e4a71b224d86
+    appSecret: 
+    grantType: authorization_code
