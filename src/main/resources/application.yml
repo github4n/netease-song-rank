@@ -51,12 +51,13 @@ mybatis:
         map-underscore-to-camel-case: true
 
 server:
-    port: 9800
+    # HttpsConfiguration中有重定向端口配置
+    port: 8443
     ssl:
-        key-store: H:/red2us.keystore
-        key-store-password: 930910
+        key-store: /software/www.olook.me.jks
+        key-store-password: wx55nc4ao9
 http:
-    port: 5201
+    port: 80
     
 flyway:
     baselineOnMigrate: true

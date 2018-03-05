@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @Data
 @ConfigurationProperties(prefix = "http")
-public class HttpsProperties {
+public class HttpProperties {
 
     private Integer port;
 
