@@ -40,11 +40,11 @@ public class WxServerController {
     private UserRefJobBiz userRefJobBiz;
 
     @ApiOperation(value = "获取用户关联的任务")
-    @RequestMapping(value = "getUerJob",method = RequestMethod.GET)
+    @RequestMapping(value = "getUerJob", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<String> getUerJob(String code){
+    public ResponseEntity<String> getUerJob(String code) {
         String params = "?appid=" + wxApp.getAppId() + "&secret=" + wxApp.getAppSecret() + "&js_code=" + code + "&grant_type=" + wxApp.getGrantType();
-        String url = "https://api.weixin.qq.com/sns/jscode2session"+params;
+        String url = "https://api.weixin.qq.com/sns/jscode2session" + params;
         String wxJson = restTemplate.getForEntity(url, String.class).getBody();
         JSONObject jsonObject = JSON.parseObject(wxJson);
         String openid = jsonObject.get("openid").toString();
@@ -56,9 +56,9 @@ public class WxServerController {
     }
 
     @ApiOperation(value = "获取网易云用户")
-    @RequestMapping(value = "getNeteaseUser",method = RequestMethod.GET)
+    @RequestMapping(value = "getNeteaseUser", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<String> getNeteaseUser(String keyWord){
+    public ResponseEntity<String> getNeteaseUser(String keyWord) {
         List<NeteaseUserDTO> list = NeteaseUtil.searchUser(keyWord);
         String json = JSONObject.toJSONString(list);
         System.out.println(json);
