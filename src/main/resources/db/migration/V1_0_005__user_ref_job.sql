@@ -5,7 +5,9 @@ DROP TABLE IF EXISTS `user_ref_job`;
 CREATE TABLE `user_ref_job` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `job_alias` varchar(100) DEFAULT NULL,
-  `job_id` int(11) NOT NULL COMMENT '定时任务id',
+  `target_userid` varchar(50) NOT NULL COMMENT '订阅用户id',
+  `target_nickname` varchar(200) NOT NULL COMMENT '订阅用户昵称',
+  `target_avatar` varchar(200) NOT NULL COMMENT '订阅用户头像',
   `openid` varchar(50) DEFAULT NULL,
   `unionid` varchar(50) DEFAULT NULL,
   `crt_time` datetime DEFAULT NULL,

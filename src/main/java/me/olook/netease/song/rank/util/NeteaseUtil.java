@@ -121,8 +121,8 @@ public class NeteaseUtil {
         }
     }
 
-//    public static void main(String[] args) {
-//        //获取听歌排行数据
-//        System.out.println(songRank("33255454"));
-//    }
+    public static void main(String[] args) {
+        //获取听歌排行数据
+        System.out.println(songRank("33255454"));
+    }
 }

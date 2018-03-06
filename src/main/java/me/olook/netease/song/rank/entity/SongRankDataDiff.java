@@ -4,12 +4,14 @@ import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.Date;
 
 /**
  * @author zhaohw
  * @date 2018-02-08 18:15
  */
+@Table(name = "song_rank_data_diff")
 public class SongRankDataDiff {
 
     @ApiModelProperty(hidden = true)
@@ -37,9 +39,9 @@ public class SongRankDataDiff {
     @Column(name = "change_time")
     private Date changeTime;
 
-    @ApiModelProperty(value = "目标用户昵称")
-    @Column(name = "target_nickname")
-    private String targetNickname;
+    @ApiModelProperty(value = "目标用户id")
+    @Column(name = "target_userid")
+    private String targetUserId;
 
     public Integer getId() {
         return id;
@@ -89,24 +91,11 @@ public class SongRankDataDiff {
         this.changeTime = changeTime;
     }
 
-    public String getTargetNickname() {
-        return targetNickname;
+    public String getTargetUserId() {
+        return targetUserId;
     }
 
-    public void setTargetNickname(String targetNickname) {
-        this.targetNickname = targetNickname;
-    }
-
-    @Override
-    public String toString() {
-        return "SongRankDataDiff{" +
-                "id=" + id +
-                ", jobRecordId='" + jobRecordId + '\'' +
-                ", rankChange=" + rankChange +
-                ", song='" + song + '\'' +
-                ", singer='" + singer + '\'' +
-                ", changeTime=" + changeTime +
-                ", targetNickname='" + targetNickname + '\'' +
-                '}';
+    public void setTargetUserId(String targetUserId) {
+        this.targetUserId = targetUserId;
     }
 }

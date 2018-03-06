@@ -21,8 +21,14 @@ public class UserRefJob {
     @Column(name = "job_alias")
     private String jobAlias;
 
-    @Column(name = "job_id")
-    private Integer jobId;
+    @Column(name = "target_userid")
+    private String targetUserId;
+
+    @Column(name = "target_nickname")
+    private String targetNickname;
+
+    @Column(name = "target_avatar")
+    private String targetAvatar;
 
     @Column(name = "openid")
     private String openId;
@@ -54,12 +60,20 @@ public class UserRefJob {
         this.jobAlias = jobAlias;
     }
 
-    public Integer getJobId() {
-        return jobId;
+    public String getTargetUserId() {
+        return targetUserId;
     }
 
-    public void setJobId(Integer jobId) {
-        this.jobId = jobId;
+    public void setTargetUserId(String targetUserId) {
+        this.targetUserId = targetUserId;
+    }
+
+    public String getTargetNickname() {
+        return targetNickname;
+    }
+
+    public void setTargetNickname(String targetNickname) {
+        this.targetNickname = targetNickname;
     }
 
     public String getOpenId() {
@@ -94,16 +108,11 @@ public class UserRefJob {
         this.updTime = updTime;
     }
 
-    @Override
-    public String toString() {
-        return "UserRefJob{" +
-                "id=" + id +
-                ", jobAlias='" + jobAlias + '\'' +
-                ", jobId=" + jobId +
-                ", openId='" + openId + '\'' +
-                ", unionId='" + unionId + '\'' +
-                ", crtTime=" + crtTime +
-                ", updTime=" + updTime +
-                '}';
+    public String getTargetAvatar() {
+        return targetAvatar;
+    }
+
+    public void setTargetAvatar(String targetAvatar) {
+        this.targetAvatar = targetAvatar;
     }
 }

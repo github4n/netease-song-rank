@@ -9,6 +9,6 @@ CREATE TABLE `song_rank_data_diff` (
   `change_time` datetime DEFAULT NULL COMMENT '记录时间',
   `song` varchar(255) DEFAULT NULL COMMENT '歌曲名称',
   `singer` varchar(255) DEFAULT NULL COMMENT '歌手名称',
-  `target_nickname` varchar(255) DEFAULT NULL COMMENT '目标昵称',
+  `target_userid` varchar(255) DEFAULT NULL COMMENT '目标昵称',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT = '排行变化表';
