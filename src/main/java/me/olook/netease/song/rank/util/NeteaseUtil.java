@@ -3,6 +3,7 @@ package me.olook.netease.song.rank.util;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import me.olook.netease.song.rank.dto.NeteaseUserDTO;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -17,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.alibaba.fastjson.JSON.parseObject;
 
@@ -82,4 +84,45 @@ public class NeteaseUtil {
             return null;
         }
     }
+
+    public static String songRank(String userId){
+        Map<String,String> map = Maps.newHashMap();
+        map.put("type","1");
+        map.put("limit","1000");
+        map.put("offset","0");
+        map.put("total","true");
+        map.put("csrf_token","");
+        map.put("uid",userId);
+        String json = JSONObject.toJSONString(map);
+        String params = NeteaseEncryptUtil.getUrlParams(json);
+        String url = "http://music.163.com/weapi/v1/play/record"+params;
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpPost request = new HttpPost(url);
+        try {
+            request.setHeader(HttpHeaders.ACCEPT, "*/*");
+            request.setHeader(HttpHeaders.ACCEPT_ENCODING, "gzip,deflate,sdch");
+            request.setHeader(HttpHeaders.ACCEPT_LANGUAGE, "zh-CN,en-US;q=0.7,en;q=0.3");
+            request.setHeader(HttpHeaders.CONNECTION, "keep-alive");
+            request.setHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded; charset=UTF-8");
+            request.setHeader(HttpHeaders.HOST, "music.163.com");
+            request.setHeader(HttpHeaders.REFERER, "http://music.163.com/");
+            request.setHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0 (X11; Linux x86_64; rv:39.0) Gecko/20100101 Firefox/39.0");
+            // 通过请求对象获取响应对象
+            HttpResponse response = httpClient.execute(request);
+            //判断网络连接状态码是否正常(0--200都数正常)
+            if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
+                //获取响应实体
+                return EntityUtils.toString(response.getEntity(), "utf-8");
+            }
+            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+//    public static void main(String[] args) {
+//        //获取听歌排行数据
+//        System.out.println(songRank("33255454"));
+//    }
 }
