@@ -1,11 +1,7 @@
 package me.olook.netease.song.rank.task;
 
-import com.gargoylesoftware.htmlunit.BrowserVersion;
-import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.DomElement;
-import com.gargoylesoftware.htmlunit.html.DomNodeList;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import me.olook.netease.song.rank.annotation.TimerJobTypeName;
 import me.olook.netease.song.rank.biz.SongRankDataBiz;
 import me.olook.netease.song.rank.biz.SongRankDataDiffBiz;
@@ -15,10 +11,7 @@ import me.olook.netease.song.rank.entity.SongRankData;
 import me.olook.netease.song.rank.entity.SongRankDataDiff;
 import me.olook.netease.song.rank.entity.TimerJob;
 import me.olook.netease.song.rank.entity.TimerJobRecord;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import me.olook.netease.song.rank.util.NeteaseUtil;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -26,10 +19,8 @@ import org.quartz.JobKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 import tk.mybatis.mapper.entity.Example;
 
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -64,71 +55,61 @@ public class SongRankTask implements Job {
         log.info("job name :" + jobKey.getName() + " job group :" +jobKey.getGroup() + " execute");
         TimerJob currentJob = timerJobBiz.selectOne(timerJob);
 
-        try{
-            WebClient wc = new WebClient(BrowserVersion.CHROME);
-            wc.getOptions().setUseInsecureSSL(true);
-            wc.getOptions().setJavaScriptEnabled(true);
-            wc.getOptions().setRedirectEnabled(true);
-            wc.setAjaxController(new NicelyResynchronizingAjaxController());
-            wc.getOptions().setCssEnabled(false);
-            wc.getOptions().setThrowExceptionOnScriptError(false);
-            wc.getOptions().setTimeout(100000);
-            wc.getOptions().setDoNotTrackEnabled(false);
-            HtmlPage page = wc
-                    .getPage("http://music.163.com/#/user/songs/rank?id="+currentJob.getTargetUserid());
-            HtmlPage framePage = (HtmlPage)page.getFrameByName("contentFrame").getEnclosedPage();
-            //累计听歌
-            DomNodeList<DomElement> count = framePage.getElementsByTagName("h4");
-            String countText = count.get(0).asText();
-            List<SongRankData> songRankDataList = new ArrayList<SongRankData>(100);
-            Document dom = Jsoup.parse(framePage.asXml());
-            Elements lis = dom.select("li");
-            String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-            StringBuilder sb = new StringBuilder();
-            for(Element li : lis){
-                if(!StringUtils.isEmpty(li.select("span.num").text())){
-                    songRankDataList.add(
-                            new SongRankData(
-                                    uuid,
-                                    Integer.parseInt(li.select(".num").text().replace(".","")),
-                                    li.select("b").text(),
-                                    li.select("span.s-fc8 > span").attr("title"),
-                                    li.select("span.bg").attr("style").split(":")[1].replace(";","")
-                            ));
-                    sb.append(li.select(".num").text().replace(".",""));
-                    sb.append(li.select("b").text());
-                }
-
-            }
-            if(songRankDataList.size()==0){
-                log.error(currentJob.getTargetUserid()+" 获取数据异常");
-                return;
-            }
-            String snapshot = sb.toString().hashCode()+"";
-            wc.close();
-            TimerJobRecord oldRecord = timerJobRecordBiz.getLatestRecord(currentJob.getId());
-            timerJobRecord.setNewData(0);
-            if(oldRecord==null||!snapshot.equals(oldRecord.getSnapshot())){
-                timerJobRecord.setNewData(1);
-                //旧记录不为空 非第一次记录数据 需记录变化
-                if (oldRecord != null) {
-                    recordDiffData(getOldDataList(oldRecord.getId()),songRankDataList,uuid,currentJob.getTargetNickname());
-                    log.info(currentJob.getJobName()+" 数据变更");
-                }else{
-                    log.info(currentJob.getJobName()+" 初始数据");
-                }
-                songRankDataBiz.insertByBatch(songRankDataList);
-            }
-            timerJobRecord.setSnapshot(snapshot);
-            timerJobRecord.setId(uuid);
-            timerJobRecord.setCount(Integer.parseInt(countText.substring(4,countText.indexOf("首"))));
-            timerJobRecord.setJobId(currentJob.getId());
-            timerJobRecord.setEndTime(new Date());
-            timerJobRecordBiz.insert(timerJobRecord);
-            log.info(currentJob.getJobName()+" 执行结束");
-        }catch (IOException e){
-            log.error(e.getMessage());
+        String jsonStr = NeteaseUtil.songRank(currentJob.getTargetUserid());
+        if(jsonStr==null) {
+            log.info(currentJob.getTargetUserid()+" 获取排行数据失败");
+            return;
         }
+        JSONObject jsonObject = JSONObject.parseObject(jsonStr);
+        String code = jsonObject.get("code").toString();
+        if(!"200".equals(code)) {
+            log.info(currentJob.getTargetUserid()+"获取排行数据权限不足");
+            return;
+        }
+        List<SongRankData> songRankDataList = new ArrayList<SongRankData>(100);
+
+        JSONArray array = jsonObject.getJSONArray("weekData");
+        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i<array.size();i++) {
+            String ratio = JSONObject.parseObject(array.get(i).toString()).get("score").toString();
+            Object songObj = JSONObject.parseObject(array.get(i).toString()).get("song");
+            JSONArray ar = JSONObject.parseObject(songObj.toString()).getJSONArray("ar");
+            JSONObject arObj = JSONObject.parseObject(ar.get(0).toString());
+            String singer_name = arObj.get("name").toString();
+            String song_name = JSONObject.parseObject(songObj.toString()).get("name").toString();
+            songRankDataList.add(new SongRankData(
+                    uuid,
+                    i+1,
+                    song_name,
+                    singer_name,
+                    ratio
+            ));
+            sb.append(song_name).append(singer_name).append(i).append(ratio);
+
+        }
+        String snapshot = sb.toString().hashCode()+"";
+        TimerJobRecord oldRecord = timerJobRecordBiz.getLatestRecord(currentJob.getId());
+        timerJobRecord.setNewData(0);
+        //数据变更
+        if(oldRecord==null||!snapshot.equals(oldRecord.getSnapshot())){
+            timerJobRecord.setNewData(1);
+            if (oldRecord != null) {
+                recordDiffData(getOldDataList(oldRecord.getId()),songRankDataList,uuid,currentJob.getTargetUserid());
+                log.info(currentJob.getJobName()+" 数据变更");
+            }else{
+                log.info(currentJob.getJobName()+" 初始数据");
+            }
+            //记录整榜数据
+            songRankDataBiz.insertByBatch(songRankDataList);
+        }
+        timerJobRecord.setSnapshot(snapshot);
+        timerJobRecord.setId(uuid);
+        timerJobRecord.setCount(0);
+        timerJobRecord.setJobId(currentJob.getId());
+        timerJobRecord.setEndTime(new Date());
+        timerJobRecordBiz.insert(timerJobRecord);
+        log.info(currentJob.getJobName()+" 执行结束");
 
     }
 
@@ -136,13 +117,11 @@ public class SongRankTask implements Job {
     private List<SongRankData> getOldDataList(String oldJobRecordId){
         Example example = new Example(SongRankData.class);
         example.createCriteria().andEqualTo("jobRecordId",oldJobRecordId);
-        log.info("上次执行记录id:"+oldJobRecordId);
         List<SongRankData> oldDataList = songRankDataBiz.selectByExample(example);
-        log.info("旧排行数据:"+oldDataList);
         return oldDataList;
     }
 
-    private  void recordDiffData(List<SongRankData> oldDataList, List<SongRankData> newDataList,String jobRecordId ,String targetNickname){
+    private  void recordDiffData(List<SongRankData> oldDataList, List<SongRankData> newDataList,String jobRecordId ,String targrtUserId){
         Map<String,SongRankData> oldMap = new HashMap<String, SongRankData>(oldDataList.size());
         Map<String,SongRankData> newMap = new HashMap<String, SongRankData>(newDataList.size());
         for(SongRankData songRankData : oldDataList){
@@ -158,7 +137,7 @@ public class SongRankTask implements Job {
             if(oldMap.get(entry.getKey())==null){
                 SongRankDataDiff songRankDataDiff = new SongRankDataDiff();
                 songRankDataDiff.setJobRecordId(jobRecordId);
-                songRankDataDiff.setTargetNickname(targetNickname);
+                songRankDataDiff.setTargetUserId(targrtUserId);
                 songRankDataDiff.setRankChange(-1);
                 songRankDataDiff.setSong(entry.getKey());
                 songRankDataDiff.setSinger(entry.getValue().getSinger());
@@ -172,7 +151,7 @@ public class SongRankTask implements Job {
                 if(newRank<oldRank){
                     SongRankDataDiff songRankDataDiff = new SongRankDataDiff();
                     songRankDataDiff.setJobRecordId(jobRecordId);
-                    songRankDataDiff.setTargetNickname(targetNickname);
+                    songRankDataDiff.setTargetUserId(targrtUserId);
                     songRankDataDiff.setRankChange(oldRank-newRank);
                     songRankDataDiff.setSong(entry.getKey());
                     songRankDataDiff.setSinger(entry.getValue().getSinger());
@@ -182,4 +161,5 @@ public class SongRankTask implements Job {
             }
         }
     }
+
 }
