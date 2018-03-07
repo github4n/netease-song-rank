@@ -1,6 +1,5 @@
 package me.olook.netease.song.rank.rest;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -12,6 +11,8 @@ import me.olook.netease.song.rank.dto.SongRankDiffListDTO;
 import me.olook.netease.song.rank.entity.SongRankDataDiff;
 import me.olook.netease.song.rank.entity.UserRefJob;
 import me.olook.netease.song.rank.util.NeteaseUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +35,8 @@ import java.util.List;
 @EnableConfigurationProperties(WxAppProperties.class)
 public class WxServerController {
 
+    private Logger log = LoggerFactory.getLogger(WxServerController.class);
+
     @Autowired
     private RestTemplate restTemplate;
 
@@ -49,16 +52,21 @@ public class WxServerController {
     @ApiOperation(value = "获取用户关联的任务")
     @RequestMapping(value = "getUerJob", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<String> getUerJob(String code) {
-        String params = "?appid=" + wxApp.getAppId() + "&secret=" + wxApp.getAppSecret() + "&js_code=" + code + "&grant_type=" + wxApp.getGrantType();
-        String url = "https://api.weixin.qq.com/sns/jscode2session" + params;
-        String wxJson = restTemplate.getForEntity(url, String.class).getBody();
-        JSONObject jsonObject = JSON.parseObject(wxJson);
-        String openid = jsonObject.get("openid").toString();
-        String sessionKey = jsonObject.get("session_key").toString();
-        System.out.println(openid);
+    public ResponseEntity<String> getUerJob(String openid) {
         List<UserRefJob> jobList = userRefJobBiz.getUserJobByOpenId(openid);
         String json = JSONObject.toJSONString(jobList);
+        return ResponseEntity.status(200).body(json);
+    }
+
+    @ApiOperation(value = "获取用户openid")
+    @RequestMapping(value = "jsCode2Session", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<String> getWxUserInfo(String code) {
+//        JSONObject jsonObject = JSON.parseObject(jsCodeToSession(code));
+//        String openid = jsonObject.get("openid").toString();
+//        String sessionKey = jsonObject.get("session_key").toString();
+//        String unionid = jsonObject.get("unionid").toString();
+        String json = jsCodeToSession(code);
         return ResponseEntity.status(200).body(json);
     }
 
@@ -113,5 +121,14 @@ public class WxServerController {
         }
         String json = JSONObject.toJSONString(songRankDiffDTO);
         return ResponseEntity.status(200).body(json);
+    }
+
+
+    private  String jsCodeToSession(String code){
+        String params = "?appid=" + wxApp.getAppId() + "&secret=" + wxApp.getAppSecret() + "&js_code=" + code + "&grant_type=" + wxApp.getGrantType();
+        String url = "https://api.weixin.qq.com/sns/jscode2session" + params;
+        String wxJson = restTemplate.getForEntity(url, String.class).getBody();
+        log.debug("code :"+code+" to session :"+wxJson);
+        return wxJson;
     }
 }
