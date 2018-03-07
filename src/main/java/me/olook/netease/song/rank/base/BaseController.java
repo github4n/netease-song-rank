@@ -34,7 +34,7 @@ public class BaseController<Biz extends BaseBiz,Entity> {
         int result = baseBiz.insertSelective(entity);
         //唯一键重复
         if(result==-1){
-            return ResponseEntity.status(500).body("唯一键重复");
+            return ResponseEntity.status(500).body("不能重复添加");
         }
         return ResponseEntity.status(200).body("新增成功");
     }
