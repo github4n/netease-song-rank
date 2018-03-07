@@ -8,6 +8,7 @@ import me.olook.netease.song.rank.biz.SongRankDataDiffBiz;
 import me.olook.netease.song.rank.biz.UserRefJobBiz;
 import me.olook.netease.song.rank.config.WxAppProperties;
 import me.olook.netease.song.rank.dto.NeteaseUserDTO;
+import me.olook.netease.song.rank.dto.SongRankDiffListDTO;
 import me.olook.netease.song.rank.entity.SongRankDataDiff;
 import me.olook.netease.song.rank.entity.UserRefJob;
 import me.olook.netease.song.rank.util.NeteaseUtil;
@@ -19,8 +20,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
-import tk.mybatis.mapper.entity.Example;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -90,13 +91,27 @@ public class WxServerController {
     @RequestMapping(value = "getRecord", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<String> getSongRankRecord(String userId) {
-        Example example = new Example(SongRankDataDiff.class);
-        example.createCriteria().andEqualTo("targetUserId",userId);
-        List<SongRankDataDiff> dataDiffs = songRankDataDiffBiz.selectByExample(example);
-        if(dataDiffs.size()>0){
-            String json = JSONObject.toJSONString(dataDiffs);
-            return ResponseEntity.status(200).body(json);
+        SongRankDiffListDTO songRankDiffDTO = new  SongRankDiffListDTO();
+        //查出最近10条记录
+        List<SongRankDataDiff> dataDiffs = songRankDataDiffBiz.getLatestRecordLimit(userId,10);
+        List<SongRankDataDiff> responseList = new ArrayList<>();
+        for(SongRankDataDiff diff : dataDiffs){
+            if(diff.getCount()==1){
+                responseList.add(diff);
+            }
         }
-        return ResponseEntity.status(404).body("no data");
+        if(dataDiffs.size()==0){
+            return ResponseEntity.status(404).body(JSONObject.toJSONString(songRankDiffDTO));
+        }
+        //没有有效数据
+        if(responseList.size()==0){
+            songRankDiffDTO.setIsBatchUpdate(1);
+            songRankDiffDTO.setList(dataDiffs);
+        }else{
+            songRankDiffDTO.setIsBatchUpdate(0);
+            songRankDiffDTO.setList(responseList);
+        }
+        String json = JSONObject.toJSONString(songRankDiffDTO);
+        return ResponseEntity.status(200).body(json);
     }
 }

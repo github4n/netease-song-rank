@@ -76,16 +76,16 @@ public class SongRankTask implements Job {
             Object songObj = JSONObject.parseObject(array.get(i).toString()).get("song");
             JSONArray ar = JSONObject.parseObject(songObj.toString()).getJSONArray("ar");
             JSONObject arObj = JSONObject.parseObject(ar.get(0).toString());
-            String singer_name = arObj.get("name").toString();
-            String song_name = JSONObject.parseObject(songObj.toString()).get("name").toString();
+            String singerName = arObj.get("name").toString();
+            String songName = JSONObject.parseObject(songObj.toString()).get("name").toString();
             songRankDataList.add(new SongRankData(
                     uuid,
                     i+1,
-                    song_name,
-                    singer_name,
+                    songName,
+                    singerName,
                     ratio
             ));
-            sb.append(song_name).append(singer_name).append(i).append(ratio);
+            sb.append(songName).append(singerName).append(i).append(ratio);
 
         }
         String snapshot = sb.toString().hashCode()+"";
@@ -117,11 +117,10 @@ public class SongRankTask implements Job {
     private List<SongRankData> getOldDataList(String oldJobRecordId){
         Example example = new Example(SongRankData.class);
         example.createCriteria().andEqualTo("jobRecordId",oldJobRecordId);
-        List<SongRankData> oldDataList = songRankDataBiz.selectByExample(example);
-        return oldDataList;
+        return songRankDataBiz.selectByExample(example);
     }
 
-    private  void recordDiffData(List<SongRankData> oldDataList, List<SongRankData> newDataList,String jobRecordId ,String targrtUserId){
+    private  void recordDiffData(List<SongRankData> oldDataList, List<SongRankData> newDataList,String jobRecordId ,String targetUserId){
         Map<String,SongRankData> oldMap = new HashMap<String, SongRankData>(oldDataList.size());
         Map<String,SongRankData> newMap = new HashMap<String, SongRankData>(newDataList.size());
         for(SongRankData songRankData : oldDataList){
@@ -137,7 +136,7 @@ public class SongRankTask implements Job {
             if(oldMap.get(entry.getKey())==null){
                 SongRankDataDiff songRankDataDiff = new SongRankDataDiff();
                 songRankDataDiff.setJobRecordId(jobRecordId);
-                songRankDataDiff.setTargetUserId(targrtUserId);
+                songRankDataDiff.setTargetUserId(targetUserId);
                 songRankDataDiff.setRankChange(-1);
                 songRankDataDiff.setSong(entry.getKey());
                 songRankDataDiff.setSinger(entry.getValue().getSinger());
@@ -151,7 +150,7 @@ public class SongRankTask implements Job {
                 if(newRank<oldRank){
                     SongRankDataDiff songRankDataDiff = new SongRankDataDiff();
                     songRankDataDiff.setJobRecordId(jobRecordId);
-                    songRankDataDiff.setTargetUserId(targrtUserId);
+                    songRankDataDiff.setTargetUserId(targetUserId);
                     songRankDataDiff.setRankChange(oldRank-newRank);
                     songRankDataDiff.setSong(entry.getKey());
                     songRankDataDiff.setSinger(entry.getValue().getSinger());

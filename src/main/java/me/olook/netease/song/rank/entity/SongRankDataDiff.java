@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.util.Date;
 
 /**
@@ -42,6 +43,9 @@ public class SongRankDataDiff {
     @ApiModelProperty(value = "目标用户id")
     @Column(name = "target_userid")
     private String targetUserId;
+
+    @Transient
+    private Integer count;
 
     public Integer getId() {
         return id;
@@ -97,5 +101,15 @@ public class SongRankDataDiff {
 
     public void setTargetUserId(String targetUserId) {
         this.targetUserId = targetUserId;
+    }
+
+    @Transient
+    public Integer getCount() {
+        return count;
+    }
+
+    @Transient
+    public void setCount(Integer count) {
+        this.count = count;
     }
 }

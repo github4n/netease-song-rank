@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="me.olook.netease.song.rank.mapper.SongRankDataDiffMapper">
+    <!-- 待优化 -->
+    <sql id="songRankDiffSql">
+        a.id as id,
+        a.job_record_id as job_record_id,
+        a.change_time as change_time,
+        a.rank_change as rank_change,
+        a.song as song,
+        a.singer as singer,
+        a.target_userid as target_userid
+    </sql>
+    <select id="getLatestRecordLimit" resultMap="songRankDataDiffMap">
+        SELECT
+        <include refid="songRankDiffSql"/>
+        ,b.count as `count` from song_rank_data_diff a
+        LEFT JOIN
+        (SELECT change_time,count(change_time) as count from song_rank_data_diff where target_userid =  #{userId}  GROUP BY change_time) b
+        on a.change_time = b.change_time
+        where target_userid =  #{userId} ORDER BY change_time desc limit #{limit}
+    </select>
+    <resultMap id="songRankDataDiffMap" type="me.olook.netease.song.rank.entity.SongRankDataDiff">
+        <id column="id" property="id"/>
+        <result column="job_record_id" property="jobRecordId"/>
+        <result column="change_time" property="changeTime"/>
+        <result column="rank_change" property="rankChange"/>
+        <result column="song" property="song"/>
+        <result column="singer" property="singer"/>
+        <result column="target_userid" property="targetUserId"/>
+        <result column="count" property="count"/>
+    </resultMap>
+</mapper>
