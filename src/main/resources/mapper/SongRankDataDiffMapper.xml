@@ -9,7 +9,8 @@
         a.rank_change as rank_change,
         a.song as song,
         a.singer as singer,
-        a.target_userid as target_userid
+        a.target_userid as target_userid,
+        a.is_batch_update as is_batch_update
     </sql>
     <select id="getLatestRecordLimit" resultMap="songRankDataDiffMap">
         SELECT
@@ -29,5 +30,6 @@
         <result column="singer" property="singer"/>
         <result column="target_userid" property="targetUserId"/>
         <result column="count" property="count"/>
+        <result column="is_batch_update" property="isBatchUpdate"/>
     </resultMap>
 </mapper>
