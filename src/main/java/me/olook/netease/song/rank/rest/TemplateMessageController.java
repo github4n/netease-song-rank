@@ -35,7 +35,7 @@ public class TemplateMessageController
             return ResponseEntity.status(500).body(errorList.get(0).getDefaultMessage());
         }
         templateMessage.setCrtTime(new Date());
-        templateMessage.setPage("page/record/record?userId="+templateMessage.getTargetUserId());
+        templateMessage.setPage("/pages/record/record?userId="+templateMessage.getTargetUserId());
         templateMessage.setTemplateId("AIL1AXTIKfmmifc4uPpCthIiNi-AMgMSxXBvXihnPOg");
         templateMessage.setIsValid(1);
         int result = baseBiz.insertSelective(templateMessage);

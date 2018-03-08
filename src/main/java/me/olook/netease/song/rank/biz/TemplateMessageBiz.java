@@ -16,6 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -86,7 +88,11 @@ public class TemplateMessageBiz extends BaseBiz<TemplateMessageMapper,TemplateMe
         String url = "https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token="+token;
         String paramJson = JSONObject.toJSONString(param);
         log.info("模板消息参数: "+paramJson);
-        HttpEntity<String> formEntity = new HttpEntity<String>(paramJson);
+        HttpHeaders headers = new HttpHeaders();
+        MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
+        headers.setContentType(type);
+        headers.add("Accept", MediaType.APPLICATION_JSON.toString());
+        HttpEntity<String> formEntity = new HttpEntity<String>(paramJson,headers);
         String result = restTemplate.postForObject(url, formEntity, String.class);
         log.info("模板消息响应: "+result);
     }
