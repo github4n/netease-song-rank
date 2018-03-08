@@ -6,40 +6,43 @@ package me.olook.netease.song.rank.dto;
  */
 public class TemplateMsgKeyWord {
 
-    public TemplateMsgKeyWord(String value1, String value2, String value3) {
-        this.keyWord1.setValue(value1);
-        this.keyWord2.setValue(value2);
-        this.keyWord3.setValue(value3);
+    public TemplateMsgKeyWord() {
     }
 
-    private KeyWord keyWord1;
+    public TemplateMsgKeyWord(String value1, String value2, String value3) {
+        this.keyword1 = new KeyWord(value1);
+        this.keyword2 = new KeyWord(value2);
+        this.keyword3 = new KeyWord(value3);
+    }
 
-    private KeyWord keyWord2;
+    private KeyWord keyword1;
 
-    private KeyWord keyWord3;
+    private KeyWord keyword2;
+
+    private KeyWord keyword3;
 
     public KeyWord getKeyWord1() {
-        return keyWord1;
+        return keyword1;
     }
 
-    public void setKeyWord1(KeyWord keyWord1) {
-        this.keyWord1 = keyWord1;
+    public void setKeyWord1(KeyWord keyword1) {
+        this.keyword1 = keyword1;
     }
 
     public KeyWord getKeyWord2() {
-        return keyWord2;
+        return keyword2;
     }
 
-    public void setKeyWord2(KeyWord keyWord2) {
-        this.keyWord2 = keyWord2;
+    public void setKeyWord2(KeyWord keyword2) {
+        this.keyword2 = keyword2;
     }
 
     public KeyWord getKeyWord3() {
-        return keyWord3;
+        return keyword3;
     }
 
-    public void setKeyWord3(KeyWord keyWord3) {
-        this.keyWord3 = keyWord3;
+    public void setKeyWord3(KeyWord keyword3) {
+        this.keyword3 = keyword3;
     }
 }
 

@@ -101,7 +101,7 @@ public class SongRankTask implements Job {
                         List<TemplateMessage> msg = templateMessageBiz.selectByExample(example);
                         templateMessageBiz.pushTemplateMsg(msg,firstDiff);
                     }catch (Exception e){
-                        log.error("推送模板消息时出现异常");
+                        log.error("推送模板消息时出现异常: "+e.getMessage());
                     }
                 }
                 log.info(currentJob.getJobName()+" 数据变更");

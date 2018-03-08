@@ -85,10 +85,10 @@ public class TemplateMessageBiz extends BaseBiz<TemplateMessageMapper,TemplateMe
     private void sendPushRequest(TemplateMsgParam param, String token ){
         String url = "https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token="+token;
         String paramJson = JSONObject.toJSONString(param);
-        log.debug("模板消息参数: "+paramJson);
+        log.info("模板消息参数: "+paramJson);
         HttpEntity<String> formEntity = new HttpEntity<String>(paramJson);
         String result = restTemplate.postForObject(url, formEntity, String.class);
-        log.debug("模板消息响应: "+result);
+        log.info("模板消息响应: "+result);
     }
 
 
@@ -126,7 +126,7 @@ public class TemplateMessageBiz extends BaseBiz<TemplateMessageMapper,TemplateMe
     private String getAccessToken(){
         String url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="+wxApp.getAppId()+"&secret="+wxApp.getAppSecret();
         String wxJson = restTemplate.getForEntity(url, String.class).getBody();
-        log.debug("access-token响应: "+wxJson);
+        log.info("access-token响应: "+wxJson);
         JSONObject jsonObject = JSON.parseObject(wxJson);
         Object accessTokenObj = jsonObject.get("access_token");
         if(accessTokenObj == null){

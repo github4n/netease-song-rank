@@ -8,6 +8,14 @@ public class KeyWord {
      private String value;
      private String color;
 
+    public KeyWord() {
+
+    }
+
+    public KeyWord(String value) {
+        this.value = value;
+    }
+
     public String getValue() {
         return value;
     }
