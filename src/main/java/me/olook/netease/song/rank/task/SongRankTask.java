@@ -95,10 +95,14 @@ public class SongRankTask implements Job {
                 SongRankDataDiff firstDiff = recordDiffData(getOldDataList(oldRecord.getId()),songRankDataList,uuid,currentJob.getTargetUserid());
                 //不是批量更新，判断是否推送模板消息
                 if(firstDiff.getIsBatchUpdate()==0){
-                    Example example = new Example(TemplateMessage.class);
-                    example.createCriteria().andEqualTo("targetUserId",currentJob.getTargetUserid()).andEqualTo("isValid",1);
-                    List<TemplateMessage> msg = templateMessageBiz.selectByExample(example);
-                    templateMessageBiz.pushTemplateMsg(msg,firstDiff);
+                    try{
+                        Example example = new Example(TemplateMessage.class);
+                        example.createCriteria().andEqualTo("targetUserId",currentJob.getTargetUserid()).andEqualTo("isValid",1);
+                        List<TemplateMessage> msg = templateMessageBiz.selectByExample(example);
+                        templateMessageBiz.pushTemplateMsg(msg,firstDiff);
+                    }catch (Exception e){
+                        log.error("推送模板消息时出现异常");
+                    }
                 }
                 log.info(currentJob.getJobName()+" 数据变更");
             }else{

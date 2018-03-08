@@ -30,6 +30,9 @@ public class AccessTokenInfo {
     @Column(name = "is_valid")
     private Integer isValid;
 
+    public AccessTokenInfo() {
+    }
+
     public AccessTokenInfo(String accessToken) {
         this.accessToken = accessToken;
         this.isValid = 1;

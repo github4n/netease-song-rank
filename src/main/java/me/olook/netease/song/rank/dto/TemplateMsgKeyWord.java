@@ -7,9 +7,9 @@ package me.olook.netease.song.rank.dto;
 public class TemplateMsgKeyWord {
 
     public TemplateMsgKeyWord(String value1, String value2, String value3) {
-        this.keyWord1.value = value1;
-        this.keyWord2.value = value2;
-        this.keyWord3.value = value3;
+        this.keyWord1.setValue(value1);
+        this.keyWord2.setValue(value2);
+        this.keyWord3.setValue(value3);
     }
 
     private KeyWord keyWord1;
@@ -43,8 +43,3 @@ public class TemplateMsgKeyWord {
     }
 }
 
-class KeyWord{
-     String value;
-     String color;
-
-}
