@@ -70,7 +70,7 @@ public class TemplateMessageController
         example.createCriteria().andEqualTo("openid",openid)
                 .andEqualTo("isValid",1);
         List<TemplateMessage> templateMessages = baseBiz.selectByExample(example);
-        if(templateMessages.size()>0){
+        if(templateMessages.size()==0){
             return ResponseEntity.status(400).body("");
         }
         String json = JSONObject.toJSONString(templateMessages);
