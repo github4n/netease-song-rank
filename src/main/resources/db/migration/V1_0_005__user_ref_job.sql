@@ -8,7 +8,7 @@ CREATE TABLE `user_ref_job` (
   `target_userid` varchar(20) NOT NULL COMMENT '订阅用户id',
   `target_nickname` varchar(200) NOT NULL COMMENT '订阅用户昵称',
   `target_avatar` varchar(200) NOT NULL COMMENT '订阅用户头像',
-  `openid` varchar(50) DEFAULT NULL,
+  `openid` varchar(50) NOT NULL,
   `unionid` varchar(50) DEFAULT NULL,
   `crt_time` datetime DEFAULT NULL,
   `upd_time` datetime DEFAULT NULL,
