@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -60,6 +61,23 @@ public class UserRefJobController extends BaseController<UserRefJobBiz,UserRefJo
             timerJobBiz.insert(newJob);
             baseQuartzBiz.createJobByGosTimerJob(newJob);
         }
-        return super.add(userRefJob, bindingResult);
+        //已创建目标任务对象 未启动
+        else if(TimerJob.STATUS_STOP.equals(timerJobs.get(0).getStatus())){
+                TimerJob oldTimerJob = timerJobs.get(0);
+                oldTimerJob.setStatus(TimerJob.STATUS_RUN);
+                timerJobBiz.updateSelectiveById(oldTimerJob);
+                baseQuartzBiz.createJobByGosTimerJob(oldTimerJob);
+
+        }
+        if (bindingResult.hasErrors()) {
+            List<FieldError> errorList = bindingResult.getFieldErrors();
+            return ResponseEntity.status(500).body(errorList.get(0).getDefaultMessage());
+        }
+        int result = baseBiz.insertSelective(userRefJob);
+        //唯一键重复
+        if(result==-1){
+            return ResponseEntity.status(500).body("您已经订阅过Ta了~");
+        }
+        return ResponseEntity.status(200).body("新增成功，您是第"+(timerJobs.size()+1)+"位订阅Ta的朋友!");
     }
 }

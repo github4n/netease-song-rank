@@ -129,6 +129,8 @@ public class SongRankTask implements Job {
         for(SongRankData songRankData : newDataList){
             newMap.put(songRankData.getSong(),songRankData);
         }
+        //待插入list
+        List<SongRankDataDiff> addList = new ArrayList<>();
         Iterator<Map.Entry<String, SongRankData>> entries = newMap.entrySet().iterator();
         while (entries.hasNext()) {
             Map.Entry<String, SongRankData> entry = entries.next();
@@ -141,7 +143,7 @@ public class SongRankTask implements Job {
                 songRankDataDiff.setSong(entry.getKey());
                 songRankDataDiff.setSinger(entry.getValue().getSinger());
                 songRankDataDiff.setChangeTime(new Date());
-                songRankDataDiffBiz.insert(songRankDataDiff);
+                addList.add(songRankDataDiff);
             }
             //旧榜存在 排行不同 且新榜大于旧榜排序
             else{
@@ -155,9 +157,18 @@ public class SongRankTask implements Job {
                     songRankDataDiff.setSong(entry.getKey());
                     songRankDataDiff.setSinger(entry.getValue().getSinger());
                     songRankDataDiff.setChangeTime(new Date());
-                    songRankDataDiffBiz.insert(songRankDataDiff);
+                    addList.add(songRankDataDiff);
                 }
             }
+        }
+        Integer isBatchUpdate = 0;
+        //如果同一时间抓到的歌曲变化数大于三，判定为系统自动批量更新数据
+        if(addList.size()>3){
+            isBatchUpdate = 1;
+        }
+        for(SongRankDataDiff rankDataDiff : addList){
+            rankDataDiff.setIsBatchUpdate(isBatchUpdate);
+            songRankDataDiffBiz.insert(rankDataDiff);
         }
     }
 

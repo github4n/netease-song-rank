@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 
@@ -22,6 +23,7 @@ import javax.validation.Valid;
 @Controller
 @RequestMapping("timer")
 @Api(description = "定时任务模块")
+@ApiIgnore
 public class TimerJobController extends BaseController<TimerJobBiz,TimerJob>{
 
     @Autowired
@@ -36,7 +38,7 @@ public class TimerJobController extends BaseController<TimerJobBiz,TimerJob>{
         if(result==-1){
             return ResponseEntity.status(500).body("唯一键重复");
         }
-        if(timerJob.getStatus()==TimerJob.STATUS_RUN){
+        if(TimerJob.STATUS_RUN.equals(timerJob.getStatus())){
             baseQuartzBiz.createJobByGosTimerJob(timerJob);
         }
         return ResponseEntity.status(200).body("新增成功");

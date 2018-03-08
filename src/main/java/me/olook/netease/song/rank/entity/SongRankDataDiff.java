@@ -47,6 +47,10 @@ public class SongRankDataDiff {
     @Transient
     private Integer count;
 
+    @ApiModelProperty(value = "是否系统批量更新")
+    @Column(name = "is_batch_update")
+    private Integer isBatchUpdate;
+
     public Integer getId() {
         return id;
     }
@@ -111,5 +115,13 @@ public class SongRankDataDiff {
     @Transient
     public void setCount(Integer count) {
         this.count = count;
+    }
+
+    public Integer getIsBatchUpdate() {
+        return isBatchUpdate;
+    }
+
+    public void setIsBatchUpdate(Integer isBatchUpdate) {
+        this.isBatchUpdate = isBatchUpdate;
     }
 }
