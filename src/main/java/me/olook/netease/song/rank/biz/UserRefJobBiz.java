@@ -25,4 +25,15 @@ public class UserRefJobBiz extends BaseBiz<UserRefJobMapper,UserRefJob> {
         example.createCriteria().andEqualTo("openId",openid);
         return this.selectByExample(example);
     }
+
+    /**
+     * 通过openid和targetUserId查询单个任务
+     * @param targetUserId
+     * @return
+     */
+    public UserRefJob getUserJobByTargetUserId(String targetUserId){
+        Example example = new Example(UserRefJob.class);
+        example.createCriteria().andEqualTo("targetUserId",targetUserId);
+        return this.selectByExample(example).get(0);
+    }
 }

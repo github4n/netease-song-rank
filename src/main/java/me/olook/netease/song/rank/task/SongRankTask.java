@@ -3,14 +3,8 @@ package me.olook.netease.song.rank.task;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import me.olook.netease.song.rank.annotation.TimerJobTypeName;
-import me.olook.netease.song.rank.biz.SongRankDataBiz;
-import me.olook.netease.song.rank.biz.SongRankDataDiffBiz;
-import me.olook.netease.song.rank.biz.TimerJobBiz;
-import me.olook.netease.song.rank.biz.TimerJobRecordBiz;
-import me.olook.netease.song.rank.entity.SongRankData;
-import me.olook.netease.song.rank.entity.SongRankDataDiff;
-import me.olook.netease.song.rank.entity.TimerJob;
-import me.olook.netease.song.rank.entity.TimerJobRecord;
+import me.olook.netease.song.rank.biz.*;
+import me.olook.netease.song.rank.entity.*;
 import me.olook.netease.song.rank.util.NeteaseUtil;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -43,6 +37,9 @@ public class SongRankTask implements Job {
 
     @Autowired
     private TimerJobRecordBiz timerJobRecordBiz;
+
+    @Autowired
+    private TemplateMessageBiz templateMessageBiz;
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -95,7 +92,14 @@ public class SongRankTask implements Job {
         if(oldRecord==null||!snapshot.equals(oldRecord.getSnapshot())){
             timerJobRecord.setNewData(1);
             if (oldRecord != null) {
-                recordDiffData(getOldDataList(oldRecord.getId()),songRankDataList,uuid,currentJob.getTargetUserid());
+                SongRankDataDiff firstDiff = recordDiffData(getOldDataList(oldRecord.getId()),songRankDataList,uuid,currentJob.getTargetUserid());
+                //不是批量更新，判断是否推送模板消息
+                if(firstDiff.getIsBatchUpdate()==0){
+                    Example example = new Example(TemplateMessage.class);
+                    example.createCriteria().andEqualTo("targetUserId",currentJob.getTargetUserid()).andEqualTo("isValid",1);
+                    List<TemplateMessage> msg = templateMessageBiz.selectByExample(example);
+                    templateMessageBiz.pushTemplateMsg(msg,firstDiff);
+                }
                 log.info(currentJob.getJobName()+" 数据变更");
             }else{
                 log.info(currentJob.getJobName()+" 初始数据");
@@ -120,7 +124,7 @@ public class SongRankTask implements Job {
         return songRankDataBiz.selectByExample(example);
     }
 
-    private  void recordDiffData(List<SongRankData> oldDataList, List<SongRankData> newDataList,String jobRecordId ,String targetUserId){
+    private  SongRankDataDiff recordDiffData(List<SongRankData> oldDataList, List<SongRankData> newDataList,String jobRecordId ,String targetUserId){
         Map<String,SongRankData> oldMap = new HashMap<String, SongRankData>(oldDataList.size());
         Map<String,SongRankData> newMap = new HashMap<String, SongRankData>(newDataList.size());
         for(SongRankData songRankData : oldDataList){
@@ -170,6 +174,9 @@ public class SongRankTask implements Job {
             rankDataDiff.setIsBatchUpdate(isBatchUpdate);
             songRankDataDiffBiz.insert(rankDataDiff);
         }
+        SongRankDataDiff firstData = addList.get(0);
+        firstData.setIsBatchUpdate(isBatchUpdate);
+        return firstData;
     }
 
 }

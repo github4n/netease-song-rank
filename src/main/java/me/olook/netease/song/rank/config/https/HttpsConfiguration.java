@@ -40,7 +40,7 @@ public class HttpsConfiguration {
                     .addWebResourceCollection(new WebResourceCollection()
                             .addUrlPattern("/*")) .setTransportGuaranteeType(TransportGuaranteeType.CONFIDENTIAL)
                     .setEmptyRoleSemantic(SecurityInfo.EmptyRoleSemantic.PERMIT))
-                    .setConfidentialPortManager(exchange -> 8443);
+                    .setConfidentialPortManager(exchange -> 443);
         });
         return undertow;
     }
