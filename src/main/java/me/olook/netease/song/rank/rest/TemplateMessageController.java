@@ -62,7 +62,7 @@ public class TemplateMessageController
         return ResponseEntity.status(200).body("true");
     }
 
-    @ApiOperation(value = "查询是否某用户已订阅的网易云用户")
+    @ApiOperation(value = "查询某用户已订阅的网易云用户")
     @RequestMapping(value = "/getSubscribe",method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<String> getSubscribe(String openid){
@@ -70,9 +70,6 @@ public class TemplateMessageController
         example.createCriteria().andEqualTo("openid",openid)
                 .andEqualTo("isValid",1);
         List<TemplateMessage> templateMessages = baseBiz.selectByExample(example);
-        if(templateMessages.size()==0){
-            return ResponseEntity.status(400).body("");
-        }
         String json = JSONObject.toJSONString(templateMessages);
         return ResponseEntity.status(200).body(json);
     }

@@ -96,9 +96,9 @@ public class WxServerController {
     }
 
     @ApiOperation(value = "获取排行变化数据")
-    @RequestMapping(value = "getRecord", method = RequestMethod.GET)
+    @RequestMapping(value = "getSameTypeRecord", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<String> getSongRankRecord(String userId) {
+    public ResponseEntity<String> getSameTypeRecord(String userId) {
         SongRankDiffListDTO songRankDiffDTO = new  SongRankDiffListDTO();
         //查出最近10条记录
         List<SongRankDataDiff> dataDiffs = songRankDataDiffBiz.getLatestRecordLimit(userId,10);
@@ -123,9 +123,23 @@ public class WxServerController {
         return ResponseEntity.status(200).body(json);
     }
 
+    @ApiOperation(value = "获取排行变化数据")
+    @RequestMapping(value = "getRecord", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<String> getSongRankRecord(String userId) {
+        SongRankDiffListDTO songRankDiffDTO = new  SongRankDiffListDTO();
+        //查出最近10条记录
+        List<SongRankDataDiff> dataDiffs = songRankDataDiffBiz.getLatestRecordLimit(userId,10);
+        songRankDiffDTO.setIsBatchUpdate(-1);
+        songRankDiffDTO.setList(dataDiffs);
+        String json = JSONObject.toJSONString(songRankDiffDTO);
+        return ResponseEntity.status(200).body(json);
+    }
+
 
     private  String jsCodeToSession(String code){
-        String params = "?appid=" + wxApp.getAppId() + "&secret=" + wxApp.getAppSecret() + "&js_code=" + code + "&grant_type=" + wxApp.getGrantType();
+        String params = "?appid=" + wxApp.getAppId() + "&secret=" + wxApp.getAppSecret()
+                + "&js_code=" + code + "&grant_type=" + wxApp.getGrantType();
         String url = "https://api.weixin.qq.com/sns/jscode2session" + params;
         String wxJson = restTemplate.getForEntity(url, String.class).getBody();
         log.debug("code :"+code+" to session :"+wxJson);
