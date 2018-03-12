@@ -46,11 +46,12 @@ public class UserRefJobController extends BaseController<UserRefJobBiz,UserRefJo
     @Override
     public ResponseEntity<String> add(@RequestBody @Valid UserRefJob userRefJob, BindingResult bindingResult) {
 
-        Example userJobExample = new Example(UserRefJob.class);
-        userJobExample.createCriteria().andEqualTo("openId",userRefJob.getOpenId());
-        List<UserRefJob> list = baseBiz.selectByExample(userJobExample);
+        Example openIdExample = new Example(UserRefJob.class);
+        openIdExample.createCriteria().andEqualTo("openId",userRefJob.getOpenId());
+        List<UserRefJob> listByOpenid = baseBiz.selectByExample(openIdExample);
+
         //每个用户当前只能创建2个任务
-        if(list.size()>=DEFAULT_JOB_NUM){
+        if(listByOpenid.size()>=DEFAULT_JOB_NUM){
             return ResponseEntity.status(401).body("您可关注好友数量已达上限!");
         }
         Example example = new Example(TimerJob.class);
@@ -84,11 +85,14 @@ public class UserRefJobController extends BaseController<UserRefJobBiz,UserRefJo
             return ResponseEntity.status(500).body(errorList.get(0).getDefaultMessage());
         }
         int result = baseBiz.insertSelective(userRefJob);
+        Example targetUserIdExample = new Example(UserRefJob.class);
+        targetUserIdExample.createCriteria().andEqualTo("targetUserId",userRefJob.getTargetUserId());
+        List<UserRefJob> listByTargetUserId = baseBiz.selectByExample(targetUserIdExample);
         //唯一键重复
         if(result==-1){
             return ResponseEntity.status(500).body("您已经订阅过Ta了~");
         }
-        return ResponseEntity.status(200).body("新增成功，您是第"+(timerJobs.size()+1)+"位订阅Ta的朋友!");
+        return ResponseEntity.status(200).body("新增成功，您是第"+listByTargetUserId.size()+"位订阅Ta的好友!");
     }
 
     @Override
@@ -96,7 +100,8 @@ public class UserRefJobController extends BaseController<UserRefJobBiz,UserRefJo
     @RequestMapping(value = "/{id}",method = RequestMethod.DELETE)
     @ResponseBody
     public ResponseEntity<String> remove(@PathVariable Object id){
-        UserRefJob userRefJob = baseBiz.selectById(id);
+        int intId  = Integer.parseInt(id.toString());
+        UserRefJob userRefJob = baseBiz.selectById(intId);
         //查找是否用其他用户也在关注此人
         Example example = new Example(UserRefJob.class);
         example.createCriteria().andEqualTo("targetUserId",userRefJob.getTargetUserId());
@@ -113,9 +118,8 @@ public class UserRefJobController extends BaseController<UserRefJobBiz,UserRefJo
                 baseQuartzBiz.deleteScheduleJob(job.getJobName(),job.getJobGroup());
             }
         }
-        int intId  = Integer.parseInt(id.toString());
         int num = baseBiz.deleteById(intId);
-        if(num>0){
+        if(num==0){
             return ResponseEntity.status(500).body("删除失败");
         }else{
             return ResponseEntity.status(200).body("删除成功");

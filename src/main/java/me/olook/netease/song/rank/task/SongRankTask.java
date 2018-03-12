@@ -54,13 +54,13 @@ public class SongRankTask implements Job {
 
         String jsonStr = NeteaseUtil.songRank(currentJob.getTargetUserid());
         if(jsonStr==null) {
-            log.info(currentJob.getTargetUserid()+" 获取排行数据失败");
+            log.error(currentJob.getTargetUserid()+" 获取排行数据失败");
             return;
         }
         JSONObject jsonObject = JSONObject.parseObject(jsonStr);
         String code = jsonObject.get("code").toString();
         if(!"200".equals(code)) {
-            log.info(currentJob.getTargetUserid()+"获取排行数据权限不足");
+            log.error(currentJob.getTargetUserid()+"获取排行数据权限不足");
             return;
         }
         List<SongRankData> songRankDataList = new ArrayList<SongRankData>(100);

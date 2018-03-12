@@ -71,7 +71,7 @@ public class BaseController<Biz extends BaseBiz,Entity> {
     public ResponseEntity<String> remove(@PathVariable Object id){
         int intId  = Integer.parseInt(id.toString());
         int num = baseBiz.deleteById(intId);
-        if(num>0){
+        if(num==0){
             return ResponseEntity.status(500).body("删除数目为0");
         }else{
             return ResponseEntity.status(200).body("删除成功");
