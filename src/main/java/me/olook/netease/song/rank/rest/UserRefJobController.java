@@ -13,10 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.validation.Valid;
@@ -32,6 +29,11 @@ import java.util.List;
 @Api(description = "用户任务模块")
 public class UserRefJobController extends BaseController<UserRefJobBiz,UserRefJob> {
 
+    /**
+     * 每个用户默认可创建任务数量
+     */
+    private final static Integer DEFAULT_JOB_NUM = 2;
+
     @Autowired
     private TimerJobBiz timerJobBiz;
 
@@ -43,6 +45,14 @@ public class UserRefJobController extends BaseController<UserRefJobBiz,UserRefJo
     @ResponseBody
     @Override
     public ResponseEntity<String> add(@RequestBody @Valid UserRefJob userRefJob, BindingResult bindingResult) {
+
+        Example userJobExample = new Example(UserRefJob.class);
+        userJobExample.createCriteria().andEqualTo("openId",userRefJob.getOpenId());
+        List<UserRefJob> list = baseBiz.selectByExample(userJobExample);
+        //每个用户当前只能创建2个任务
+        if(list.size()>=DEFAULT_JOB_NUM){
+            return ResponseEntity.status(401).body("您可关注好友数量已达上限!");
+        }
         Example example = new Example(TimerJob.class);
         example.createCriteria().andEqualTo("targetUserid",userRefJob.getTargetUserId());
         List<TimerJob> timerJobs = timerJobBiz.selectByExample(example);
@@ -79,5 +89,36 @@ public class UserRefJobController extends BaseController<UserRefJobBiz,UserRefJo
             return ResponseEntity.status(500).body("您已经订阅过Ta了~");
         }
         return ResponseEntity.status(200).body("新增成功，您是第"+(timerJobs.size()+1)+"位订阅Ta的朋友!");
+    }
+
+    @Override
+    @ApiOperation(value = "通过id删除")
+    @RequestMapping(value = "/{id}",method = RequestMethod.DELETE)
+    @ResponseBody
+    public ResponseEntity<String> remove(@PathVariable Object id){
+        UserRefJob userRefJob = baseBiz.selectById(id);
+        //查找是否用其他用户也在关注此人
+        Example example = new Example(UserRefJob.class);
+        example.createCriteria().andEqualTo("targetUserId",userRefJob.getTargetUserId());
+        List<UserRefJob> list = baseBiz.selectByExample(example);
+        //只有待删除的这一条记录 删除job
+        if(list.size()==1){
+            Example jobExample = new Example(TimerJob.class);
+            jobExample.createCriteria().andEqualTo("targetUserid",userRefJob.getTargetUserId());
+            List<TimerJob> jobs = timerJobBiz.selectByExample(jobExample);
+            if(jobs.size()>0){
+                TimerJob job = jobs.get(0);
+                job.setStatus(TimerJob.STATUS_STOP);
+                timerJobBiz.updateSelectiveById(job);
+                baseQuartzBiz.deleteScheduleJob(job.getJobName(),job.getJobGroup());
+            }
+        }
+        int intId  = Integer.parseInt(id.toString());
+        int num = baseBiz.deleteById(intId);
+        if(num>0){
+            return ResponseEntity.status(500).body("删除失败");
+        }else{
+            return ResponseEntity.status(200).body("删除成功");
+        }
     }
 }

@@ -52,6 +52,7 @@ public class BaseQuartzBiz {
             if (!scheduler.isStarted()) {
                 scheduler.start();
             }
+            log.info("创建TimerJob: "+jobName+"_"+jobGroup);
         } catch (SchedulerException e) {
             e.printStackTrace();
         }
@@ -78,6 +79,7 @@ public class BaseQuartzBiz {
             scheduler.pauseTrigger(getTriggerKey(jobName, jobGroup));
             scheduler.unscheduleJob(getTriggerKey(jobName, jobGroup));
             scheduler.deleteJob(getJobKey(jobName, jobGroup));
+            log.info("删除TimerJob: "+jobName+"_"+jobGroup);
         } catch (SchedulerException e) {
             e.printStackTrace();
         }
@@ -140,7 +142,7 @@ public class BaseQuartzBiz {
         if(taskClazz!=null){
             createScheduleJob(timerJob.getJobName(),timerJob.getJobGroup(),
                     timerJob.getCronExpression(), taskClazz);
-            log.info("创建定时任务:"+timerJob.getJobName()+" 成功");
+            log.info("创建TimerJob: "+timerJob.getJobName()+"_"+timerJob.getJobGroup());
             return true;
         }else{
             log.error("任务名:"+timerJob.getJobName()+" 未找到注解TimerJobType为:"+jobType+" 的Job Class，任务创建失败");
