@@ -8,7 +8,7 @@ CREATE TABLE `template_msg_record` (
   `target_user_id` varchar(20) NOT NULL COMMENT '订阅用户id',
   `form_id` varchar(200) NOT NULL COMMENT '表单id',
   `template_id` varchar(100) NOT NULL COMMENT '模板id',
-  `page` varchar(50) DEFAULT NULL,
+  `page` varchar(255) DEFAULT NULL,
   `crt_time` datetime DEFAULT NULL,
   `is_valid` int(1) DEFAULT 1,
   PRIMARY KEY (`id`)
