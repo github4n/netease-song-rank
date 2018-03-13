@@ -91,7 +91,7 @@ public class UserRefJobController extends BaseController<UserRefJobBiz,UserRefJo
                 baseQuartzBiz.createJobByGosTimerJob(oldTimerJob);
 
         }
-
+        userRefJob.setCrtTime(new Date());
         int result = baseBiz.insertSelective(userRefJob);
         //当前目标用户存在的任务数
         Example targetUserIdExample = new Example(UserRefJob.class);
@@ -130,6 +130,7 @@ public class UserRefJobController extends BaseController<UserRefJobBiz,UserRefJo
         }
         //逻辑删
         userRefJob.setDelFlag(1);
+        userRefJob.setUpdTime(new Date());
         int num = baseBiz.updateSelectiveById(userRefJob);
         if(num==0){
             return ResponseEntity.status(500).body("删除失败");
