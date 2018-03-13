@@ -22,7 +22,7 @@ public class UserRefJobBiz extends BaseBiz<UserRefJobMapper,UserRefJob> {
      */
     public List<UserRefJob> getUserJobByOpenId(String openid){
         Example example = new Example(UserRefJob.class);
-        example.createCriteria().andEqualTo("openId",openid);
+        example.createCriteria().andEqualTo("openId",openid).andEqualTo("delFlag",0);
         return this.selectByExample(example);
     }
 
@@ -33,7 +33,7 @@ public class UserRefJobBiz extends BaseBiz<UserRefJobMapper,UserRefJob> {
      */
     public UserRefJob getUserJobByTargetUserId(String targetUserId){
         Example example = new Example(UserRefJob.class);
-        example.createCriteria().andEqualTo("targetUserId",targetUserId);
+        example.createCriteria().andEqualTo("targetUserId",targetUserId).andEqualTo("delFlag",0);
         return this.selectByExample(example).get(0);
     }
 }

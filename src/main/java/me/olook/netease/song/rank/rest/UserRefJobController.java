@@ -32,7 +32,7 @@ public class UserRefJobController extends BaseController<UserRefJobBiz,UserRefJo
     /**
      * 每个用户默认可创建任务数量
      */
-    private final static Integer DEFAULT_JOB_NUM = 2;
+    private final static Integer DEFAULT_JOB_NUM = 3;
 
     @Autowired
     private TimerJobBiz timerJobBiz;
@@ -46,13 +46,24 @@ public class UserRefJobController extends BaseController<UserRefJobBiz,UserRefJo
     @Override
     public ResponseEntity<String> add(@RequestBody @Valid UserRefJob userRefJob, BindingResult bindingResult) {
 
+        if (bindingResult.hasErrors()) {
+            List<FieldError> errorList = bindingResult.getFieldErrors();
+            return ResponseEntity.status(500).body(errorList.get(0).getDefaultMessage());
+        }
+        //该用户已添加的任务
         Example openIdExample = new Example(UserRefJob.class);
-        openIdExample.createCriteria().andEqualTo("openId",userRefJob.getOpenId());
+        openIdExample.createCriteria().andEqualTo("openId",userRefJob.getOpenId()).andEqualTo("delFlag",0);
         List<UserRefJob> listByOpenid = baseBiz.selectByExample(openIdExample);
 
-        //每个用户当前只能创建2个任务
+        //每个用户当前只能创建3个任务
         if(listByOpenid.size()>=DEFAULT_JOB_NUM){
             return ResponseEntity.status(401).body("您可关注好友数量已达上限!");
+        }
+
+        for(UserRefJob existJob : listByOpenid){
+            if(existJob.getTargetUserId().equals(userRefJob.getOpenId())){
+                return ResponseEntity.status(401).body("您已经订阅过Ta了~");
+            }
         }
         Example example = new Example(TimerJob.class);
         example.createCriteria().andEqualTo("targetUserid",userRefJob.getTargetUserId());
@@ -80,23 +91,20 @@ public class UserRefJobController extends BaseController<UserRefJobBiz,UserRefJo
                 baseQuartzBiz.createJobByGosTimerJob(oldTimerJob);
 
         }
-        if (bindingResult.hasErrors()) {
-            List<FieldError> errorList = bindingResult.getFieldErrors();
-            return ResponseEntity.status(500).body(errorList.get(0).getDefaultMessage());
-        }
+
         int result = baseBiz.insertSelective(userRefJob);
+        //当前目标用户存在的任务数
         Example targetUserIdExample = new Example(UserRefJob.class);
-        targetUserIdExample.createCriteria().andEqualTo("targetUserId",userRefJob.getTargetUserId());
+        targetUserIdExample.createCriteria()
+                .andEqualTo("targetUserId",userRefJob.getTargetUserId())
+                .andEqualTo("delFlag",0);
         List<UserRefJob> listByTargetUserId = baseBiz.selectByExample(targetUserIdExample);
-        //唯一键重复
-        if(result==-1){
-            return ResponseEntity.status(500).body("您已经订阅过Ta了~");
-        }
+
         return ResponseEntity.status(200).body("新增成功，您是第"+listByTargetUserId.size()+"位订阅Ta的好友!");
     }
 
     @Override
-    @ApiOperation(value = "通过id删除")
+    @ApiOperation(value = "取消关注用户")
     @RequestMapping(value = "/{id}",method = RequestMethod.DELETE)
     @ResponseBody
     public ResponseEntity<String> remove(@PathVariable Object id){
@@ -104,7 +112,9 @@ public class UserRefJobController extends BaseController<UserRefJobBiz,UserRefJo
         UserRefJob userRefJob = baseBiz.selectById(intId);
         //查找是否用其他用户也在关注此人
         Example example = new Example(UserRefJob.class);
-        example.createCriteria().andEqualTo("targetUserId",userRefJob.getTargetUserId());
+        example.createCriteria()
+                .andEqualTo("targetUserId",userRefJob.getTargetUserId())
+                .andEqualTo("delFlag",0);;
         List<UserRefJob> list = baseBiz.selectByExample(example);
         //只有待删除的这一条记录 删除job
         if(list.size()==1){
@@ -118,7 +128,9 @@ public class UserRefJobController extends BaseController<UserRefJobBiz,UserRefJo
                 baseQuartzBiz.deleteScheduleJob(job.getJobName(),job.getJobGroup());
             }
         }
-        int num = baseBiz.deleteById(intId);
+        //逻辑删
+        userRefJob.setDelFlag(1);
+        int num = baseBiz.updateSelectiveById(userRefJob);
         if(num==0){
             return ResponseEntity.status(500).body("删除失败");
         }else{

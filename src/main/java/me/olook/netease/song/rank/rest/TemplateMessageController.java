@@ -5,7 +5,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import me.olook.netease.song.rank.base.BaseController;
 import me.olook.netease.song.rank.biz.TemplateMessageBiz;
+import me.olook.netease.song.rank.biz.UserRefJobBiz;
 import me.olook.netease.song.rank.entity.TemplateMessage;
+import me.olook.netease.song.rank.entity.UserRefJob;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -29,6 +32,12 @@ import java.util.List;
 @Api(description = "模板消息模块")
 public class TemplateMessageController
         extends BaseController<TemplateMessageBiz,TemplateMessage>{
+
+    @Autowired
+    private UserRefJobBiz userRefJobBiz;
+
+    private final static String TEMPLATE_ID = "AIL1AXTIKfmmifc4uPpCthIiNi-AMgMSxXBvXihnPOg";
+
     @Override
     public ResponseEntity<String> add(@RequestBody @Valid TemplateMessage templateMessage, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -36,8 +45,10 @@ public class TemplateMessageController
             return ResponseEntity.status(500).body(errorList.get(0).getDefaultMessage());
         }
         templateMessage.setCrtTime(new Date());
-        templateMessage.setPage("/pages/record/record?userId="+templateMessage.getTargetUserId());
-        templateMessage.setTemplateId("AIL1AXTIKfmmifc4uPpCthIiNi-AMgMSxXBvXihnPOg");
+        UserRefJob userRefJob = userRefJobBiz.getUserJobByTargetUserId(templateMessage.getTargetUserId());
+        templateMessage.setPage("/pages/record/record?userId="+templateMessage.getTargetUserId()
+                +"&tusername="+userRefJob.getTargetNickname());
+        templateMessage.setTemplateId(TEMPLATE_ID);
         templateMessage.setIsValid(1);
         int result = baseBiz.insertSelective(templateMessage);
         //唯一键重复

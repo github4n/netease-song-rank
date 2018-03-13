@@ -44,6 +44,10 @@ public class UserRefJob {
     @Column(name = "upd_time")
     private Date updTime;
 
+    @ApiModelProperty(hidden = true)
+    @Column(name = "del_flag")
+    private Integer delFlag;
+
     public Integer getId() {
         return id;
     }
@@ -114,5 +118,13 @@ public class UserRefJob {
 
     public void setTargetAvatar(String targetAvatar) {
         this.targetAvatar = targetAvatar;
+    }
+
+    public Integer getDelFlag() {
+        return delFlag;
+    }
+
+    public void setDelFlag(Integer delFlag) {
+        this.delFlag = delFlag;
     }
 }

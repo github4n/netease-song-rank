@@ -12,6 +12,6 @@ CREATE TABLE `user_ref_job` (
   `unionid` varchar(50) DEFAULT NULL,
   `crt_time` datetime DEFAULT NULL,
   `upd_time` datetime DEFAULT NULL,
-  UNIQUE KEY `target_userid_openid` (`target_userid`,`openid`),
+  `del_flag` int(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT = '用户任务关联表';
