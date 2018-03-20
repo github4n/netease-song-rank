@@ -94,7 +94,7 @@ public class SongRankTask implements Job {
             if (oldRecord != null) {
                 SongRankDataDiff firstDiff = recordDiffData(getOldDataList(oldRecord.getId()),songRankDataList,uuid,currentJob.getTargetUserid());
                 //不是批量更新，判断是否推送模板消息
-                if(firstDiff.getIsBatchUpdate()==0){
+                if(firstDiff!=null&&firstDiff.getIsBatchUpdate()==0){
                     try{
                         Example example = new Example(TemplateMessage.class);
                         example.createCriteria().andEqualTo("targetUserId",currentJob.getTargetUserid()).andEqualTo("isValid",1);
@@ -109,7 +109,12 @@ public class SongRankTask implements Job {
                 log.info(currentJob.getJobName()+" 初始数据");
             }
             //记录整榜数据
-            songRankDataBiz.insertByBatch(songRankDataList);
+            if(songRankDataList.size()>0){
+                songRankDataBiz.insertByBatch(songRankDataList);
+            }else{
+                log.warn(currentJob.getJobName()+" 获取 songRankDataList size 为 0");
+                timerJobRecord.setNewData(0);
+            }
         }
         timerJobRecord.setSnapshot(snapshot);
         timerJobRecord.setId(uuid);
@@ -173,6 +178,12 @@ public class SongRankTask implements Job {
         //如果同一时间抓到的歌曲变化数大于三，判定为系统自动批量更新数据
         if(addList.size()>3){
             isBatchUpdate = 1;
+        }
+        if(addList.size()==0){
+                log.warn("快照不同，但未找出变动歌曲!");
+                log.warn(JSONObject.toJSONString(oldDataList));
+                log.warn(JSONObject.toJSONString(newDataList));
+                return null;
         }
         for(SongRankDataDiff rankDataDiff : addList){
             rankDataDiff.setIsBatchUpdate(isBatchUpdate);
