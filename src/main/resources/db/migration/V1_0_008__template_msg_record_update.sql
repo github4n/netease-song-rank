@@ -1,0 +1,1 @@
+alter table template_msg_record  modify column `page` varchar(255);

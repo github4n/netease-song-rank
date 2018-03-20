@@ -46,7 +46,7 @@ public class TemplateMessageController
         }
         templateMessage.setCrtTime(new Date());
         UserRefJob userRefJob = userRefJobBiz.getUserJobByTargetUserId(templateMessage.getTargetUserId());
-        templateMessage.setPage("/pages/record/record?userId="+templateMessage.getTargetUserId()
+        templateMessage.setPage("pages/record/record?userId="+templateMessage.getTargetUserId()
                 +"&tusername="+userRefJob.getTargetNickname());
         templateMessage.setTemplateId(TEMPLATE_ID);
         templateMessage.setIsValid(1);

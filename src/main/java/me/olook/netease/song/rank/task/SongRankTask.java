@@ -67,6 +67,19 @@ public class SongRankTask implements Job {
 
         JSONArray array = jsonObject.getJSONArray("weekData");
         String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+        //暂无最近一周听歌数据
+        if(array.size()==0){
+            timerJobRecord.setSnapshot("-1");
+            timerJobRecord.setNewData(0);
+            timerJobRecord.setId(uuid);
+            timerJobRecord.setCount(0);
+            timerJobRecord.setJobId(currentJob.getId());
+            timerJobRecord.setEndTime(new Date());
+            timerJobRecordBiz.insert(timerJobRecord);
+            log.info(currentJob.getJobName()+" 执行结束,无周榜数据");
+            return;
+        }
+
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i<array.size();i++) {
             String ratio = JSONObject.parseObject(array.get(i).toString()).get("score").toString();
@@ -116,6 +129,7 @@ public class SongRankTask implements Job {
                 timerJobRecord.setNewData(0);
             }
         }
+
         timerJobRecord.setSnapshot(snapshot);
         timerJobRecord.setId(uuid);
         timerJobRecord.setCount(0);
