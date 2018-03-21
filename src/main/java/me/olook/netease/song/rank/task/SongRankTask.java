@@ -169,7 +169,7 @@ public class SongRankTask implements Job {
                 songRankDataDiff.setRankChange(-1);
                 songRankDataDiff.setSong(entry.getKey());
                 songRankDataDiff.setSinger(entry.getValue().getSinger());
-                songRankDataDiff.setChangeTime(new Date());
+                //songRankDataDiff.setChangeTime(new Date());
                 addList.add(songRankDataDiff);
             }
             //旧榜存在 排行不同 且新榜大于旧榜排序
@@ -183,16 +183,25 @@ public class SongRankTask implements Job {
                     songRankDataDiff.setRankChange(oldRank-newRank);
                     songRankDataDiff.setSong(entry.getKey());
                     songRankDataDiff.setSinger(entry.getValue().getSinger());
-                    songRankDataDiff.setChangeTime(new Date());
+                    //songRankDataDiff.setChangeTime(new Date());
                     addList.add(songRankDataDiff);
                 }
             }
         }
         Integer isBatchUpdate = 0;
-        //如果同一时间抓到的歌曲变化数大于三，判定为系统自动批量更新数据
-        if(addList.size()>3){
+//        //如果同一时间抓到的歌曲变化数大于三，判定为系统自动批量更新数据
+//        if(addList.size()>3){
+//            isBatchUpdate = 1;
+//        }
+        //如果时间为3~5点，判定为系统更新数据
+        Calendar c = Calendar.getInstance();
+        int hour = c.get(Calendar.HOUR_OF_DAY);
+        if(3==hour||4==hour||5==hour){
+            //日期减一天
+            c.add(Calendar.DAY_OF_MONTH,-1);
             isBatchUpdate = 1;
         }
+
         if(addList.size()==0){
                 log.warn("快照不同，但未找出变动歌曲!");
                 log.warn(JSONObject.toJSONString(oldDataList));
@@ -201,6 +210,7 @@ public class SongRankTask implements Job {
         }
         for(SongRankDataDiff rankDataDiff : addList){
             rankDataDiff.setIsBatchUpdate(isBatchUpdate);
+            rankDataDiff.setChangeTime(c.getTime());
             songRankDataDiffBiz.insert(rankDataDiff);
         }
         SongRankDataDiff firstData = addList.get(0);
