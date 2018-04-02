@@ -1,5 +1,6 @@
 package me.olook.netease.song.rank;
 
+import me.olook.netease.song.rank.util.ProxyUtil;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.ServletComponentScan;
@@ -18,5 +19,6 @@ public class TimerServerBootstrap {
 
     public static void main(String[] args) {
         new SpringApplicationBuilder(TimerServerBootstrap.class).web(true).run(args);
+        ProxyUtil.init();
         }
 }

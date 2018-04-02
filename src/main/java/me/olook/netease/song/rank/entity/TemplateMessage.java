@@ -38,6 +38,9 @@ public class TemplateMessage {
     @Column(name = "crt_time")
     private Date crtTime;
 
+    @Column(name = "upd_time")
+    private Date updTime;
+
     @Column(name = "is_valid")
     private Integer isValid;
 
@@ -93,6 +96,14 @@ public class TemplateMessage {
         return crtTime;
     }
 
+    public Date getUpdTime() {
+        return updTime;
+    }
+
+    public void setUpdTime(Date updTime) {
+        this.updTime = updTime;
+    }
+
     public void setCrtTime(Date crtTime) {
         this.crtTime = crtTime;
     }
@@ -104,4 +115,6 @@ public class TemplateMessage {
     public void setIsValid(Integer isValid) {
         this.isValid = isValid;
     }
+
+
 }

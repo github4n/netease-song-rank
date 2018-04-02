@@ -9,4 +9,7 @@
          (null,#{item.jobRecordId}, #{item.rank},#{item.song},#{item.singer},#{item.ratio})
       </foreach>
    </insert>
+   <delete id="deleteByRecordId">
+      DELETE  from song_rank_data where job_record_id = #{recordId}
+   </delete>
 </mapper>

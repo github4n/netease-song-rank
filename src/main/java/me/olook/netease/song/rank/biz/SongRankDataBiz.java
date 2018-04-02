@@ -17,4 +17,8 @@ public class SongRankDataBiz extends BaseBiz<SongRankDataMapper,SongRankData>{
     public int insertByBatch(List<SongRankData> songRankDataList){
         return mapper.insertByBatch(songRankDataList);
     }
+
+    public int deleteByRecordId(String recordId){
+        return mapper.deleteByRecordId(recordId);
+    }
 }

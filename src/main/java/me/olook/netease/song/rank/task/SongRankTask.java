@@ -6,6 +6,7 @@ import me.olook.netease.song.rank.annotation.TimerJobTypeName;
 import me.olook.netease.song.rank.biz.*;
 import me.olook.netease.song.rank.entity.*;
 import me.olook.netease.song.rank.util.NeteaseUtil;
+import me.olook.netease.song.rank.util.ProxyUtil;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -61,8 +62,16 @@ public class SongRankTask implements Job {
         String code = jsonObject.get("code").toString();
         if(!"200".equals(code)) {
             log.error(currentJob.getTargetUserid()+"获取排行数据权限不足");
+            log.error(jsonStr);
+
+            if("-460".equals(code)) {
+                log.error("反爬虫执行，切换代理");
+                log.error(jsonStr);
+                ProxyUtil.init();
+            }
             return;
         }
+
         List<SongRankData> songRankDataList = new ArrayList<SongRankData>(100);
 
         JSONArray array = jsonObject.getJSONArray("weekData");
@@ -124,6 +133,10 @@ public class SongRankTask implements Job {
             //记录整榜数据
             if(songRankDataList.size()>0){
                 songRankDataBiz.insertByBatch(songRankDataList);
+                //插入当前整榜后，删除旧数据
+                if(oldRecord!=null){
+                    songRankDataBiz.deleteByRecordId(oldRecord.getId());
+                }
             }else{
                 log.warn(currentJob.getJobName()+" 获取 songRankDataList size 为 0");
                 timerJobRecord.setNewData(0);
@@ -136,7 +149,7 @@ public class SongRankTask implements Job {
         timerJobRecord.setJobId(currentJob.getId());
         timerJobRecord.setEndTime(new Date());
         timerJobRecordBiz.insert(timerJobRecord);
-        log.info(currentJob.getJobName()+" 执行结束");
+        //log.info(currentJob.getJobName()+" 执行结束");
 
     }
 

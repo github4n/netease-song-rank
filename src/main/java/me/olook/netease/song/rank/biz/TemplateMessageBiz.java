@@ -74,6 +74,7 @@ public class TemplateMessageBiz extends BaseBiz<TemplateMessageMapper,TemplateMe
             param.setData(keyWord);
             sendPushRequest(param, validToken);
             msg.setIsValid(0);
+            msg.setUpdTime(new Date());
             mapper.updateByPrimaryKeySelective(msg);
         }
 

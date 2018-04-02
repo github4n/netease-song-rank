@@ -16,4 +16,11 @@ public interface SongRankDataMapper extends Mapper<SongRankData> {
      * @return
      */
     int insertByBatch(List<SongRankData> songRankDataList);
+
+    /**
+     * 通过记录id删除数据
+     * @param recordId
+     * @return
+     */
+    int deleteByRecordId(String recordId);
 }

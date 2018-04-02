@@ -6,8 +6,10 @@ import me.olook.netease.song.rank.base.BaseController;
 import me.olook.netease.song.rank.biz.BaseQuartzBiz;
 import me.olook.netease.song.rank.biz.TimerJobBiz;
 import me.olook.netease.song.rank.biz.UserRefJobBiz;
+import me.olook.netease.song.rank.biz.WxUserBiz;
 import me.olook.netease.song.rank.entity.TimerJob;
 import me.olook.netease.song.rank.entity.UserRefJob;
+import me.olook.netease.song.rank.entity.WxUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -40,6 +42,9 @@ public class UserRefJobController extends BaseController<UserRefJobBiz,UserRefJo
     @Autowired
     private BaseQuartzBiz baseQuartzBiz;
 
+    @Autowired
+    private WxUserBiz wxUserBiz;
+
     @ApiOperation(value = "新增")
     @RequestMapping(value = "",method = RequestMethod.POST)
     @ResponseBody
@@ -50,49 +55,57 @@ public class UserRefJobController extends BaseController<UserRefJobBiz,UserRefJo
             List<FieldError> errorList = bindingResult.getFieldErrors();
             return ResponseEntity.status(500).body(errorList.get(0).getDefaultMessage());
         }
-        //该用户已添加的任务
-        Example openIdExample = new Example(UserRefJob.class);
-        openIdExample.createCriteria().andEqualTo("openId",userRefJob.getOpenId()).andEqualTo("delFlag",0);
-        List<UserRefJob> listByOpenid = baseBiz.selectByExample(openIdExample);
-
-        //每个用户当前只能创建3个任务
-        if(listByOpenid.size()>=DEFAULT_JOB_NUM){
-            return ResponseEntity.status(401).body("您可关注好友数量已达上限!");
-        }
-
-        for(UserRefJob existJob : listByOpenid){
-            if(existJob.getTargetUserId().equals(userRefJob.getOpenId())){
-                return ResponseEntity.status(401).body("您已经订阅过Ta了~");
+        synchronized (this){
+            //该用户已添加的任务
+            Example openIdExample = new Example(UserRefJob.class);
+            openIdExample.createCriteria().andEqualTo("openId",userRefJob.getOpenId()).andEqualTo("delFlag",0);
+            List<UserRefJob> listByOpenid = baseBiz.selectByExample(openIdExample);
+            int jobLimit = DEFAULT_JOB_NUM;
+            Example wxUserExm = new Example(WxUser.class);
+            wxUserExm.createCriteria().andEqualTo("openId",userRefJob.getOpenId());
+            List<WxUser> users = wxUserBiz.selectByExample(wxUserExm);
+            if(users.size()>0){
+                jobLimit = users.get(0).getLimit();
             }
-        }
-        Example example = new Example(TimerJob.class);
-        example.createCriteria().andEqualTo("targetUserid",userRefJob.getTargetUserId());
-        List<TimerJob> timerJobs = timerJobBiz.selectByExample(example);
-        //未创建该目标对象的任务
-        if(timerJobs.size()==0){
-            TimerJob newJob = new TimerJob();
-            newJob.setCronExpression("0 */1 * * * ?");
-            newJob.setJobName(userRefJob.getTargetUserId());
-            newJob.setJobGroup("group1");
-            newJob.setStatus(1);
-            newJob.setJobType("听歌排行爬取任务");
-            newJob.setTargetUserid(userRefJob.getTargetUserId());
-            newJob.setTargetNickname(userRefJob.getTargetNickname());
-            newJob.setCrtUser(userRefJob.getOpenId());
-            newJob.setCrtTime(new Date());
-            timerJobBiz.insert(newJob);
-            baseQuartzBiz.createJobByGosTimerJob(newJob);
-        }
-        //已创建目标任务对象 未启动
-        else if(TimerJob.STATUS_STOP.equals(timerJobs.get(0).getStatus())){
-                TimerJob oldTimerJob = timerJobs.get(0);
-                oldTimerJob.setStatus(TimerJob.STATUS_RUN);
-                timerJobBiz.updateSelectiveById(oldTimerJob);
-                baseQuartzBiz.createJobByGosTimerJob(oldTimerJob);
+            //每个用户当前只能创建3个任务
+            if(listByOpenid.size()>=jobLimit){
+                return ResponseEntity.status(401).body("您可关注好友数量已达上限!");
+            }
 
+            for(UserRefJob existJob : listByOpenid){
+                if(existJob.getTargetUserId().equals(userRefJob.getOpenId())){
+                    return ResponseEntity.status(401).body("您已经订阅过Ta了~");
+                }
+            }
+            Example example = new Example(TimerJob.class);
+            example.createCriteria().andEqualTo("targetUserid",userRefJob.getTargetUserId());
+            List<TimerJob> timerJobs = timerJobBiz.selectByExample(example);
+            //未创建该目标对象的任务
+            if(timerJobs.size()==0){
+                TimerJob newJob = new TimerJob();
+                newJob.setCronExpression("0 */1 * * * ?");
+                newJob.setJobName(userRefJob.getTargetUserId());
+                newJob.setJobGroup("group1");
+                newJob.setStatus(1);
+                newJob.setJobType("听歌排行爬取任务");
+                newJob.setTargetUserid(userRefJob.getTargetUserId());
+                newJob.setTargetNickname(userRefJob.getTargetNickname());
+                newJob.setCrtUser(userRefJob.getOpenId());
+                newJob.setCrtTime(new Date());
+                timerJobBiz.insert(newJob);
+                baseQuartzBiz.createJobByGosTimerJob(newJob);
+            }
+            //已创建目标任务对象 未启动
+            else if(TimerJob.STATUS_STOP.equals(timerJobs.get(0).getStatus())){
+                    TimerJob oldTimerJob = timerJobs.get(0);
+                    oldTimerJob.setStatus(TimerJob.STATUS_RUN);
+                    timerJobBiz.updateSelectiveById(oldTimerJob);
+                    baseQuartzBiz.createJobByGosTimerJob(oldTimerJob);
+
+            }
+            userRefJob.setCrtTime(new Date());
+            int result = baseBiz.insertSelective(userRefJob);
         }
-        userRefJob.setCrtTime(new Date());
-        int result = baseBiz.insertSelective(userRefJob);
         //当前目标用户存在的任务数
         Example targetUserIdExample = new Example(UserRefJob.class);
         targetUserIdExample.createCriteria()

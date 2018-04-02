@@ -142,7 +142,6 @@ public class BaseQuartzBiz {
         if(taskClazz!=null){
             createScheduleJob(timerJob.getJobName(),timerJob.getJobGroup(),
                     timerJob.getCronExpression(), taskClazz);
-            log.info("创建TimerJob: "+timerJob.getJobName()+"_"+timerJob.getJobGroup());
             return true;
         }else{
             log.error("任务名:"+timerJob.getJobName()+" 未找到注解TimerJobType为:"+jobType+" 的Job Class，任务创建失败");
