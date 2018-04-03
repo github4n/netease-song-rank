@@ -42,8 +42,8 @@ public class WxUser {
     @Column(name = "openid")
     private String openId;
 
-    @Column(name = "limit")
-    private Integer limit;
+    @Column(name = "job_limit")
+    private Integer jobLimit;
 
     @ApiModelProperty(hidden = true)
     @Column(name = "crt_time")
@@ -125,12 +125,12 @@ public class WxUser {
         this.openId = openId;
     }
 
-    public Integer getLimit() {
-        return limit;
+    public Integer getJobLimit() {
+        return jobLimit;
     }
 
-    public void setLimit(Integer limit) {
-        this.limit = limit;
+    public void setJobLimit(Integer jobLimit) {
+        this.jobLimit = jobLimit;
     }
 
     public Date getCrtTime() {

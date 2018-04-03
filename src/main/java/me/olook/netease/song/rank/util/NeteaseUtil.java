@@ -20,11 +20,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.alibaba.fastjson.JSON.parseObject;
+import static me.olook.netease.song.rank.util.ProxyUtil.currentProxy;
 
 /**
  * 网易云工具
@@ -92,7 +91,7 @@ public class NeteaseUtil {
         }
     }
 
-    public static String songRank(String userId){
+    public static JSONObject songRank(String userId){
         Map<String,String> map = Maps.newHashMap();
         map.put("type","1");
         map.put("limit","1000");
@@ -106,12 +105,23 @@ public class NeteaseUtil {
 
 
         RequestConfig.Builder builder = RequestConfig.custom();
-        if(ProxyUtil.currentProxy==null){
-            ProxyUtil.init();
-        }else{
-            HttpHost proxy = new HttpHost(ProxyUtil.currentProxy.getIp(), ProxyUtil.currentProxy.getPort(), "http");
-            builder.setProxy(proxy);
+        Random random = new Random();
+        int randomProxyKey = -1;
+        ProxyInfo proxyInfo = null;
+        if(currentProxy.size()>0){
+            Set<Integer> keySet = currentProxy.keySet();
+            Object[] keySetArray = keySet.toArray();
+            int randomArrayIndex = random.nextInt(keySetArray.length);
+            randomProxyKey = Integer.parseInt(keySetArray[randomArrayIndex].toString());
+            proxyInfo = currentProxy.get(randomProxyKey);
+            if(proxyInfo!=null){
+                HttpHost proxy = new HttpHost(proxyInfo.getIp(), proxyInfo.getPort(), "http");
+                builder.setProxy(proxy);
+            }
         }
+        builder.setConnectTimeout(5000);
+        builder.setConnectionRequestTimeout(5000);
+        builder.setSocketTimeout(5000);
         RequestConfig proxyConfig = builder.build();
 
         HttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(proxyConfig).build();
@@ -131,14 +141,50 @@ public class NeteaseUtil {
             //判断网络连接状态码是否正常(0--200都数正常)
             if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
                 //获取响应实体
-                return EntityUtils.toString(response.getEntity(), "utf-8");
+                String jsonStr = EntityUtils.toString(response.getEntity(), "utf-8");
+                if(jsonStr==null) {
+                    log.error(userId+" 获取排行数据失败");
+                    return null;
+                }
+                JSONObject jsonObject = JSONObject.parseObject(jsonStr);
+                String code = jsonObject.get("code").toString();
+                if("-460".equals(code)){
+                    if(proxyInfo!=null){
+                        log.info(userId+" code -406 "+proxyInfo.toString());
+                        if(currentProxy.get(randomProxyKey)!=null){
+                            log.error("反爬虫执行，删除代理 "+randomProxyKey);
+                            currentProxy.remove(randomProxyKey);
+                        }
+                    }else {
+                        log.info(userId+" code -406 本机原始ip");
+                    }
+                    return null;
+                }
+                if(!"200".equals(code)){
+                    log.error(userId+" 获取数据权限不足 code: "+code);
+                    return null;
+                }
+                if(proxyInfo!=null){
+                    log.info(userId+" 任务执行完成,获取到有效数据,使用代理: "+randomProxyKey+" "+proxyInfo.toString());
+                }
+                return jsonObject;
+            }
+            log.warn(userId+" 请求返回码错误: "+response.getStatusLine().getStatusCode());
+            if(currentProxy.get(randomProxyKey)!=null){
+                log.warn("请求返回码错误,移除失效代理 "+randomProxyKey);
+                currentProxy.remove(randomProxyKey);
+                return null;
             }
             return null;
         } catch (IOException e) {
-            log.error("歌曲排行数据请求失败"+e.getMessage());
-            ProxyUtil.init();
-            return null;
+            log.warn(userId+" 请求IO异常："+e.getMessage());
+            if(currentProxy.get(randomProxyKey)!=null){
+                log.warn("请求IO异常,移除失效代理 "+randomProxyKey);
+                currentProxy.remove(randomProxyKey);
+                return null;
+            }
         }
+        return null;
     }
 
     public static void main(String[] args) {

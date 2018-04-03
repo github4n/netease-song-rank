@@ -65,7 +65,7 @@ public class UserRefJobController extends BaseController<UserRefJobBiz,UserRefJo
             wxUserExm.createCriteria().andEqualTo("openId",userRefJob.getOpenId());
             List<WxUser> users = wxUserBiz.selectByExample(wxUserExm);
             if(users.size()>0){
-                jobLimit = users.get(0).getLimit();
+                jobLimit = users.get(0).getJobLimit();
             }
             //每个用户当前只能创建3个任务
             if(listByOpenid.size()>=jobLimit){

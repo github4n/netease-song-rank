@@ -12,7 +12,7 @@ CREATE TABLE `wx_user` (
   `city` varchar(100) DEFAULT NULL COMMENT '城市',
   `language` varchar(20) DEFAULT NULL COMMENT '语言',
   `openid` varchar(50) NOT NULL,
-  `limit` int(3) DEFAULT 3 COMMENT '关注上限数量',
+  `job_limit` int(3) DEFAULT 3 COMMENT '关注上限数量',
   `crt_time` datetime DEFAULT NULL,
   `upd_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)

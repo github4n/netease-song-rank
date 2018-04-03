@@ -6,7 +6,6 @@ import me.olook.netease.song.rank.annotation.TimerJobTypeName;
 import me.olook.netease.song.rank.biz.*;
 import me.olook.netease.song.rank.entity.*;
 import me.olook.netease.song.rank.util.NeteaseUtil;
-import me.olook.netease.song.rank.util.ProxyUtil;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -50,28 +49,13 @@ public class SongRankTask implements Job {
         TimerJob timerJob = new TimerJob();
         timerJob.setJobName(jobKey.getName());
         timerJob.setJobGroup(jobKey.getGroup());
-        log.info("job name :" + jobKey.getName() + " job group :" +jobKey.getGroup() + " execute");
+        //log.info("job name :" + jobKey.getName() + " job group :" +jobKey.getGroup() + " execute");
         TimerJob currentJob = timerJobBiz.selectOne(timerJob);
 
-        String jsonStr = NeteaseUtil.songRank(currentJob.getTargetUserid());
-        if(jsonStr==null) {
-            log.error(currentJob.getTargetUserid()+" 获取排行数据失败");
+        JSONObject jsonObject = NeteaseUtil.songRank(currentJob.getTargetUserid());
+        if(jsonObject==null){
             return;
         }
-        JSONObject jsonObject = JSONObject.parseObject(jsonStr);
-        String code = jsonObject.get("code").toString();
-        if(!"200".equals(code)) {
-            log.error(currentJob.getTargetUserid()+"获取排行数据权限不足");
-            log.error(jsonStr);
-
-            if("-460".equals(code)) {
-                log.error("反爬虫执行，切换代理");
-                log.error(jsonStr);
-                ProxyUtil.init();
-            }
-            return;
-        }
-
         List<SongRankData> songRankDataList = new ArrayList<SongRankData>(100);
 
         JSONArray array = jsonObject.getJSONArray("weekData");

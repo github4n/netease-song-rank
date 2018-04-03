@@ -84,10 +84,9 @@ public class WxServerController {
     @RequestMapping(value = "checkSongRank", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<String> checkSongRank(String userId) {
-        String result = NeteaseUtil.songRank(userId);
+        JSONObject result = NeteaseUtil.songRank(userId);
         if(result!=null){
-            JSONObject jsonObject = JSONObject.parseObject(result);
-            String code = jsonObject.get("code").toString();
+            String code = result.get("code").toString();
             if("200".equals(code)){
                 return ResponseEntity.status(200).body("true");
             }

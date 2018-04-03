@@ -12,10 +12,13 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
+import java.util.Hashtable;
 import java.util.Map;
 
 /**
@@ -24,38 +27,60 @@ import java.util.Map;
  */
 public class ProxyUtil {
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     private static Logger log = LoggerFactory.getLogger(ApplicationContextUtil.class);
 
-    public volatile static ProxyInfo currentProxy = null;
+    public static Hashtable<Integer,ProxyInfo> currentProxy = new Hashtable<>();
 
-    public synchronized static void init(){
-        try {
-            HttpClient httpClient = HttpClientBuilder.create().build();
-            HttpGet request =
-                    new HttpGet("http://tvp.daxiangdaili.com/ip/?tid=&num=1&delay=2&category=2&protocol=https&sortby=time&filter=on");
-                HttpResponse response = httpClient.execute(request);
-                if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
-                    //获取响应实体
-                   String res = EntityUtils.toString(response.getEntity(), "utf-8");
-                   String[] proxys = res.split(System.getProperty("line.separator"));
-                    for(String proxy : proxys){
-                        if(proxy.split(":").length<2){
-                            log.warn("代理格式不正确"+proxy);
-                            init();
-                        }
-                        ProxyInfo proxyInfo = new ProxyInfo(proxy);
-                        if(checkProxy(proxyInfo.getIp(),proxyInfo.getPort())){
-                            currentProxy = proxyInfo;
-                            log.info("获取到可用代理配置:"+proxyInfo.toString());
-                        }else{
-                            init();
+    /**
+     * 是否正在获取代理
+     */
+    public volatile static boolean isInit = false;
+
+    public volatile static int index = 0;
+
+    public static void init(int num){
+                isInit = true;
+                try {
+                    HttpClient httpClient = HttpClientBuilder.create().build();
+                    HttpGet request =
+                            new HttpGet("http://tvp.daxiangdaili.com/ip/?tid=订单号&num=1&delay=3&filter=on");
+                    HttpResponse response = httpClient.execute(request);
+                    if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
+                        //获取响应实体
+                        String res = EntityUtils.toString(response.getEntity(), "utf-8");
+                        String[] proxys = res.split(System.getProperty("line.separator"));
+                        for(String proxy : proxys){
+                            if(proxy.split(":").length<2){
+                                //log.warn("代理格式不正确 "+proxy);
+                                init(num);
+                            }else{
+
+                            String ip = proxy.split(":")[0];
+                            Integer port = Integer.parseInt(proxy.split(":")[1]);
+                            ProxyInfo proxyInfo = new ProxyInfo(ip,port);
+                                if(checkProxy(proxyInfo.getIp(),proxyInfo.getPort())){
+                                    currentProxy.put(num-currentProxy.size(),proxyInfo);
+                                    log.info("添加可用代理配置:"+proxyInfo.toString());
+                                    System.out.println(JSONObject.toJSONString(currentProxy));
+                                    if(currentProxy.size()<num){
+                                        init(num);
+                                    }else{
+                                        isInit =false;
+                                    }
+                                }else{
+                                    init(num);
+                                }
+                            }
                         }
                     }
+                }catch (IOException e) {
+                    e.printStackTrace();
                 }
-        }catch (IOException e) {
-            e.printStackTrace();
         }
-    }
+
 
     private static boolean checkProxy(String ip,Integer port){
             log.info("校验代理: "+ip+":"+port);
@@ -103,43 +128,50 @@ public class ProxyUtil {
             }
         }
 
+    public static void fixProxyPool(Integer key){
+        index = key;
+        isInit =true;
+        try {
+            HttpClient httpClient = HttpClientBuilder.create().build();
+            HttpGet request =
+                    new HttpGet("http://tvp.daxiangdaili.com/ip/?tid=订单号&num=1&delay=3&filter=on");
+            HttpResponse response = httpClient.execute(request);
+            if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
+                //获取响应实体
+                String res = EntityUtils.toString(response.getEntity(), "utf-8");
+                String[] proxys = res.split(System.getProperty("line.separator"));
+                for(String proxy : proxys){
+                    if(proxy.split(":").length<2){
+                        try {
+                            log.warn(proxy);
+                            Thread.sleep(3000);
+                            fixProxyPool(key);
+                        } catch (InterruptedException e) {
+                            fixProxyPool(key);
+                        }
+                    }else {
+                        String ip = proxy.split(":")[0];
+                        Integer port = Integer.parseInt(proxy.split(":")[1]);
+
+                        ProxyInfo proxyInfo = new ProxyInfo(ip,port);
+                        if(checkProxy(proxyInfo.getIp(),proxyInfo.getPort())){
+                            currentProxy.put(key,proxyInfo);
+                            log.info("补充可用代理配置:"+key+"."+proxyInfo.toString());
+                            isInit =false;
+                        }else{
+                            fixProxyPool(key);
+                        }
+                    }
+                }
+            }else{
+                    fixProxyPool(key);
+            }
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String[] args) {
-        init();
-    }
-}
-
-class ProxyInfo {
-
-    ProxyInfo(String proxy){
-        this.ip = proxy.split(":")[0];
-        this.port = Integer.parseInt(proxy.split(":")[1]);
-    }
-
-    private String ip;
-
-    private Integer port;
-
-    public String getIp() {
-        return ip;
-    }
-
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
-
-    public Integer getPort() {
-        return port;
-    }
-
-    public void setPort(Integer port) {
-        this.port = port;
-    }
-
-    @Override
-    public String toString() {
-        return "ProxyInfo{" +
-                "ip='" + ip + '\'' +
-                ", port=" + port +
-                '}';
+            ProxyUtil.init(5);
     }
 }
