@@ -73,7 +73,7 @@ public class UserRefJobController extends BaseController<UserRefJobBiz,UserRefJo
             }
 
             for(UserRefJob existJob : listByOpenid){
-                if(existJob.getTargetUserId().equals(userRefJob.getOpenId())){
+                if(existJob.getTargetUserId().equals(userRefJob.getTargetUserId())){
                     return ResponseEntity.status(401).body("您已经订阅过Ta了~");
                 }
             }
