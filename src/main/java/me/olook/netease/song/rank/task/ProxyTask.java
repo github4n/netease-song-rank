@@ -29,7 +29,7 @@ public class ProxyTask implements Job {
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         int size = currentProxy.size();
-        log.info("当前存活有效代理数量: %d 任务执行状态: {} 当前正在填充: {} \n {}",currentProxy.size(),
+        log.info("当前存活有效代理数量: {} 任务执行状态: {} 当前正在填充: {} \n {}",currentProxy.size(),
                 lock.get(),ProxyUtil.index, JSONObject.toJSONString(currentProxy));
         if(DEFAULT_PROXY_POOL_SIZE == size){
             log.info("线程池已满,无需维护...");
@@ -38,7 +38,7 @@ public class ProxyTask implements Job {
         if(!lock.get()){
             log.info("开始执行代理维护任务...");
             lock.getAndSet(true);
-            for(int i = 1; i< DEFAULT_PROXY_POOL_SIZE ; i++){
+            for(int i = 0; i< DEFAULT_PROXY_POOL_SIZE ; i++){
                 if(currentProxy.get(i)==null){
                     ProxyUtil.fixProxyPool(i);
                 }
