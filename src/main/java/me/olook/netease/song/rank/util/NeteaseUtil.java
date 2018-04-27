@@ -86,7 +86,7 @@ public class NeteaseUtil {
             }
             return null;
         } catch (IOException e) {
-            log.error(" 用户搜索请求失败"+e.getMessage());
+            log.error(" 用户搜索请求失败 {}",e.getMessage());
             return null;
         }
     }
@@ -143,7 +143,7 @@ public class NeteaseUtil {
                 //获取响应实体
                 String jsonStr = EntityUtils.toString(response.getEntity(), "utf-8");
                 if(jsonStr==null) {
-                    log.error(userId+" 获取排行数据失败");
+                    log.error("{} 获取排行数据失败",userId);
                     return null;
                 }
                 JSONObject jsonObject = JSONObject.parseObject(jsonStr);
@@ -152,34 +152,35 @@ public class NeteaseUtil {
                     if(proxyInfo!=null){
                         log.info(userId+" code -406 "+proxyInfo.toString());
                         if(currentProxy.get(randomProxyKey)!=null){
-                            log.error("反爬虫执行，删除代理 "+randomProxyKey);
+                            log.error("反爬虫执行，删除代理 {}",randomProxyKey);
                             currentProxy.remove(randomProxyKey);
                         }
                     }else {
-                        log.info(userId+" code -406 本机原始ip");
+                        log.info("{} code -406",userId);
+                        currentProxy.remove(randomProxyKey);
                     }
                     return null;
                 }
                 if(!"200".equals(code)){
-                    log.error(userId+" 获取数据权限不足 code: "+code);
+                    log.error("{} 获取数据权限不足 code: {}",userId,code);
                     return null;
                 }
                 if(proxyInfo!=null){
-                    log.info(userId+" 任务执行完成,获取到有效数据,使用代理: "+randomProxyKey+" "+proxyInfo.toString());
+                    log.info("{} 任务执行完成,获取到有效数据,使用代理: {}. {}",userId,randomProxyKey,proxyInfo.toString());
                 }
                 return jsonObject;
             }
-            log.warn(userId+" 请求返回码错误: "+response.getStatusLine().getStatusCode());
+            log.warn("{} 请求返回码错误: {}",userId,response.getStatusLine().getStatusCode());
             if(currentProxy.get(randomProxyKey)!=null){
-                log.warn("请求返回码错误,移除失效代理 "+randomProxyKey);
+                log.warn("请求返回码错误,移除失效代理 {}",randomProxyKey);
                 currentProxy.remove(randomProxyKey);
                 return null;
             }
             return null;
         } catch (IOException e) {
-            log.warn(userId+" 请求IO异常："+e.getMessage());
+            log.warn("{} 请求IO异常：{}",userId,e.getMessage());
             if(currentProxy.get(randomProxyKey)!=null){
-                log.warn("请求IO异常,移除失效代理 "+randomProxyKey);
+                log.warn("请求IO异常,移除失效代理 {}",randomProxyKey);
                 currentProxy.remove(randomProxyKey);
                 return null;
             }

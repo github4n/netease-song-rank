@@ -38,6 +38,11 @@ public class ProxyUtil {
     public static final Integer DEFAULT_PROXY_POOL_SIZE = 15;
 
     /**
+     * 大象代理订单id
+     */
+    private static final String PROXY_ORDER_ID ="";
+
+    /**
      * 是否正在获取代理
      */
 
@@ -51,7 +56,7 @@ public class ProxyUtil {
                 try {
                     HttpClient httpClient = HttpClientBuilder.create().build();
                     HttpGet request =
-                            new HttpGet("http://tvp.daxiangdaili.com/ip/?tid=订单id&num=1&delay=3&filter=on");
+                            new HttpGet("http://tvp.daxiangdaili.com/ip/?tid="+PROXY_ORDER_ID+"&num=1&delay=3&filter=on");
                     HttpResponse response = httpClient.execute(request);
                     if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
                         //获取响应实体
@@ -68,7 +73,7 @@ public class ProxyUtil {
                             ProxyInfo proxyInfo = new ProxyInfo(ip,port);
                                 if(checkProxy(proxyInfo.getIp(),proxyInfo.getPort())){
                                     currentProxy.put(num-currentProxy.size(),proxyInfo);
-                                    log.info("添加可用代理配置:%s",proxyInfo.toString());
+                                    log.info("添加可用代理配置: {}",proxyInfo.toString());
                                     System.out.println(JSONObject.toJSONString(currentProxy));
                                     if(currentProxy.size()<num){
                                         init(num);
@@ -87,7 +92,7 @@ public class ProxyUtil {
 
 
     private static boolean checkProxy(String ip,Integer port){
-            log.info("校验代理: %s:%d",ip,port);
+            log.info("校验代理: {} : {}",ip,port);
             Map<String,String> map = Maps.newHashMap();
             map.put("type","1");
             map.put("limit","1000");
@@ -141,7 +146,7 @@ public class ProxyUtil {
         try {
             HttpClient httpClient = HttpClientBuilder.create().build();
             HttpGet request =
-                    new HttpGet("http://tvp.daxiangdaili.com/ip/?tid=559808970308294&num=1&delay=3&filter=on");
+                    new HttpGet("http://tvp.daxiangdaili.com/ip/?tid="+PROXY_ORDER_ID+"&num=1&delay=3&filter=on");
             HttpResponse response = httpClient.execute(request);
             if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
                 //获取响应实体
@@ -163,7 +168,7 @@ public class ProxyUtil {
                         ProxyInfo proxyInfo = new ProxyInfo(ip,port);
                         if(checkProxy(proxyInfo.getIp(),proxyInfo.getPort())){
                             currentProxy.put(key,proxyInfo);
-                            log.info("补充可用代理配置:%d.%s",key,proxyInfo.toString());
+                            log.info("补充可用代理配置: {}. {}",key,proxyInfo.toString());
                         }else{
                             fixProxyPool(key);
                         }

@@ -69,7 +69,7 @@ public class SongRankTask implements Job {
             timerJobRecord.setJobId(currentJob.getId());
             timerJobRecord.setEndTime(new Date());
             timerJobRecordBiz.insert(timerJobRecord);
-            log.info(currentJob.getJobName()+" 执行结束,无周榜数据");
+            log.info("{} 执行结束,无周榜数据",currentJob.getJobName());
             return;
         }
 
@@ -107,12 +107,12 @@ public class SongRankTask implements Job {
                         List<TemplateMessage> msg = templateMessageBiz.selectByExample(example);
                         templateMessageBiz.pushTemplateMsg(msg,firstDiff);
                     }catch (Exception e){
-                        log.error("推送模板消息时出现异常: "+e.getMessage());
+                        log.error("推送模板消息时出现异常: {}",e.getMessage());
                     }
                 }
-                log.info(currentJob.getJobName()+" 数据变更");
+                log.info("{} 数据变更",currentJob.getJobName());
             }else{
-                log.info(currentJob.getJobName()+" 初始数据");
+                log.info("{} 初始数据",currentJob.getJobName());
             }
             //记录整榜数据
             if(songRankDataList.size()>0){
@@ -122,7 +122,7 @@ public class SongRankTask implements Job {
                     songRankDataBiz.deleteByRecordId(oldRecord.getId());
                 }
             }else{
-                log.warn(currentJob.getJobName()+" 获取 songRankDataList size 为 0");
+                log.warn("{} 获取 songRankDataList size 为 0",currentJob.getJobName());
                 timerJobRecord.setNewData(0);
             }
         }
