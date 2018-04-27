@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author zhaohw
@@ -34,19 +35,23 @@ public class ProxyUtil {
 
     public static Hashtable<Integer,ProxyInfo> currentProxy = new Hashtable<>();
 
+    public static final Integer DEFAULT_PROXY_POOL_SIZE = 15;
+
     /**
      * 是否正在获取代理
      */
-    public volatile static boolean isInit = false;
 
-    public volatile static int index = 0;
+    public static AtomicInteger index = new AtomicInteger(0);
 
+    /**
+     * 初始化代理池
+     * @param num 代理池大小
+     */
     public static void init(int num){
-                isInit = true;
                 try {
                     HttpClient httpClient = HttpClientBuilder.create().build();
                     HttpGet request =
-                            new HttpGet("http://tvp.daxiangdaili.com/ip/?tid=订单号&num=1&delay=3&filter=on");
+                            new HttpGet("http://tvp.daxiangdaili.com/ip/?tid=订单id&num=1&delay=3&filter=on");
                     HttpResponse response = httpClient.execute(request);
                     if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
                         //获取响应实体
@@ -54,7 +59,7 @@ public class ProxyUtil {
                         String[] proxys = res.split(System.getProperty("line.separator"));
                         for(String proxy : proxys){
                             if(proxy.split(":").length<2){
-                                //log.warn("代理格式不正确 "+proxy);
+                                //代理格式不正确，重新获取
                                 init(num);
                             }else{
 
@@ -63,12 +68,11 @@ public class ProxyUtil {
                             ProxyInfo proxyInfo = new ProxyInfo(ip,port);
                                 if(checkProxy(proxyInfo.getIp(),proxyInfo.getPort())){
                                     currentProxy.put(num-currentProxy.size(),proxyInfo);
-                                    log.info("添加可用代理配置:"+proxyInfo.toString());
+                                    log.info("添加可用代理配置:%s",proxyInfo.toString());
                                     System.out.println(JSONObject.toJSONString(currentProxy));
                                     if(currentProxy.size()<num){
                                         init(num);
                                     }else{
-                                        isInit =false;
                                     }
                                 }else{
                                     init(num);
@@ -83,7 +87,7 @@ public class ProxyUtil {
 
 
     private static boolean checkProxy(String ip,Integer port){
-            log.info("校验代理: "+ip+":"+port);
+            log.info("校验代理: %s:%d",ip,port);
             Map<String,String> map = Maps.newHashMap();
             map.put("type","1");
             map.put("limit","1000");
@@ -128,13 +132,16 @@ public class ProxyUtil {
             }
         }
 
+    /**
+     * 补充代理池代理
+     * @param key 代理序号
+     */
     public static void fixProxyPool(Integer key){
-        index = key;
-        isInit =true;
+        index.getAndSet(key);
         try {
             HttpClient httpClient = HttpClientBuilder.create().build();
             HttpGet request =
-                    new HttpGet("http://tvp.daxiangdaili.com/ip/?tid=订单号&num=1&delay=3&filter=on");
+                    new HttpGet("http://tvp.daxiangdaili.com/ip/?tid=559808970308294&num=1&delay=3&filter=on");
             HttpResponse response = httpClient.execute(request);
             if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
                 //获取响应实体
@@ -156,8 +163,7 @@ public class ProxyUtil {
                         ProxyInfo proxyInfo = new ProxyInfo(ip,port);
                         if(checkProxy(proxyInfo.getIp(),proxyInfo.getPort())){
                             currentProxy.put(key,proxyInfo);
-                            log.info("补充可用代理配置:"+key+"."+proxyInfo.toString());
-                            isInit =false;
+                            log.info("补充可用代理配置:%d.%s",key,proxyInfo.toString());
                         }else{
                             fixProxyPool(key);
                         }

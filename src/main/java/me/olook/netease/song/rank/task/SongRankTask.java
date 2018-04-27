@@ -187,9 +187,9 @@ public class SongRankTask implements Job {
         }
         Integer isBatchUpdate = 0;
 //        //如果同一时间抓到的歌曲变化数大于三，判定为系统自动批量更新数据
-//        if(addList.size()>3){
-//            isBatchUpdate = 1;
-//        }
+        if(addList.size()>3){
+            isBatchUpdate = 1;
+        }
         //如果时间为3~5点，判定为系统更新数据
         Calendar c = Calendar.getInstance();
         int hour = c.get(Calendar.HOUR_OF_DAY);
