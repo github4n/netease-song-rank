@@ -62,13 +62,13 @@ public class SongRankTask implements Job {
         String uuid = UUID.randomUUID().toString().replaceAll("-", "");
         //暂无最近一周听歌数据
         if(array.size()==0){
-            timerJobRecord.setSnapshot("-1");
-            timerJobRecord.setNewData(0);
-            timerJobRecord.setId(uuid);
-            timerJobRecord.setCount(0);
-            timerJobRecord.setJobId(currentJob.getId());
-            timerJobRecord.setEndTime(new Date());
-            timerJobRecordBiz.insert(timerJobRecord);
+//            timerJobRecord.setSnapshot("-1");
+//            timerJobRecord.setNewData(0);
+//            timerJobRecord.setId(uuid);
+//            timerJobRecord.setCount(0);
+//            timerJobRecord.setJobId(currentJob.getId());
+//            timerJobRecord.setEndTime(new Date());
+//            timerJobRecordBiz.insert(timerJobRecord);
             log.info("{} 执行结束,无周榜数据",currentJob.getJobName());
             return;
         }
