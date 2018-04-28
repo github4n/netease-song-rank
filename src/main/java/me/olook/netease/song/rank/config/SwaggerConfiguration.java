@@ -17,10 +17,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
  * swagger配置项
- *
  * @description
- * @author wanghaobin
- * @date 2017年6月20日
  * @since 1.7
  */
 @Configuration
@@ -31,14 +28,7 @@ public class SwaggerConfiguration extends WebMvcConfigurerAdapter implements Env
 	private String serviceName;
 	private RelaxedPropertyResolver propertyResolver;
 	private String description;
-	/**
-	 * 这个地方要重新注入一下资源文件，不然不会注入资源的，也没有注入requestHandlerMappping,相当于xml配置的
-	 *  <!--swagger资源配置-->
-	 *  <mvc:resources location="classpath:/META-INF/resources/" mapping="swagger-ui.html"/>
-	 *  <mvc:resources location="classpath:/META-INF/resources/webjars/" mapping="/webjars/**"/>
-	 *  不知道为什么，这也是spring boot的一个缺点（菜鸟觉得的）
-	 * @param registry
-	 */
+
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		registry.addResourceHandler("swagger-ui.html")
@@ -47,8 +37,6 @@ public class SwaggerConfiguration extends WebMvcConfigurerAdapter implements Env
 				.addResourceLocations("classpath:/META-INF/resources/webjars/");
 	}
 
-
-	
 	@Bean
 	public Docket createRestApi() {
 		return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo())
@@ -68,7 +56,6 @@ public class SwaggerConfiguration extends WebMvcConfigurerAdapter implements Env
 	public void setEnvironment(Environment environment) {
 		this.propertyResolver = new RelaxedPropertyResolver(environment, null);
 		this.basePackage = propertyResolver.getProperty("swagger.basepackage");
-		//this.basePackage = "com.gospell.platform.oa.biz.user.rest";
 		this.creatName = propertyResolver.getProperty("swagger.service.developer");
 		this.serviceName = propertyResolver.getProperty("swagger.service.name");
 		this.description = propertyResolver.getProperty("swagger.service.description");

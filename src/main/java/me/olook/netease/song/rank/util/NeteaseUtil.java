@@ -156,7 +156,7 @@ public class NeteaseUtil {
                             currentProxy.remove(randomProxyKey);
                         }
                     }else {
-                        log.info("{} code -406 ,proxy : {}",userId,currentProxy.get(randomProxyKey).toString());
+                        log.warn("{} code -406 ,proxy : {}",userId,currentProxy.get(randomProxyKey).toString());
                         currentProxy.remove(randomProxyKey);
                     }
                     return null;

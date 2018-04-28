@@ -125,14 +125,15 @@ public class SongRankTask implements Job {
                 log.warn("{} 获取 songRankDataList size 为 0",currentJob.getJobName());
                 timerJobRecord.setNewData(0);
             }
+
+            timerJobRecord.setSnapshot(snapshot);
+            timerJobRecord.setId(uuid);
+            timerJobRecord.setCount(0);
+            timerJobRecord.setJobId(currentJob.getId());
+            timerJobRecord.setEndTime(new Date());
+            timerJobRecordBiz.insert(timerJobRecord);
         }
 
-        timerJobRecord.setSnapshot(snapshot);
-        timerJobRecord.setId(uuid);
-        timerJobRecord.setCount(0);
-        timerJobRecord.setJobId(currentJob.getId());
-        timerJobRecord.setEndTime(new Date());
-        timerJobRecordBiz.insert(timerJobRecord);
         //log.info(currentJob.getJobName()+" 执行结束");
 
     }

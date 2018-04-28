@@ -40,7 +40,7 @@ public class ProxyUtil {
     /**
      * 大象代理订单id
      */
-    private static final String PROXY_ORDER_ID ="";
+    private static final String PROXY_ORDER_ID ="订单id";
 
     /**
      * 是否正在获取代理

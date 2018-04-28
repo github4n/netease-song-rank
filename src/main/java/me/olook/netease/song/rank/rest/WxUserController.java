@@ -11,12 +11,17 @@ import me.olook.netease.song.rank.entity.WxUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import tk.mybatis.mapper.entity.Example;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -30,6 +35,24 @@ public class WxUserController  extends BaseController<WxUserBiz,WxUser> {
 
     @Autowired
     private UserRefJobBiz userRefJobBiz;
+
+    @Override
+    @ApiOperation(value = "新增")
+    @RequestMapping(value = "",method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<String> add(@RequestBody @Valid WxUser entity, BindingResult bindingResult){
+        if (bindingResult.hasErrors()) {
+            List<FieldError> errorList = bindingResult.getFieldErrors();
+            return ResponseEntity.status(500).body(errorList.get(0).getDefaultMessage());
+        }
+        entity.setCrtTime(new Date());
+        int result = baseBiz.insertSelective(entity);
+        //唯一键重复
+        if(result==-1){
+            return ResponseEntity.status(500).body("不能重复添加");
+        }
+        return ResponseEntity.status(200).body("新增成功");
+    }
 
     @ApiOperation(value = "查询关注的微信用户")
     @RequestMapping(value = "getFollow", method = RequestMethod.GET)

@@ -88,14 +88,14 @@ public class TemplateMessageBiz extends BaseBiz<TemplateMessageMapper,TemplateMe
     private void sendPushRequest(TemplateMsgParam param, String token ){
         String url = "https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token="+token;
         String paramJson = JSONObject.toJSONString(param);
-        log.info("模板消息参数: "+paramJson);
+        log.info("模板消息参数: {}",paramJson);
         HttpHeaders headers = new HttpHeaders();
         MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
         headers.setContentType(type);
         headers.add("Accept", MediaType.APPLICATION_JSON.toString());
         HttpEntity<String> formEntity = new HttpEntity<String>(paramJson,headers);
         String result = restTemplate.postForObject(url, formEntity, String.class);
-        log.info("模板消息响应: "+result);
+        log.info("模板消息响应: {}",result);
     }
 
 
@@ -133,7 +133,7 @@ public class TemplateMessageBiz extends BaseBiz<TemplateMessageMapper,TemplateMe
     private String getAccessToken(){
         String url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="+wxApp.getAppId()+"&secret="+wxApp.getAppSecret();
         String wxJson = restTemplate.getForEntity(url, String.class).getBody();
-        log.info("access-token响应: "+wxJson);
+        log.info("access-token响应: {}",wxJson);
         JSONObject jsonObject = JSON.parseObject(wxJson);
         Object accessTokenObj = jsonObject.get("access_token");
         if(accessTokenObj == null){
