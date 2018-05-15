@@ -10,10 +10,14 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -188,8 +192,51 @@ public class NeteaseUtil {
         return null;
     }
 
+    /**
+     * 获取听歌量
+     * @param userId
+     * @return 异常返回-1 正常返回听歌量
+     */
+    public static int songCount(String userId){
+        String url = "http://music.163.com/user/songs/rank?id="+userId;
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpGet request = new HttpGet(url);
+        try {
+            request.setHeader(HttpHeaders.ACCEPT, "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+            request.setHeader(HttpHeaders.ACCEPT_ENCODING, "gzip, deflate");
+            request.setHeader(HttpHeaders.ACCEPT_LANGUAGE, "zh-CN,zh;q=0.9");
+            request.setHeader(HttpHeaders.CONNECTION, "keep-alive");
+            request.setHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded; charset=UTF-8");
+            request.setHeader(HttpHeaders.HOST, "music.163.com");
+            request.setHeader(HttpHeaders.REFERER, "http://music.163.com/");
+            //request.setHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0 (X11; Linux x86_64; rv:39.0) Gecko/20100101 Firefox/39.0");
+            request.setHeader(HttpHeaders.USER_AGENT,UserAgents.randomUserAgent());
+            // 通过请求对象获取响应对象
+            HttpResponse response = httpClient.execute(request);
+            //判断网络连接状态码是否正常(0--200都数正常)
+            if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
+                //获取响应实体
+                String responseHtml = EntityUtils.toString(response.getEntity(), "utf-8");
+                Document document = Jsoup.parse(responseHtml);
+                Element element = document.select("h4").get(0);
+                System.out.println(element.text());
+                if(element.text().contains("累积听歌")){
+                    return Integer.parseInt(element.text().replace("累积听歌","").replace("首",""));
+                }
+            }
+            return -1;
+        } catch (IOException e) {
+            log.error(" 用户听歌数量获取失败 {}",e.getMessage());
+            return -1;
+        }
+    }
+
+    public static void getOpenSinger(){
+
+    }
+
     public static void main(String[] args) {
         //获取听歌排行数据
-       System.out.println(songRank("33255454"));
+       System.out.println(songCount("618063500"));
     }
 }
