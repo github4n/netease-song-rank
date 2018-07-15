@@ -12,7 +12,7 @@
     <groupId>me.olook.netease</groupId>
     <artifactId>song-rank</artifactId>
     <packaging>jar</packaging>  
-    <version>0.9.3</version>
+    <version>0.9.4</version>
     
     <properties>
         <hystrix.version>1.5.13</hystrix.version>
@@ -65,6 +65,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional></dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
