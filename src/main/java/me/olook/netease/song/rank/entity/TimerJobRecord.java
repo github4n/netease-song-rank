@@ -1,6 +1,10 @@
 package me.olook.netease.song.rank.entity;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
@@ -13,7 +17,10 @@ import java.util.Date;
  * @author zhaohw
  * @date 2018-01-10 17:21
  */
-
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "song_rank_job_record")
 public class TimerJobRecord {
 
@@ -45,72 +52,4 @@ public class TimerJobRecord {
     @Column(name = "count")
     private Integer count;
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Integer getJobId() {
-        return jobId;
-    }
-
-    public void setJobId(Integer jobId) {
-        this.jobId = jobId;
-    }
-
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
-
-    public Date getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
-    }
-
-    public Integer getNewData() {
-        return newData;
-    }
-
-    public void setNewData(Integer newData) {
-        this.newData = newData;
-    }
-
-    public String getSnapshot() {
-        return snapshot;
-    }
-
-    public void setSnapshot(String snapshot) {
-        this.snapshot = snapshot;
-    }
-
-    public Integer getCount() {
-        return count;
-    }
-
-    public void setCount(Integer count) {
-        this.count = count;
-    }
-
-    @Override
-    public String toString() {
-        return "TimerJobRecord{" +
-                "id='" + id + '\'' +
-                ", jobId=" + jobId +
-                ", startTime=" + startTime +
-                ", endTime=" + endTime +
-                ", newData=" + newData +
-                ", snapshot='" + snapshot + '\'' +
-                ", count=" + count +
-                '}';
-    }
 }

@@ -17,7 +17,7 @@ public class TimerJobRecordBiz extends BaseBiz<TimerJobRecordMapper,TimerJobReco
      * @param jobId
      * @return
      */
-    public TimerJobRecord getLatestRecord(Integer jobId){
+    public TimerJobRecord   getLatestRecord(Integer jobId){
         return mapper.getLatestRecord(jobId);
     };
 }

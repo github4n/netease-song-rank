@@ -3,6 +3,7 @@ package me.olook.netease.song.rank.biz;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
+import lombok.extern.slf4j.Slf4j;
 import me.olook.netease.song.rank.base.BaseBiz;
 import me.olook.netease.song.rank.config.WxAppProperties;
 import me.olook.netease.song.rank.dto.TemplateMsgKeyWord;
@@ -30,10 +31,9 @@ import java.util.Map;
  * @author zhaohw
  * @date 2018-03-08 13:07
  */
+@Slf4j
 @Service
 public class TemplateMessageBiz extends BaseBiz<TemplateMessageMapper,TemplateMessage>{
-
-    private Logger log = LoggerFactory.getLogger(TemplateMessageBiz.class);
 
     @Autowired
     private RestTemplate restTemplate;
@@ -60,11 +60,8 @@ public class TemplateMessageBiz extends BaseBiz<TemplateMessageMapper,TemplateMe
             return;
         }
         UserRefJob job = userRefJobBiz.getUserJobByTargetUserId(dataDiff.getTargetUserId());
-        Map<String,Object> pushedMap = Maps.newHashMap();
         for(TemplateMessage msg : list){
-            if(pushedMap.get(msg.getOpenid())!=null){
-                continue;
-            }
+            //todo openid为null处理
             TemplateMsgParam param = new TemplateMsgParam();
             param.setTouser(msg.getOpenid());
             param.setTemplate_id(msg.getTemplateId());
@@ -72,7 +69,9 @@ public class TemplateMessageBiz extends BaseBiz<TemplateMessageMapper,TemplateMe
             param.setForm_id(msg.getFormId());
             TemplateMsgKeyWord keyWord = new TemplateMsgKeyWord(dataDiff.getSong(),sdf.format(new Date()),job.getTargetNickname());
             param.setData(keyWord);
+            
             sendPushRequest(param, validToken);
+
             msg.setIsValid(0);
             msg.setUpdTime(new Date());
             mapper.updateByPrimaryKeySelective(msg);
@@ -81,7 +80,15 @@ public class TemplateMessageBiz extends BaseBiz<TemplateMessageMapper,TemplateMe
     }
 
     /**
-     * 推送一个模板消息
+     * 清理过期模板记录
+     * @return
+     */
+    public int updateExpired(){
+        return mapper.updateExpired();
+    }
+
+    /**
+     * 发送推送请求
      * @param param
      * @param token
      */
@@ -132,8 +139,9 @@ public class TemplateMessageBiz extends BaseBiz<TemplateMessageMapper,TemplateMe
      */
     private String getAccessToken(){
         String url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="+wxApp.getAppId()+"&secret="+wxApp.getAppSecret();
+        log.info("access-token 请求: {}",url);
         String wxJson = restTemplate.getForEntity(url, String.class).getBody();
-        log.info("access-token响应: {}",wxJson);
+        log.info("access-token 响应: {}",wxJson);
         JSONObject jsonObject = JSON.parseObject(wxJson);
         Object accessTokenObj = jsonObject.get("access_token");
         if(accessTokenObj == null){
@@ -141,4 +149,5 @@ public class TemplateMessageBiz extends BaseBiz<TemplateMessageMapper,TemplateMe
         }
         return accessTokenObj.toString();
     }
+
 }

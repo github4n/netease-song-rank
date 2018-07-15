@@ -1,6 +1,7 @@
 package me.olook.netease.song.rank.entity;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
@@ -13,6 +14,7 @@ import java.util.Date;
  * @author zhaohw
  * @date 2018-03-08 12:58
  */
+@Data
 @Table(name = "template_msg_record")
 public class TemplateMessage {
 
@@ -41,80 +43,10 @@ public class TemplateMessage {
     @Column(name = "upd_time")
     private Date updTime;
 
+    /**
+     * 0:已用 1:可用 2:过期
+     */
     @Column(name = "is_valid")
     private Integer isValid;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getOpenid() {
-        return openid;
-    }
-
-    public void setOpenid(String openid) {
-        this.openid = openid;
-    }
-
-    public String getTargetUserId() {
-        return targetUserId;
-    }
-
-    public void setTargetUserId(String targetUserId) {
-        this.targetUserId = targetUserId;
-    }
-
-    public String getFormId() {
-        return formId;
-    }
-
-    public void setFormId(String formId) {
-        this.formId = formId;
-    }
-
-    public String getTemplateId() {
-        return templateId;
-    }
-
-    public void setTemplateId(String templateId) {
-        this.templateId = templateId;
-    }
-
-    public String getPage() {
-        return page;
-    }
-
-    public void setPage(String page) {
-        this.page = page;
-    }
-
-    public Date getCrtTime() {
-        return crtTime;
-    }
-
-    public Date getUpdTime() {
-        return updTime;
-    }
-
-    public void setUpdTime(Date updTime) {
-        this.updTime = updTime;
-    }
-
-    public void setCrtTime(Date crtTime) {
-        this.crtTime = crtTime;
-    }
-
-    public Integer getIsValid() {
-        return isValid;
-    }
-
-    public void setIsValid(Integer isValid) {
-        this.isValid = isValid;
-    }
-
 
 }

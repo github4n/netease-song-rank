@@ -9,4 +9,5 @@ import tk.mybatis.mapper.common.Mapper;
 * @date 2018/1/10 17:25
 */
 public interface TimerJobMapper extends Mapper<TimerJob> {
+
 }

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class CustomJobFactory extends AdaptableJobFactory {
+
     @Autowired
     private AutowireCapableBeanFactory capableBeanFactory;
 

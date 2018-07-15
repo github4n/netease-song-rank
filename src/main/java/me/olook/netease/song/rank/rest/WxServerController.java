@@ -4,13 +4,15 @@ import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import me.olook.netease.song.rank.biz.SongRankDataDiffBiz;
+import me.olook.netease.song.rank.biz.TimerJobBiz;
 import me.olook.netease.song.rank.biz.UserRefJobBiz;
 import me.olook.netease.song.rank.config.WxAppProperties;
 import me.olook.netease.song.rank.dto.NeteaseUserDTO;
 import me.olook.netease.song.rank.dto.SongRankDiffListDTO;
 import me.olook.netease.song.rank.entity.SongRankDataDiff;
+import me.olook.netease.song.rank.entity.TimerJob;
 import me.olook.netease.song.rank.entity.UserRefJob;
-import me.olook.netease.song.rank.util.NeteaseUtil;
+import me.olook.netease.song.rank.util.netease.NeteaseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +49,9 @@ public class WxServerController {
     private UserRefJobBiz userRefJobBiz;
 
     @Autowired
+    private TimerJobBiz timerJobBiz;
+
+    @Autowired
     private SongRankDataDiffBiz songRankDataDiffBiz;
 
     @ApiOperation(value = "获取用户关联的任务")
@@ -76,7 +81,7 @@ public class WxServerController {
     public ResponseEntity<String> getNeteaseUser(String keyWord) {
         List<NeteaseUserDTO> list = NeteaseUtil.searchUser(keyWord);
         String json = JSONObject.toJSONString(list);
-        System.out.println(json);
+        log.debug(json);
         return ResponseEntity.status(200).body(json);
     }
 
@@ -127,6 +132,11 @@ public class WxServerController {
     @ResponseBody
     public ResponseEntity<String> getSongRankRecord(String userId) {
         SongRankDiffListDTO songRankDiffDTO = new  SongRankDiffListDTO();
+        //查看任务是否已经停止
+        TimerJob timerJob = timerJobBiz.findByTargetUserId(userId);
+        if(timerJob == null||TimerJob.STATUS_STOP.equals(timerJob.getStatus())){
+            return ResponseEntity.status(403).body("Ta好像已经隐藏了自己的听歌记录,建议尝试取消再重新关注Ta.");
+        }
         //查出最近10条记录
         List<SongRankDataDiff> dataDiffs = songRankDataDiffBiz.getLatestRecordLimit(userId,10);
         songRankDiffDTO.setIsBatchUpdate(-1);

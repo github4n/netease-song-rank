@@ -1,6 +1,10 @@
 package me.olook.netease.song.rank.entity;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
@@ -12,7 +16,11 @@ import java.util.Date;
  * @author zhaohw
  * @date 2018-02-08 18:15
  */
+@Data
 @Table(name = "song_rank_data_diff")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class SongRankDataDiff {
 
     @ApiModelProperty(hidden = true)
@@ -51,77 +59,4 @@ public class SongRankDataDiff {
     @Column(name = "is_batch_update")
     private Integer isBatchUpdate;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getJobRecordId() {
-        return jobRecordId;
-    }
-
-    public void setJobRecordId(String jobRecordId) {
-        this.jobRecordId = jobRecordId;
-    }
-
-    public Integer getRankChange() {
-        return rankChange;
-    }
-
-    public void setRankChange(Integer rankChange) {
-        this.rankChange = rankChange;
-    }
-
-    public String getSong() {
-        return song;
-    }
-
-    public void setSong(String song) {
-        this.song = song;
-    }
-
-    public String getSinger() {
-        return singer;
-    }
-
-    public void setSinger(String singer) {
-        this.singer = singer;
-    }
-
-    public Date getChangeTime() {
-        return changeTime;
-    }
-
-    public void setChangeTime(Date changeTime) {
-        this.changeTime = changeTime;
-    }
-
-    public String getTargetUserId() {
-        return targetUserId;
-    }
-
-    public void setTargetUserId(String targetUserId) {
-        this.targetUserId = targetUserId;
-    }
-
-    @Transient
-    public Integer getCount() {
-        return count;
-    }
-
-    @Transient
-    public void setCount(Integer count) {
-        this.count = count;
-    }
-
-    public Integer getIsBatchUpdate() {
-        return isBatchUpdate;
-    }
-
-    public void setIsBatchUpdate(Integer isBatchUpdate) {
-        this.isBatchUpdate = isBatchUpdate;
-    }
 }

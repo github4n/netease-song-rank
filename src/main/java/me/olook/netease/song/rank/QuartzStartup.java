@@ -32,10 +32,8 @@ public class QuartzStartup implements ApplicationListener<ApplicationReadyEvent>
     public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
             log.info("QuartzStartup onApplicationEvent start!");
             List<TimerJob> jobList = timerJobBiz.selectListAll();
-            for (TimerJob timerJob : jobList) {
-                if (timerJob.getStatus() == 1) {
-                    baseQuartzBiz.createJobByGosTimerJob(timerJob);
-                }
-            }
+            jobList.stream()
+                    .filter(p->TimerJob.STATUS_RUN.equals(p.getStatus()))
+                    .forEach(baseQuartzBiz::createJobByGosTimerJob);
     }
 }

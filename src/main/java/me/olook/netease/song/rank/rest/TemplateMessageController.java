@@ -36,6 +36,9 @@ public class TemplateMessageController
     @Autowired
     private UserRefJobBiz userRefJobBiz;
 
+    /**
+     * 模板id
+     */
     private final static String TEMPLATE_ID = "AIL1AXTIKfmmifc4uPpCthIiNi-AMgMSxXBvXihnPOg";
 
     @Override

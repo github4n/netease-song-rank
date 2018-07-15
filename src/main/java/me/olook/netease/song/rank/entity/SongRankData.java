@@ -1,6 +1,9 @@
 package me.olook.netease.song.rank.entity;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import me.olook.netease.song.rank.dto.SongRankDataDTO;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
@@ -10,6 +13,8 @@ import javax.persistence.Table;
  * @author zhaohw
  * @date 2018-02-08 15:01
  */
+@NoArgsConstructor
+@Data
 @Table(name = "song_rank_data")
 public class SongRankData {
 
@@ -37,9 +42,6 @@ public class SongRankData {
     @Column(name = "ratio")
     private String ratio;
 
-    public SongRankData() {
-    }
-
     public SongRankData(String jobRecordId, Integer rank, String song, String singer, String ratio) {
         this.jobRecordId = jobRecordId;
         this.rank = rank;
@@ -48,63 +50,11 @@ public class SongRankData {
         this.ratio = ratio;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getJobRecordId() {
-        return jobRecordId;
-    }
-
-    public void setJobRecordId(String jobRecordId) {
+    public SongRankData(String jobRecordId,SongRankDataDTO dataDTO) {
         this.jobRecordId = jobRecordId;
-    }
-
-    public Integer getRank() {
-        return rank;
-    }
-
-    public void setRank(Integer rank) {
-        this.rank = rank;
-    }
-
-    public String getSong() {
-        return song;
-    }
-
-    public void setSong(String song) {
-        this.song = song;
-    }
-
-    public String getSinger() {
-        return singer;
-    }
-
-    public void setSinger(String singer) {
-        this.singer = singer;
-    }
-
-    public String getRatio() {
-        return ratio;
-    }
-
-    public void setRatio(String ratio) {
-        this.ratio = ratio;
-    }
-
-    @Override
-    public String toString() {
-        return "SongRankData{" +
-                "id=" + id +
-                ", jobRecordId=" + jobRecordId +
-                ", rank=" + rank +
-                ", song='" + song + '\'' +
-                ", singer='" + singer + '\'' +
-                ", ratio=" + ratio +
-                '}';
+        this.rank = dataDTO.getRank();
+        this.song = dataDTO.getSongName();
+        this.singer = dataDTO.getSingerName();
+        this.ratio = dataDTO.getRatio();
     }
 }

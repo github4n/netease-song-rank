@@ -1,6 +1,7 @@
 package me.olook.netease.song.rank.entity;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
@@ -12,6 +13,7 @@ import java.util.Date;
  * @author zhaohw
  * @date 2018-03-05 20:39
  */
+@Data
 public class UserRefJob {
 
     @ApiModelProperty(hidden = true)
@@ -48,83 +50,4 @@ public class UserRefJob {
     @Column(name = "del_flag")
     private Integer delFlag;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getJobAlias() {
-        return jobAlias;
-    }
-
-    public void setJobAlias(String jobAlias) {
-        this.jobAlias = jobAlias;
-    }
-
-    public String getTargetUserId() {
-        return targetUserId;
-    }
-
-    public void setTargetUserId(String targetUserId) {
-        this.targetUserId = targetUserId;
-    }
-
-    public String getTargetNickname() {
-        return targetNickname;
-    }
-
-    public void setTargetNickname(String targetNickname) {
-        this.targetNickname = targetNickname;
-    }
-
-    public String getOpenId() {
-        return openId;
-    }
-
-    public void setOpenId(String openId) {
-        this.openId = openId;
-    }
-
-    public String getUnionId() {
-        return unionId;
-    }
-
-    public void setUnionId(String unionId) {
-        this.unionId = unionId;
-    }
-
-    public Date getCrtTime() {
-        return crtTime;
-    }
-
-    public void setCrtTime(Date crtTime) {
-        this.crtTime = crtTime;
-    }
-
-    public Date getUpdTime() {
-        return updTime;
-    }
-
-    public void setUpdTime(Date updTime) {
-        this.updTime = updTime;
-    }
-
-    public String getTargetAvatar() {
-        return targetAvatar;
-    }
-
-    public void setTargetAvatar(String targetAvatar) {
-        this.targetAvatar = targetAvatar;
-    }
-
-    public Integer getDelFlag() {
-        return delFlag;
-    }
-
-    public void setDelFlag(Integer delFlag) {
-        this.delFlag = delFlag;
-    }
 }

@@ -82,16 +82,7 @@ public class UserRefJobController extends BaseController<UserRefJobBiz,UserRefJo
             List<TimerJob> timerJobs = timerJobBiz.selectByExample(example);
             //未创建该目标对象的任务
             if(timerJobs.size()==0){
-                TimerJob newJob = new TimerJob();
-                newJob.setCronExpression("0 */1 * * * ?");
-                newJob.setJobName(userRefJob.getTargetUserId());
-                newJob.setJobGroup("group1");
-                newJob.setStatus(1);
-                newJob.setJobType("听歌排行爬取任务");
-                newJob.setTargetUserid(userRefJob.getTargetUserId());
-                newJob.setTargetNickname(userRefJob.getTargetNickname());
-                newJob.setCrtUser(userRefJob.getOpenId());
-                newJob.setCrtTime(new Date());
+                TimerJob newJob = userRefJobToJob(userRefJob);
                 timerJobBiz.insert(newJob);
                 baseQuartzBiz.createJobByGosTimerJob(newJob);
             }
@@ -150,5 +141,19 @@ public class UserRefJobController extends BaseController<UserRefJobBiz,UserRefJo
         }else{
             return ResponseEntity.status(200).body("删除成功");
         }
+    }
+
+    private TimerJob userRefJobToJob(UserRefJob userRefJob){
+        TimerJob newJob = new TimerJob();
+        newJob.setCronExpression("0 */1 * * * ?");
+        newJob.setJobName(userRefJob.getTargetUserId());
+        newJob.setJobGroup("group1");
+        newJob.setStatus(1);
+        newJob.setJobType("听歌排行爬取任务");
+        newJob.setTargetUserid(userRefJob.getTargetUserId());
+        newJob.setTargetNickname(userRefJob.getTargetNickname());
+        newJob.setCrtUser(userRefJob.getOpenId());
+        newJob.setCrtTime(new Date());
+        return newJob;
     }
 }
