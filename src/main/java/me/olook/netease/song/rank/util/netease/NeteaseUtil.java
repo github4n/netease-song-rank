@@ -163,7 +163,7 @@ public class NeteaseUtil {
                 }
                 JSONObject jsonObject = JSONObject.parseObject(jsonStr);
                 String code = jsonObject.get("code").toString();
-                if("-460".equals(code)){
+                if("-460".equals(code)||"403".equals(code)){
                     if(proxyInfo != null){
                         log.info(userId+" code -406 "+proxyInfo.toString());
                         if(currentProxy.get(randomProxyKey)!=null){
@@ -176,9 +176,14 @@ public class NeteaseUtil {
                     }
                     return null;
                 }
-                if(!"200".equals(code)){
+                if("-2".equals(code)){
                     log.warn("{} 获取数据权限不足 code: {}",userId,code);
                     throw new PermissionDeniedException(userId+" 获取数据权限不足 , code: "+code);
+                }
+                if(!"200".equals(code)){
+                    log.warn("{} 获取数据返回码错误 code: {}",userId,code);
+                    log.warn(jsonStr);
+                    return null;
                 }
                 if(proxyInfo != null){
                     log.debug("{} 任务执行完成,获取到有效数据,使用代理: {}. {}",userId,randomProxyKey,proxyInfo.toString());
@@ -241,6 +246,6 @@ public class NeteaseUtil {
 
     public static void main(String[] args) {
         //获取听歌排行数据
-       System.out.println(songCount("618063500"));
+       System.out.println(songRank("9753203"));
     }
 }

@@ -34,6 +34,7 @@ public class UserRefJobBiz extends BaseBiz<UserRefJobMapper,UserRefJob> {
     public UserRefJob getUserJobByTargetUserId(String targetUserId){
         Example example = new Example(UserRefJob.class);
         example.createCriteria().andEqualTo("targetUserId",targetUserId).andEqualTo("delFlag",0);
+        //todo 任务已删除 推送错误
         return this.selectByExample(example).get(0);
     }
 }
