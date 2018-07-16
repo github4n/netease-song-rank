@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import me.olook.netease.song.rank.dto.NeteaseUserDTO;
+import me.olook.netease.song.rank.util.proxy.ProxyInfo;
+import me.olook.netease.song.rank.util.proxy.UserAgents;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -27,7 +29,7 @@ import java.io.IOException;
 import java.util.*;
 
 import static com.alibaba.fastjson.JSON.parseObject;
-import static me.olook.netease.song.rank.util.ProxyUtil.currentProxy;
+import static me.olook.netease.song.rank.util.proxy.ProxyUtil.currentProxy;
 
 /**
  * 网易云工具

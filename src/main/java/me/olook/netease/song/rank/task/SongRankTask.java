@@ -80,7 +80,7 @@ public class SongRankTask implements Job {
         TimerJobRecord oldRecord = timerJobRecordBiz.getLatestRecord(currentJob.getId());
         //暂无最近一周听歌数据
         if(array.size() == 0){
-            log.info("{} {} 执行结束,无周榜数据",currentJob.getTargetNickname(),currentJob.getTargetUserid());
+            log.debug("{} {} 执行结束,无周榜数据",currentJob.getTargetNickname(),currentJob.getTargetUserid());
             // 无周榜数据 若没有记录新数据 同样插入一条快照记录 表示初始数据
             if(oldRecord == null){
                 log.info("{} {} 初始空白数据",currentJob.getTargetNickname(),currentJob.getTargetUserid());
@@ -228,7 +228,7 @@ public class SongRankTask implements Job {
         }
 
         if(addList.size()==0){
-                log.warn("快照不同，但未找出变动歌曲!");
+                log.warn("快照不同，但未找出变动歌曲");
                 log.debug(JSONObject.toJSONString(oldDataList));
                 log.debug(JSONObject.toJSONString(newDataList));
                 return null;

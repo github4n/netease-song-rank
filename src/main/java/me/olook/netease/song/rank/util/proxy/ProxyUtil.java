@@ -35,7 +35,7 @@ public class ProxyUtil {
      * 大象代理订单id
      * http://www.daxiangdaili.com/orders
      */
-    private static final String PROXY_ORDER_ID ="大象代理订单id";
+    private static final String PROXY_ORDER_ID ="559808970308294";
 
     /**
      * 是否正在获取代理
