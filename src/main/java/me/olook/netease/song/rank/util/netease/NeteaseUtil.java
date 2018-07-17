@@ -4,8 +4,10 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import lombok.extern.slf4j.Slf4j;
 import me.olook.netease.song.rank.dto.NeteaseUserDTO;
 import me.olook.netease.song.rank.exception.PermissionDeniedException;
+import me.olook.netease.song.rank.exception.ProxyInvalidException;
 import me.olook.netease.song.rank.util.proxy.ProxyInfo;
 import me.olook.netease.song.rank.util.proxy.UserAgents;
 import org.apache.http.HttpHost;
@@ -21,8 +23,6 @@ import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
@@ -38,9 +38,8 @@ import static me.olook.netease.song.rank.util.proxy.ProxyUtil.currentProxy;
  * @author zhaohw
  * @date 2018-03-05 21:36
  */
+@Slf4j
 public class NeteaseUtil {
-
-    private static Logger log = LoggerFactory.getLogger(NeteaseUtil.class);
 
     /**
      * 搜索网易云用户
@@ -198,14 +197,12 @@ public class NeteaseUtil {
             }
             return null;
         } catch (IOException e) {
-            log.warn("{} 请求IO异常：{}",userId,e.getMessage());
             if(currentProxy.get(randomProxyKey)!=null){
-                log.warn("请求IO异常,移除失效代理 {}",randomProxyKey);
                 currentProxy.remove(randomProxyKey);
                 return null;
             }
+            throw new ProxyInvalidException(currentProxy.get(randomProxyKey).toString());
         }
-        return null;
     }
 
     /**
