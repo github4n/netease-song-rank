@@ -199,9 +199,9 @@ public class NeteaseUtil {
         } catch (IOException e) {
             if(currentProxy.get(randomProxyKey)!=null){
                 currentProxy.remove(randomProxyKey);
-                return null;
+                throw new ProxyInvalidException(currentProxy.get(randomProxyKey).toString());
             }
-            throw new ProxyInvalidException(currentProxy.get(randomProxyKey).toString());
+            return null;
         }
     }
 
