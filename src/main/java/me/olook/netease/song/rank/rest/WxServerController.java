@@ -134,6 +134,7 @@ public class WxServerController {
         SongRankDiffListDTO songRankDiffDTO = new  SongRankDiffListDTO();
         //查看任务是否已经停止
         TimerJob timerJob = timerJobBiz.findByTargetUserId(userId);
+        timerJobBiz.updateLastTime(userId);
         if(timerJob == null||TimerJob.STATUS_STOP.equals(timerJob.getStatus())){
             return ResponseEntity.status(403).body("Ta好像已经隐藏了自己的听歌记录,建议尝试取消再重新关注Ta.");
         }

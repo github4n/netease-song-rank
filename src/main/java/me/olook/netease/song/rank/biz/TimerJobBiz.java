@@ -6,6 +6,7 @@ import me.olook.netease.song.rank.mapper.TimerJobMapper;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,5 +29,27 @@ public class TimerJobBiz extends BaseBiz<TimerJobMapper,TimerJob>{
             return list.get(0);
         }
         return null;
+    }
+
+    /**
+     * 更新任务最后查看时间
+     * @param userId
+     */
+    public void updateLastTime(String userId){
+        Example example = new Example(TimerJob.class);
+        example.createCriteria().andEqualTo("targetUserid",userId);
+        TimerJob timerJob = new TimerJob();
+        timerJob.setTargetUserid(userId);
+        timerJob.setUpdTime(new Date());
+        timerJob.setUpdName("getRecord");
+        mapper.updateByExampleSelective(timerJob,example);
+
+    }
+
+    /**
+     * 查询不活跃爬虫
+     */
+    public List<TimerJob> findExpiredTimerJob(Integer dayDiff){
+       return mapper.findExpiredTimerJob(dayDiff);
     }
 }

@@ -37,4 +37,16 @@ public class UserRefJobBiz extends BaseBiz<UserRefJobMapper,UserRefJob> {
         //todo 任务已删除 推送错误
         return this.selectByExample(example).get(0);
     }
+
+    /**
+     * 通过网易云id逻辑删除任务绑定
+     */
+    public void updateDelFlagByTargetUserId(String targetUserId,Integer delFlag){
+        Example example = new Example(UserRefJob.class);
+        example.createCriteria().andEqualTo("targetUserId",targetUserId);
+        UserRefJob userRefJob = new UserRefJob();
+        userRefJob.setTargetUserId(targetUserId);
+        userRefJob.setDelFlag(delFlag);
+        mapper.updateByExampleSelective(userRefJob,example);
+    }
 }

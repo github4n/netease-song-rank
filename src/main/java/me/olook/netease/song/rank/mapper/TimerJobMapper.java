@@ -1,7 +1,10 @@
 package me.olook.netease.song.rank.mapper;
 
 import me.olook.netease.song.rank.entity.TimerJob;
+import org.apache.ibatis.annotations.Param;
 import tk.mybatis.mapper.common.Mapper;
+
+import java.util.List;
 
 /**
 * @定时任务mapper
@@ -10,4 +13,5 @@ import tk.mybatis.mapper.common.Mapper;
 */
 public interface TimerJobMapper extends Mapper<TimerJob> {
 
+    List<TimerJob> findExpiredTimerJob(@Param("dayDiff") Integer dayDiff);
 }
