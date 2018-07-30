@@ -12,5 +12,6 @@
         <result column="job_group" property="jobGroup"/>
         <result column="status" property="status"/>
         <result column="del_flag" property="delDlag"/>
+        <result column="target_userid" property="targetUserid"/>
     </resultMap>
 </mapper>
