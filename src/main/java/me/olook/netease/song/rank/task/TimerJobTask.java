@@ -11,6 +11,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -25,7 +26,7 @@ public class TimerJobTask implements Job {
     /**
      * 不活跃判定周期
      */
-    private final static int DAY_DIFF = 7;
+    private final static int DAY_DIFF = 5;
 
     @Autowired
     private TimerJobBiz timerJobBiz;
@@ -43,7 +44,9 @@ public class TimerJobTask implements Job {
             //删除quartz job
             baseQuartzBiz.deleteScheduleJob(p.getJobName(),p.getJobGroup());
             //更新timer job 状态
-            p.setStatus(TimerJob.STATUS_STOP);
+            p.setStatus(TimerJob.STATUS_EXPIRED);
+            p.setUpdTime(new Date());
+            p.setUpdName("不活跃自动清理");
             timerJobBiz.updateSelectiveById(p);
             //更新user_ref_job del_flag
             userRefJobBiz.updateDelFlagByTargetUserId(p.getTargetUserid(),1);

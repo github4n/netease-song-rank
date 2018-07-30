@@ -4,6 +4,9 @@ import me.olook.netease.song.rank.base.BaseBiz;
 import me.olook.netease.song.rank.entity.AppNotice;
 import me.olook.netease.song.rank.mapper.AppNoticeMapper;
 import org.springframework.stereotype.Service;
+import tk.mybatis.mapper.entity.Example;
+
+import java.util.List;
 
 /**
  * 系统公告
@@ -13,4 +16,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class AppNoticeBiz extends BaseBiz<AppNoticeMapper,AppNotice> {
 
+    public List<AppNotice> findByType(String type){
+        Example example = new Example(AppNotice.class);
+        example.createCriteria().andEqualTo("type",type).andEqualTo("delFlag","0");
+        return mapper.selectByExample(example);
+    }
 }

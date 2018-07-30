@@ -87,7 +87,8 @@ public class UserRefJobController extends BaseController<UserRefJobBiz,UserRefJo
                 baseQuartzBiz.createJobByGosTimerJob(newJob);
             }
             //已创建目标任务对象 未启动
-            else if(TimerJob.STATUS_STOP.equals(timerJobs.get(0).getStatus())){
+            else if(TimerJob.STATUS_STOP.equals(timerJobs.get(0).getStatus())
+                    || TimerJob.STATUS_EXPIRED.equals(timerJobs.get(0).getStatus())){
                     TimerJob oldTimerJob = timerJobs.get(0);
                     oldTimerJob.setStatus(TimerJob.STATUS_RUN);
                     timerJobBiz.updateSelectiveById(oldTimerJob);

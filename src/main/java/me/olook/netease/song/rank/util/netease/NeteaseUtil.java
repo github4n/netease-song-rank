@@ -170,7 +170,7 @@ public class NeteaseUtil {
                             currentProxy.remove(randomProxyKey);
                         }
                     }else {
-                        log.warn("{} code -406 ,proxy : {}",userId,currentProxy.get(randomProxyKey).toString());
+                        log.warn("{} code -406 ,proxy : {}",userId,currentProxy.get(randomProxyKey));
                         currentProxy.remove(randomProxyKey);
                     }
                     return null;
@@ -199,7 +199,7 @@ public class NeteaseUtil {
         } catch (IOException e) {
             if(currentProxy.get(randomProxyKey)!=null){
                 currentProxy.remove(randomProxyKey);
-                throw new ProxyInvalidException(currentProxy.get(randomProxyKey).toString());
+                throw new ProxyInvalidException(currentProxy.get(randomProxyKey)!=null?currentProxy.get(randomProxyKey).toString():"null proxy");
             }
             return null;
         }

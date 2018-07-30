@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import me.olook.netease.song.rank.base.BaseController;
 import me.olook.netease.song.rank.biz.BaseQuartzBiz;
 import me.olook.netease.song.rank.biz.TimerJobBiz;
+import me.olook.netease.song.rank.biz.UserRefJobBiz;
 import me.olook.netease.song.rank.entity.TimerJob;
 import me.olook.netease.song.rank.util.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +13,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author zhaohw
@@ -23,11 +25,13 @@ import javax.validation.Valid;
 @Controller
 @RequestMapping("timer")
 @Api(description = "定时任务模块")
-@ApiIgnore
 public class TimerJobController extends BaseController<TimerJobBiz,TimerJob>{
 
     @Autowired
     private BaseQuartzBiz baseQuartzBiz;
+
+    @Autowired
+    private UserRefJobBiz userRefJobBiz;
 
     @ApiOperation(value = "新增")
     @RequestMapping(value = "",method = RequestMethod.POST)
@@ -80,5 +84,21 @@ public class TimerJobController extends BaseController<TimerJobBiz,TimerJob>{
             baseQuartzBiz.deleteScheduleJob(targetJob.getJobName(),targetJob.getJobGroup());
         }
         return super.remove(id);
+    }
+
+    @ApiOperation(value = "清理不活跃任务")
+    @RequestMapping(value = "clear",method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity clear(Integer dayDiff){
+        List<TimerJob> timerJobs = baseBiz.findExpiredTimerJob(dayDiff);
+        timerJobs.forEach(p->{
+            baseQuartzBiz.deleteScheduleJob(p.getJobName(),p.getJobGroup());
+            p.setStatus(TimerJob.STATUS_EXPIRED);
+            p.setUpdTime(new Date());
+            p.setUpdName("不活跃手动清理");
+            baseBiz.updateSelectiveById(p);
+            userRefJobBiz.updateDelFlagByTargetUserId(p.getTargetUserid(),1);
+        });
+        return ResponseEntity.status(200).body("清理不活跃爬虫任务 "+timerJobs.size()+" 个");
     }
 }

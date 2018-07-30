@@ -29,13 +29,13 @@ public class ProxyUtil {
 
     public static Hashtable<Integer,ProxyInfo> currentProxy = new Hashtable<>();
 
-    public static final Integer DEFAULT_PROXY_POOL_SIZE = 15;
+    public static final Integer DEFAULT_PROXY_POOL_SIZE = 25;
 
     /**
      * 大象代理订单id
      * http://www.daxiangdaili.com/orders
      */
-    private static final String PROXY_ORDER_ID ="559808970308294";
+    private static final String PROXY_ORDER_ID ="557519751112708";
 
     /**
      * 是否正在获取代理
@@ -51,7 +51,7 @@ public class ProxyUtil {
                 try {
                     HttpClient httpClient = HttpClientBuilder.create().build();
                     HttpGet request =
-                            new HttpGet("http://tvp.daxiangdaili.com/ip/?tid="+PROXY_ORDER_ID+"&num=1&delay=3&filter=on");
+                            new HttpGet("http://tvp.daxiangdaili.com/ip/?tid="+PROXY_ORDER_ID+"&num=1&delay=5&filter=on");
                     HttpResponse response = httpClient.execute(request);
                     if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
                         //获取响应实体
@@ -140,7 +140,7 @@ public class ProxyUtil {
         try {
             HttpClient httpClient = HttpClientBuilder.create().build();
             HttpGet request =
-                    new HttpGet("http://tvp.daxiangdaili.com/ip/?tid="+PROXY_ORDER_ID+"&num=1&delay=3&filter=on");
+                    new HttpGet("http://tvp.daxiangdaili.com/ip/?tid="+PROXY_ORDER_ID+"&num=1&delay=5&filter=on");
             HttpResponse response = httpClient.execute(request);
             if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
                 //获取响应实体
@@ -162,7 +162,7 @@ public class ProxyUtil {
                         ProxyInfo proxyInfo = new ProxyInfo(ip,port);
                         if(checkProxy(proxyInfo.getIp(),proxyInfo.getPort())){
                             currentProxy.put(key,proxyInfo);
-                            log.debug("补充可用代理配置: {}. {}",key,proxyInfo.toString());
+                            log.info("补充可用代理配置: {}. {}",key,proxyInfo.toString());
                         }else{
                             fixProxyPool(key);
                         }

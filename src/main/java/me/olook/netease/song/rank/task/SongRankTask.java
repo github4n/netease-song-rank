@@ -61,15 +61,18 @@ public class SongRankTask implements Job {
         JSONObject jsonObject = null;
         try {
             jsonObject = NeteaseUtil.songRank(currentJob.getTargetUserid());
-        } catch (ProxyInvalidException e){
-            try{
-                jsonObject = NeteaseUtil.songRank(currentJob.getTargetUserid());
-                log.info("{} {} 代理失效,重试结果：{}",currentJob.getTargetNickname(),currentJob.getTargetUserid(), jsonObject == null);
-            }catch (Exception e1){
-                log.info("{} {} 重试失败,取消本次操作");
-                return;
-            }
-        } catch (PermissionDeniedException e){
+        }
+        catch (ProxyInvalidException e){
+//            try{
+//                jsonObject = NeteaseUtil.songRank(currentJob.getTargetUserid());
+//                log.info("{} {} 代理失效,重试结果：{}",currentJob.getTargetNickname(),currentJob.getTargetUserid(), jsonObject == null);
+//            }catch (Exception e1){
+//                log.info("{} {} 重试失败,取消本次操作");
+//                return;
+//            }
+            return;
+        }
+        catch (PermissionDeniedException e){
             log.info("{} {} 停止任务",currentJob.getTargetNickname(),currentJob.getTargetUserid());
             baseQuartzBiz.deleteScheduleJob(currentJob.getJobName(),currentJob.getJobGroup());
             currentJob.setStatus(TimerJob.STATUS_STOP);

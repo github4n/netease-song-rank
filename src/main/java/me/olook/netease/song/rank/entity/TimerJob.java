@@ -14,10 +14,12 @@ import javax.persistence.Table;
  * @author zhaohw
  * @date 2018-01-10 17:16
  */
-@Data()
+@Data
 @EqualsAndHashCode(callSuper=true)
 @Table(name = "song_rank_job")
 public class TimerJob extends BaseCreateAndUpdateEntity {
+
+    public final static Integer STATUS_EXPIRED = 2;
 
     public final static Integer STATUS_RUN = 1;
 

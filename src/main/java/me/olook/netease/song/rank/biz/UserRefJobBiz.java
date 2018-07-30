@@ -6,6 +6,7 @@ import me.olook.netease.song.rank.mapper.UserRefJobMapper;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -47,6 +48,7 @@ public class UserRefJobBiz extends BaseBiz<UserRefJobMapper,UserRefJob> {
         UserRefJob userRefJob = new UserRefJob();
         userRefJob.setTargetUserId(targetUserId);
         userRefJob.setDelFlag(delFlag);
+        userRefJob.setUpdTime(new Date());
         mapper.updateByExampleSelective(userRefJob,example);
     }
 }

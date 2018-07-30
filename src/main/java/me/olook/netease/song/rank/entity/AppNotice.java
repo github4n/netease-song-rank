@@ -29,4 +29,6 @@ public class AppNotice {
 
     @Column(name = "del_flag")
     private Integer delFlag;
+
+    private String type;
 }
