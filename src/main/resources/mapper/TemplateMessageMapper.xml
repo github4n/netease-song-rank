@@ -3,6 +3,6 @@
 <mapper namespace="me.olook.netease.song.rank.mapper.TemplateMessageMapper">
 
     <update id="updateExpired">
-        UPDATE template_msg_record set is_valid = '2' where DATEDIFF(NOW(),crt_time) > 7
+        UPDATE template_msg_record set is_valid = '2' where DATEDIFF(NOW(),crt_time) > 7 and is_valid = '1'
     </update>
 </mapper>
