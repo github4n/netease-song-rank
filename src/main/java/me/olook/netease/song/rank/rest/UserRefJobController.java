@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -146,7 +147,8 @@ public class UserRefJobController extends BaseController<UserRefJobBiz,UserRefJo
 
     private TimerJob userRefJobToJob(UserRefJob userRefJob){
         TimerJob newJob = new TimerJob();
-        newJob.setCronExpression("0 */1 * * * ?");
+        String expression = LocalDateTime.now().getSecond()+" */1 * * * ?";
+        newJob.setCronExpression(expression);
         newJob.setJobName(userRefJob.getTargetUserId());
         newJob.setJobGroup("group1");
         newJob.setStatus(1);
