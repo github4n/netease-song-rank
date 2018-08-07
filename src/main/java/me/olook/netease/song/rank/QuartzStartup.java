@@ -30,6 +30,18 @@ public class QuartzStartup implements ApplicationListener<ApplicationReadyEvent>
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
+
+
+//            log.info("rebuild quartz expression ...");
+//            jobList.stream()
+//                    .filter(p->p.getJobGroup().equals("group1"))
+//                    .forEach(p->{
+//                int second = (int) (Math.random() * 59);
+//                String expression = second+" */1 * * * ?";
+//                p.setCronExpression(expression);
+//                timerJobBiz.updateSelectiveById(p);
+//            });
+
             log.info("QuartzStartup onApplicationEvent start!");
             List<TimerJob> jobList = timerJobBiz.selectListAll();
             jobList.stream()
