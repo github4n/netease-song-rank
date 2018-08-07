@@ -29,7 +29,7 @@ public class ProxyUtil {
 
     public static Hashtable<Integer,ProxyInfo> currentProxy = new Hashtable<>();
 
-    public static final Integer DEFAULT_PROXY_POOL_SIZE = 25;
+    public static final Integer DEFAULT_PROXY_POOL_SIZE = 10;
 
     /**
      * 大象代理订单id
@@ -148,13 +148,9 @@ public class ProxyUtil {
                 String[] proxys = res.split(System.getProperty("line.separator"));
                 for(String proxy : proxys){
                     if(proxy.split(":").length<2){
-                        try {
                             log.warn(proxy);
                             Thread.sleep(3000);
                             fixProxyPool(key);
-                        } catch (InterruptedException e) {
-                            fixProxyPool(key);
-                        }
                     }else {
                         String ip = proxy.split(":")[0];
                         Integer port = Integer.parseInt(proxy.split(":")[1]);
@@ -164,15 +160,18 @@ public class ProxyUtil {
                             currentProxy.put(key,proxyInfo);
                             log.info("补充可用代理配置: {}. {}",key,proxyInfo.toString());
                         }else{
+                            Thread.sleep(500);
                             fixProxyPool(key);
                         }
                     }
                 }
             }else{
-                    fixProxyPool(key);
+                Thread.sleep(500);
+                fixProxyPool(key);
             }
-        }catch (IOException e) {
-            e.printStackTrace();
+        }catch (IOException | InterruptedException e) {
+            log.error("fixProxyPool error , retry ... {} ",e.getMessage());
+            fixProxyPool(key);
         }
     }
 

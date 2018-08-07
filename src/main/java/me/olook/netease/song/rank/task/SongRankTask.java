@@ -161,6 +161,8 @@ public class SongRankTask implements Job {
                     .jobId(currentJob.getId())
                     .endTime(new Date()).build();
             timerJobRecordBiz.insert(timerJobRecord);
+        }else{
+            log.debug("{} {} 数据未变更 hash {}",currentJob.getTargetNickname(),currentJob.getTargetUserid(),snapshot);
         }
 
     }

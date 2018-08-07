@@ -125,7 +125,9 @@ public class NeteaseUtil {
         Random random = new Random();
         int randomProxyKey = -1;
         ProxyInfo proxyInfo = null;
-        if(currentProxy.size()>0){
+
+        //至少两个代理才使用代理池
+        if(currentProxy.size() > 1){
             Set<Integer> keySet = currentProxy.keySet();
             Object[] keySetArray = keySet.toArray();
             int randomArrayIndex = random.nextInt(keySetArray.length);
@@ -166,11 +168,11 @@ public class NeteaseUtil {
                     if(proxyInfo != null){
                         log.info(userId+" code -406 "+proxyInfo.toString());
                         if(currentProxy.get(randomProxyKey)!=null){
-                            log.error("反爬虫执行，删除代理 {}",randomProxyKey);
+                            log.error("{} 反爬虫执行 , 删除代理 {}",userId,randomProxyKey);
                             currentProxy.remove(randomProxyKey);
                         }
                     }else {
-                        log.warn("{} code -406 ,proxy : {}",userId,currentProxy.get(randomProxyKey));
+                        log.warn("{} 反爬虫执行 , 代理池为空",userId);
                         currentProxy.remove(randomProxyKey);
                     }
                     return null;
@@ -184,19 +186,18 @@ public class NeteaseUtil {
                     log.warn(jsonStr);
                     return null;
                 }
-                if(proxyInfo != null){
-                    log.debug("{} 任务执行完成,获取到有效数据,使用代理: {}. {}",userId,randomProxyKey,proxyInfo.toString());
-                }
+
+                log.debug("{} 获取到有效数据,使用代理 {}", userId,proxyInfo);
                 return jsonObject;
             }
-            log.warn("{} 请求返回码错误: {}",userId,response.getStatusLine().getStatusCode());
+            log.warn("{} http返回码错误: {}",userId,response.getStatusLine().getStatusCode());
             if(currentProxy.get(randomProxyKey)!=null){
-                log.warn("请求返回码错误,移除失效代理 {}",randomProxyKey);
+                log.warn("http返回码错误,移除失效代理 {}",randomProxyKey);
                 currentProxy.remove(randomProxyKey);
-                return null;
             }
             return null;
         } catch (IOException e) {
+            log.error("{} http IO异常,使用代理 {}",userId, proxyInfo);
             if(currentProxy.get(randomProxyKey)!=null){
                 currentProxy.remove(randomProxyKey);
                 throw new ProxyInvalidException(currentProxy.get(randomProxyKey)!=null?currentProxy.get(randomProxyKey).toString():"null proxy");
