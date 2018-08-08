@@ -58,7 +58,7 @@ public class TimerJobController extends BaseController<TimerJobBiz,TimerJob>{
         } catch (Exception e) {
             return ResponseEntity.status(500).body("主键查询失败");
         }
-        TimerJob targetJob = baseBiz.selectById(id);
+        TimerJob targetJob = baseBiz.selectById(Integer.parseInt(id.toString()));
         int num = baseBiz.updateSelectiveById(timerJob);
         if(!timerJob.getStatus().equals(targetJob.getStatus())){
             if(TimerJob.STATUS_RUN.equals(timerJob.getStatus())){
@@ -67,10 +67,10 @@ public class TimerJobController extends BaseController<TimerJobBiz,TimerJob>{
                 baseQuartzBiz.deleteScheduleJob(targetJob.getJobName(),targetJob.getJobGroup());
             }
         }
-        if(num>0){
-            return ResponseEntity.status(500).body("更新数目为0");
-        }else{
+        if(num > 0){
             return ResponseEntity.status(200).body("更新成功");
+        }else{
+            return ResponseEntity.status(500).body("更新数目为0");
         }
     }
 

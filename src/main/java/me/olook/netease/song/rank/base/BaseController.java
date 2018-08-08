@@ -59,9 +59,9 @@ public class BaseController<Biz extends BaseBiz,Entity> {
         }
         int num = baseBiz.updateSelectiveById(entity);
         if(num>0){
-            return ResponseEntity.status(500).body("更新数目为0");
-        }else{
             return ResponseEntity.status(200).body("更新成功");
+        }else{
+            return ResponseEntity.status(500).body("更新数目为0");
         }
     }
 

@@ -41,7 +41,7 @@ public class TimerJobBiz extends BaseBiz<TimerJobMapper,TimerJob>{
         TimerJob timerJob = new TimerJob();
         timerJob.setTargetUserid(userId);
         timerJob.setUpdTime(new Date());
-        timerJob.setUpdName("getRecord");
+        timerJob.setUpdName("get record");
         mapper.updateByExampleSelective(timerJob,example);
 
     }

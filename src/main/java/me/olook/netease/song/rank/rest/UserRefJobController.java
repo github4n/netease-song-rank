@@ -92,6 +92,8 @@ public class UserRefJobController extends BaseController<UserRefJobBiz,UserRefJo
                     || TimerJob.STATUS_EXPIRED.equals(timerJobs.get(0).getStatus())){
                     TimerJob oldTimerJob = timerJobs.get(0);
                     oldTimerJob.setStatus(TimerJob.STATUS_RUN);
+                    oldTimerJob.setUpdTime(new Date());
+                    oldTimerJob.setUpdName("re run");
                     timerJobBiz.updateSelectiveById(oldTimerJob);
                     baseQuartzBiz.createJobByGosTimerJob(oldTimerJob);
 
@@ -157,6 +159,8 @@ public class UserRefJobController extends BaseController<UserRefJobBiz,UserRefJo
         newJob.setTargetNickname(userRefJob.getTargetNickname());
         newJob.setCrtUser(userRefJob.getOpenId());
         newJob.setCrtTime(new Date());
+        newJob.setUpdTime(new Date());
+        newJob.setUpdName("new job");
         return newJob;
     }
 }
