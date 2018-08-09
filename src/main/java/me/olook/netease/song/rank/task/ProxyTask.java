@@ -19,7 +19,7 @@ import static me.olook.netease.song.rank.util.proxy.ProxyUtil.currentProxy;
  * @date 2018-04-03 9:45
  */
 //@DisallowConcurrentExecution
-@TimerJobTypeName(value = "代理维护任务")
+@TimerJobTypeName(value = "代理维护任务old")
 public class ProxyTask implements Job {
 
     private Logger log = LoggerFactory.getLogger(ProxyTask.class);
