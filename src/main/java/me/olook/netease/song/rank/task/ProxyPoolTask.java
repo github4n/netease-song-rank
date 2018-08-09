@@ -16,7 +16,7 @@ import static me.olook.netease.song.rank.util.proxy.ProxyUtil.currentProxy;
 @Component
 public class ProxyPoolTask {
 
-    @Scheduled(fixedDelay = 1000 * 10)
+    @Scheduled(initialDelay = 1000 * 10 , fixedDelay = 1000 * 10)
     public void fix() {
         int size = currentProxy.size();
         log.info("当前存活有效代理数量: {}",currentProxy.size());

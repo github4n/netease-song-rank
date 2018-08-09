@@ -29,14 +29,11 @@ public class ProxyUtil {
 
     public static Hashtable<Integer,ProxyInfo> currentProxy = new Hashtable<>();
 
-    public static final Integer DEFAULT_PROXY_POOL_SIZE = 10;
+    public static Integer DEFAULT_PROXY_POOL_SIZE = 10;
 
-    /**
-     * 大象代理订单id
-     * http://www.daxiangdaili.com/orders
-     */
-    private static final String PROXY_ORDER_ID ="557519751112708";
+    public static String PROXY_ORDER_ID ="";
 
+    public static String PROXY_API_OPTION ="";
     /**
      * 是否正在获取代理
      */
@@ -51,7 +48,7 @@ public class ProxyUtil {
                 try {
                     HttpClient httpClient = HttpClientBuilder.create().build();
                     HttpGet request =
-                            new HttpGet("http://tvp.daxiangdaili.com/ip/?tid="+PROXY_ORDER_ID+"&num=1&delay=5&filter=on");
+                            new HttpGet("http://tvp.daxiangdaili.com/ip/?tid="+PROXY_ORDER_ID+PROXY_API_OPTION);
                     HttpResponse response = httpClient.execute(request);
                     if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
                         //获取响应实体
@@ -102,9 +99,9 @@ public class ProxyUtil {
             RequestConfig.Builder builder = RequestConfig.custom();
             HttpHost proxy = new HttpHost(ip, port, "http");
             builder.setProxy(proxy);
-            builder.setConnectTimeout(2000);
-            builder.setConnectionRequestTimeout(2000);
-            builder.setSocketTimeout(5000);
+            builder.setConnectTimeout(3000);
+            builder.setConnectionRequestTimeout(3000);
+            builder.setSocketTimeout(4000);
             RequestConfig proxyConfig = builder.build();
 
             HttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(proxyConfig).build();
@@ -121,11 +118,7 @@ public class ProxyUtil {
                 // 通过请求对象获取响应对象
                 HttpResponse response = httpClient.execute(request);
                 //判断网络连接状态码是否正常(0--200都数正常)
-                if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
-                    //获取响应实体
-                    return true;
-                }
-                return false;
+                return response.getStatusLine().getStatusCode() == HttpStatus.OK.value();
             } catch (IOException e) {
                 return false;
             }
@@ -140,7 +133,7 @@ public class ProxyUtil {
         try {
             HttpClient httpClient = HttpClientBuilder.create().build();
             HttpGet request =
-                    new HttpGet("http://tvp.daxiangdaili.com/ip/?tid="+PROXY_ORDER_ID+"&num=1&delay=5&filter=on");
+                    new HttpGet("http://tvp.daxiangdaili.com/ip/?tid="+PROXY_ORDER_ID+PROXY_API_OPTION);
             HttpResponse response = httpClient.execute(request);
             if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
                 //获取响应实体
@@ -158,8 +151,9 @@ public class ProxyUtil {
                         ProxyInfo proxyInfo = new ProxyInfo(ip,port);
                         if(checkProxy(proxyInfo.getIp(),proxyInfo.getPort())){
                             currentProxy.put(key,proxyInfo);
-                            log.info("补充可用代理配置: {}. {}",key,proxyInfo.toString());
+                            log.info("accept proxy: {}. {}",key,proxyInfo.toString());
                         }else{
+                            log.warn("discard proxy: {}. {}",key,proxyInfo.toString());
                             Thread.sleep(500);
                             fixProxyPool(key);
                         }
