@@ -197,7 +197,7 @@ public class NeteaseUtil {
             }
             return null;
         } catch (IOException e) {
-            log.error("{} http IO异常,使用代理 {}",userId, proxyInfo);
+            log.error("{} http IO异常,使用代理 {} , {}",userId, proxyInfo,e.getMessage());
             if(currentProxy.get(randomProxyKey)!=null){
                 currentProxy.remove(randomProxyKey);
                 throw new ProxyInvalidException(currentProxy.get(randomProxyKey)!=null?currentProxy.get(randomProxyKey).toString():"null proxy");

@@ -26,7 +26,7 @@ public class TimerJobTask implements Job {
     /**
      * 不活跃判定周期
      */
-    private final static int DAY_DIFF = 5;
+    private final static int DAY_DIFF = 8;
 
     @Autowired
     private TimerJobBiz timerJobBiz;
