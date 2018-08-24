@@ -1,8 +1,7 @@
 logging:
     level:
         tk.mybatis: INFO
-        package com.gospell.platform.oa.biz.user: INFO
-        
+
 spring:
     application:
         name: netease-song-rank
@@ -14,7 +13,7 @@ spring:
         name: test
         url: jdbc:mysql://127.0.0.1:3306/song_rank?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowMultiQueries=true
         username: root
-        password: 
+        password:
         # 使用druid数据源
         type: com.alibaba.druid.pool.DruidDataSource
         driver-class-name: com.mysql.cj.jdbc.Driver
@@ -50,10 +49,10 @@ server:
     port: 443
     ssl:
         key-store: /software/wxapp.olook.me.jks
-        key-store-password: 
+        key-store-password:
 http:
     port: 80
-    
+
 flyway:
     baselineOnMigrate: true
     # 暂时关闭flyway校验
@@ -67,11 +66,11 @@ swagger:
         description:  ·公用定时任务服务
         developer: red
 wxapp:
-    appId: 
-    appSecret: 
+    appId:
+    appSecret:
     grantType: authorization_code
 proxy:
-    order-id: 
+    order-id:
     pool-size: 10
-    # 不加转义有毒 \&num=1\&delay=5\&filter=on
+    # \&num=1\&delay=5\&filter=on
     option: \&num=1\&filter=on
