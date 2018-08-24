@@ -34,7 +34,6 @@ import static me.olook.netease.song.rank.util.proxy.ProxyUtil.currentProxy;
 
 /**
  * 网易云工具
- *
  * @author zhaohw
  * @date 2018-03-05 21:36
  */

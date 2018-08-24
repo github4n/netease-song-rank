@@ -34,54 +34,13 @@ public class ProxyUtil {
     public static String PROXY_ORDER_ID ="";
 
     public static String PROXY_API_OPTION ="";
-    /**
-     * 是否正在获取代理
-     */
 
     public static AtomicInteger index = new AtomicInteger(0);
 
     /**
-     * 初始化代理池
-     * @param num 代理池大小
+     * 校验代理
+     * @return 是否可用
      */
-    public static void init(int num){
-                try {
-                    HttpClient httpClient = HttpClientBuilder.create().build();
-                    HttpGet request =
-                            new HttpGet("http://tvp.daxiangdaili.com/ip/?tid="+PROXY_ORDER_ID+PROXY_API_OPTION);
-                    HttpResponse response = httpClient.execute(request);
-                    if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
-                        //获取响应实体
-                        String res = EntityUtils.toString(response.getEntity(), "utf-8");
-                        String[] proxys = res.split(System.getProperty("line.separator"));
-                        for(String proxy : proxys){
-                            if(proxy.split(":").length<2){
-                                //代理格式不正确，重新获取
-                                init(num);
-                            }else{
-
-                            String ip = proxy.split(":")[0];
-                            Integer port = Integer.parseInt(proxy.split(":")[1]);
-                            ProxyInfo proxyInfo = new ProxyInfo(ip,port);
-                                if(checkProxy(proxyInfo.getIp(),proxyInfo.getPort())){
-                                    currentProxy.put(num-currentProxy.size(),proxyInfo);
-                                    log.info("添加可用代理配置: {}",proxyInfo.toString());
-                                    System.out.println(JSONObject.toJSONString(currentProxy));
-                                    if(currentProxy.size()<num){
-                                        init(num);
-                                    }
-                                }else{
-                                    init(num);
-                                }
-                            }
-                        }
-                    }
-                }catch (IOException e) {
-                    e.printStackTrace();
-                }
-        }
-
-
     private static boolean checkProxy(String ip,Integer port){
             log.debug("校验代理: {} : {}",ip,port);
             Map<String,String> map = Maps.newHashMap();
@@ -170,6 +129,5 @@ public class ProxyUtil {
     }
 
     public static void main(String[] args) {
-            ProxyUtil.init(5);
     }
 }
