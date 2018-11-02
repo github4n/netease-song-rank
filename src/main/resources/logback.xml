@@ -1,8 +1,6 @@
 <configuration>
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
     <jmxConfigurator/>
-    <logger name="com.gospell.platform.oa.gos.timerserver.mapper" level="INFO"></logger>
-    <logger name="com.gargoylesoftware.htmlunit" level="OFF"></logger>
 
     <!-- 定义日志文件 输入位置 -->
     <property name="log_dir" value="/software/song-rank-log" />

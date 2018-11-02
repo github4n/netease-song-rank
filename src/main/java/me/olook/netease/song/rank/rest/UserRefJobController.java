@@ -56,51 +56,49 @@ public class UserRefJobController extends BaseController<UserRefJobBiz,UserRefJo
             List<FieldError> errorList = bindingResult.getFieldErrors();
             return ResponseEntity.status(500).body(errorList.get(0).getDefaultMessage());
         }
-        synchronized (this){
-            //该用户已添加的任务
-            Example openIdExample = new Example(UserRefJob.class);
-            openIdExample.createCriteria().andEqualTo("openId",userRefJob.getOpenId()).andEqualTo("delFlag",0);
-            List<UserRefJob> listByOpenid = baseBiz.selectByExample(openIdExample);
-            int jobLimit = DEFAULT_JOB_NUM;
-            Example wxUserExm = new Example(WxUser.class);
-            wxUserExm.createCriteria().andEqualTo("openId",userRefJob.getOpenId());
-            List<WxUser> users = wxUserBiz.selectByExample(wxUserExm);
-            if(users.size()>0){
-                jobLimit = users.get(0).getJobLimit();
-            }
-            //每个用户当前只能创建3个任务
-            if(listByOpenid.size()>=jobLimit){
-                return ResponseEntity.status(401).body("您可关注好友数量已达上限!");
-            }
-
-            for(UserRefJob existJob : listByOpenid){
-                if(existJob.getTargetUserId().equals(userRefJob.getTargetUserId())){
-                    return ResponseEntity.status(401).body("您已经订阅过Ta了~");
-                }
-            }
-            Example example = new Example(TimerJob.class);
-            example.createCriteria().andEqualTo("targetUserid",userRefJob.getTargetUserId());
-            List<TimerJob> timerJobs = timerJobBiz.selectByExample(example);
-            //未创建该目标对象的任务
-            if(timerJobs.size()==0){
-                TimerJob newJob = userRefJobToJob(userRefJob);
-                timerJobBiz.insert(newJob);
-                baseQuartzBiz.createJobByGosTimerJob(newJob);
-            }
-            //已创建目标任务对象 未启动
-            else if(TimerJob.STATUS_STOP.equals(timerJobs.get(0).getStatus())
-                    || TimerJob.STATUS_EXPIRED.equals(timerJobs.get(0).getStatus())){
-                    TimerJob oldTimerJob = timerJobs.get(0);
-                    oldTimerJob.setStatus(TimerJob.STATUS_RUN);
-                    oldTimerJob.setUpdTime(new Date());
-                    oldTimerJob.setUpdName("re run");
-                    timerJobBiz.updateSelectiveById(oldTimerJob);
-                    baseQuartzBiz.createJobByGosTimerJob(oldTimerJob);
-
-            }
-            userRefJob.setCrtTime(new Date());
-            int result = baseBiz.insertSelective(userRefJob);
+        //该用户已添加的任务
+        Example openIdExample = new Example(UserRefJob.class);
+        openIdExample.createCriteria().andEqualTo("openId",userRefJob.getOpenId()).andEqualTo("delFlag",0);
+        List<UserRefJob> listByOpenid = baseBiz.selectByExample(openIdExample);
+        int jobLimit = DEFAULT_JOB_NUM;
+        Example wxUserExm = new Example(WxUser.class);
+        wxUserExm.createCriteria().andEqualTo("openId",userRefJob.getOpenId());
+        List<WxUser> users = wxUserBiz.selectByExample(wxUserExm);
+        if(users.size()>0){
+            jobLimit = users.get(0).getJobLimit();
         }
+        //每个用户当前只能创建3个任务
+        if(listByOpenid.size()>=jobLimit){
+            return ResponseEntity.status(401).body("您最多只能关注"+jobLimit+"名好友!");
+        }
+
+        for(UserRefJob existJob : listByOpenid){
+            if(existJob.getTargetUserId().equals(userRefJob.getTargetUserId())){
+                return ResponseEntity.status(401).body("您已经订阅过Ta了~");
+            }
+        }
+        Example example = new Example(TimerJob.class);
+        example.createCriteria().andEqualTo("targetUserid",userRefJob.getTargetUserId());
+        List<TimerJob> timerJobs = timerJobBiz.selectByExample(example);
+        //未创建该目标对象的任务
+        if(timerJobs.size()==0){
+            TimerJob newJob = userRefJobToJob(userRefJob);
+            timerJobBiz.insert(newJob);
+            baseQuartzBiz.createJobByGosTimerJob(newJob);
+        }
+        //已创建目标任务对象 未启动
+        else if(TimerJob.STATUS_STOP.equals(timerJobs.get(0).getStatus())
+                || TimerJob.STATUS_EXPIRED.equals(timerJobs.get(0).getStatus())){
+                TimerJob oldTimerJob = timerJobs.get(0);
+                oldTimerJob.setStatus(TimerJob.STATUS_RUN);
+                oldTimerJob.setUpdTime(new Date());
+                oldTimerJob.setUpdName("re run");
+                timerJobBiz.updateSelectiveById(oldTimerJob);
+                baseQuartzBiz.createJobByGosTimerJob(oldTimerJob);
+
+        }
+        userRefJob.setCrtTime(new Date());
+        int result = baseBiz.insertSelective(userRefJob);
         //当前目标用户存在的任务数
         Example targetUserIdExample = new Example(UserRefJob.class);
         targetUserIdExample.createCriteria()
