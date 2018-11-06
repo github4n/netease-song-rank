@@ -42,7 +42,10 @@ public class MybatisConfiguration implements EnvironmentAware {
     private String password;
     private String xmlLocation;
     private String typeAliasesPackage;
-    /////////////////////druid参数///////////////////////////////////////////////////
+
+    /**
+     * druid 参数
+     */
     private String filters;
     private String maxActive;
     private String initialSize;
@@ -56,7 +59,6 @@ public class MybatisConfiguration implements EnvironmentAware {
     private String testOnReturn;
     private String poolPreparedStatements;
     private String maxOpenPreparedStatements;
-    //////////////////////////////////////////////////////////////////////////
 
     @Bean
     public DataSource druidDataSource() {
@@ -74,10 +76,10 @@ public class MybatisConfiguration implements EnvironmentAware {
         druidDataSource.setMinEvictableIdleTimeMillis(StringUtils.isNotBlank(minEvictableIdleTimeMillis)?
                 Integer.parseInt(minEvictableIdleTimeMillis):300000);
         druidDataSource.setValidationQuery(StringUtils.isNotBlank(validationQuery)?validationQuery:"select 'x'");
-        druidDataSource.setTestWhileIdle(StringUtils.isNotBlank(testWhileIdle)? Boolean.parseBoolean(testWhileIdle):true);
-        druidDataSource.setTestOnBorrow(StringUtils.isNotBlank(testOnBorrow)? Boolean.parseBoolean(testOnBorrow):false);
-        druidDataSource.setTestOnReturn(StringUtils.isNotBlank(testOnReturn)? Boolean.parseBoolean(testOnReturn):false);
-        druidDataSource.setPoolPreparedStatements(StringUtils.isNotBlank(poolPreparedStatements)? Boolean.parseBoolean(poolPreparedStatements):true);
+        druidDataSource.setTestWhileIdle(!StringUtils.isNotBlank(testWhileIdle) || Boolean.parseBoolean(testWhileIdle));
+        druidDataSource.setTestOnBorrow(StringUtils.isNotBlank(testOnBorrow) && Boolean.parseBoolean(testOnBorrow));
+        druidDataSource.setTestOnReturn(StringUtils.isNotBlank(testOnReturn) && Boolean.parseBoolean(testOnReturn));
+        druidDataSource.setPoolPreparedStatements(!StringUtils.isNotBlank(poolPreparedStatements) || Boolean.parseBoolean(poolPreparedStatements));
         druidDataSource.setMaxOpenPreparedStatements(StringUtils.isNotBlank(maxOpenPreparedStatements)? Integer.parseInt(maxOpenPreparedStatements):20);
 
         try {

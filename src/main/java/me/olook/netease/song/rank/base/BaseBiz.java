@@ -39,7 +39,7 @@ public abstract class BaseBiz<M extends Mapper<T>, T> {
 
 
     public Long selectCount(T entity) {
-        return new Long(mapper.selectCount(entity));
+        return (long) mapper.selectCount(entity);
     }
 
 

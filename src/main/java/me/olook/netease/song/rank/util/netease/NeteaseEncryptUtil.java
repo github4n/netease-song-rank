@@ -59,8 +59,7 @@ public class NeteaseEncryptUtil {
             byte[] encrypted1 = new BASE64Decoder().decodeBuffer(sSrc);
             try {
                 byte[] original = cipher.doFinal(encrypted1);
-                String originalString = new String(original);
-                return originalString;
+                return new String(original);
             } catch (Exception e) {
                 System.out.println(e.toString());
                 return null;

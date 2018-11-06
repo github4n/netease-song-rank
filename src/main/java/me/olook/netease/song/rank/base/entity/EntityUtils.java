@@ -43,27 +43,13 @@ public class EntityUtils {
      * @author 王浩彬
      */
     public static <T> void setCreateInfo(T entity){
-        HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
-        String hostIp = "";
-        String name = "";
-        String id = "";
-        if(request!=null) {
-            hostIp = String.valueOf(request.getHeader("userHost"));
-            name = String.valueOf(request.getHeader("userName"));
-            try {
-                name = URLDecoder.decode(name,"UTF-8");
-            }catch (UnsupportedEncodingException e){
-                e.printStackTrace();
-            }
-            id = String.valueOf(request.getHeader("userId"));
-        }
         // 默认属性
         String[] fields = {"crtName","crtUser","crtHost","crtTime"};
         Field field = ReflectionUtils.getAccessibleField(entity, "crtTime");
         // 默认值
         Object [] value = null;
         if(field!=null&&field.getType().equals(Date.class)){
-            value = new Object []{name,id,hostIp,new Date()};
+            value = extractRequestInfo();
         }
         // 填充默认属性值
         setDefaultValues(entity, fields, value);
@@ -76,26 +62,12 @@ public class EntityUtils {
      * @author 王浩彬
      */
     public static <T> void setUpdatedInfo(T entity){
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String hostIp = "";
-        String name = "";
-        String id = "";
-        if(request!=null) {
-            hostIp = String.valueOf(request.getHeader("userHost"));
-            name = String.valueOf(request.getHeader("userName"));
-            try {
-                name = URLDecoder.decode(name,"UTF-8");
-            }catch (UnsupportedEncodingException e){
-                e.printStackTrace();
-            }
-            id = String.valueOf(request.getHeader("userId"));
-        }
         // 默认属性
         String[] fields = {"updName","updUser","updHost","updTime"};
         Field field = ReflectionUtils.getAccessibleField(entity, "updTime");
         Object [] value = null;
         if(field!=null&&field.getType().equals(Date.class)){
-            value = new Object []{name,id,hostIp,new Date()};
+            value = extractRequestInfo();
         }
         // 填充默认属性值
         setDefaultValues(entity, fields, value);
@@ -126,9 +98,29 @@ public class EntityUtils {
      * @date 2016年4月28日
      */
     public static <T> boolean isPKNotNull(T entity,String field){
-        if(!ReflectionUtils.hasField(entity, field))
+        if(!ReflectionUtils.hasField(entity, field)) {
             return false;
+        }
         Object value = ReflectionUtils.getFieldValue(entity, field);
         return value!=null&&!"".equals(value);
+    }
+
+    private static Object[] extractRequestInfo(){
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String hostIp = "";
+        String name = "";
+        String id = "";
+        if(request!=null) {
+            hostIp = String.valueOf(request.getHeader("userHost"));
+            name = String.valueOf(request.getHeader("userName"));
+            try {
+                name = URLDecoder.decode(name,"UTF-8");
+            }catch (UnsupportedEncodingException e){
+                e.printStackTrace();
+            }
+            id = String.valueOf(request.getHeader("userId"));
+        }
+
+        return new Object []{name,id,hostIp,new Date()};
     }
 }
