@@ -1,24 +1,23 @@
 package me.olook.netease.song.rank.biz;
 
-import me.olook.netease.song.rank.base.BaseBiz;
 import me.olook.netease.song.rank.entity.AppNotice;
-import me.olook.netease.song.rank.mapper.AppNoticeMapper;
+import me.olook.netease.song.rank.repository.AppNoticeRepository;
 import org.springframework.stereotype.Service;
-import tk.mybatis.mapper.entity.Example;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * 系统公告
  * @author zhaohw
- * @date 2018-07-15 9:55
+ * @date 2018-11-08 16:20
  */
 @Service
-public class AppNoticeBiz extends BaseBiz<AppNoticeMapper,AppNotice> {
+public class AppNoticeBiz{
+
+    @Resource
+    private AppNoticeRepository repository;
 
     public List<AppNotice> findByType(String type){
-        Example example = new Example(AppNotice.class);
-        example.createCriteria().andEqualTo("type",type).andEqualTo("delFlag","0");
-        return mapper.selectByExample(example);
+        return repository.findByType(type);
     }
 }

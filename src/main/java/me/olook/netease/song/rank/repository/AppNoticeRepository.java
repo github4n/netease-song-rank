@@ -1,4 +1,4 @@
-package me.olook.netease.song.rank.mapper;
+package me.olook.netease.song.rank.repository;
 
 import me.olook.netease.song.rank.entity.AppNotice;
 import org.springframework.data.jpa.repository.JpaRepository;
