@@ -1,1 +1,0 @@
-alter table template_msg_record  add column `upd_time` datetime;

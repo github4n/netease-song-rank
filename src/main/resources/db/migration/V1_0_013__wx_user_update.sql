@@ -1,1 +1,0 @@
-ALTER TABLE `wx_user` ADD unique(`openid`);

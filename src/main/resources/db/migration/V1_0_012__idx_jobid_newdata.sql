@@ -1,1 +1,0 @@
-ALTER TABLE song_rank_job_record ADD INDEX idx_jobid_newdata (`job_id`,`new_data`);
