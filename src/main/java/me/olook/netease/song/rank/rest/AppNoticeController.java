@@ -2,30 +2,31 @@ package me.olook.netease.song.rank.rest;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import me.olook.netease.song.rank.base.BaseController;
 import me.olook.netease.song.rank.biz.AppNoticeBiz;
 import me.olook.netease.song.rank.entity.AppNotice;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
  * @author zhaohw
- * @date 2018-07-15 9:56
+ * @date 2018-11-08 15:28
  */
-@Controller
-@RequestMapping("notice")
+@RestController
+@RequestMapping("/notice")
 @Api(description = "系统公告模块")
-public class AppNoticeController extends BaseController<AppNoticeBiz,AppNotice> {
+public class AppNoticeController {
+
+    @Resource
+    private AppNoticeBiz appNoticeBiz;
 
     @ApiOperation(value = "通过类型查询")
-    @RequestMapping(value = "/type/{type}",method = RequestMethod.GET)
-    @ResponseBody
+    @GetMapping(value = "/type/{type}")
     public List<AppNotice> findByType(@PathVariable String type){
-        return baseBiz.findByType(type);
+        return appNoticeBiz.findByType(type);
     }
 }
