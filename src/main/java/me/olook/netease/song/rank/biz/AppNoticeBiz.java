@@ -15,9 +15,9 @@ import java.util.List;
 public class AppNoticeBiz{
 
     @Resource
-    private AppNoticeRepository repository;
+    private AppNoticeRepository appNoticeRepository;
 
     public List<AppNotice> findByType(String type){
-        return repository.findByType(type);
+        return appNoticeRepository.findByType(type);
     }
 }

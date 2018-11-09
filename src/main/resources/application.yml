@@ -2,30 +2,35 @@ server:
   port: 443
   ssl:
     key-store: classpath:wxapp.olook.me.jks
-    key-store-password:
+    key-store-password: b83wf4718f
 
 spring:
-    application:
-        name: netease-song-rank
-    datasource:
-        name: test
-        url: jdbc:mysql://123.207.22.245:3306/song_rank_test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowMultiQueries=true
-        username: root
-        password:
-        type: com.alibaba.druid.pool.DruidDataSource
-        druid:
-            max-active: 20
-            initial-size: 1
-            validation-query: SELECT 'x'
-            time-between-eviction-runs-millis: 60000
-            max-wait: 60000
-            min-idle: 1
-            min-evictable-idle-time-millis: 300000
-            test-while-idle: true
-            test-on-borrow: false
-            test-on-return: false
-            pool-prepared-statements: true
-            max-open-prepared-statements: 20
-            driver-class-name: com.mysql.cj.jdbc.Driver
+  application:
+    name: netease-song-rank
+  datasource:
+    name: test
+    url: jdbc:mysql://127.0.0.1:3306/song_rank_test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowMultiQueries=true
+    username: root
+    password:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      max-active: 20
+      initial-size: 1
+      validation-query: SELECT 'x'
+      time-between-eviction-runs-millis: 60000
+      max-wait: 60000
+      min-idle: 1
+      min-evictable-idle-time-millis: 300000
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      pool-prepared-statements: true
+      max-open-prepared-statements: 20
+      driver-class-name: com.mysql.cj.jdbc.Driver
+
+wxapp:
+  app-id:
+  app-secret:
+  grant-type: authorization_code
 
 

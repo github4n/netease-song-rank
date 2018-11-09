@@ -9,6 +9,7 @@ import javax.persistence.Table;
 import java.util.Date;
 
 /**
+ * 微信API Access Token
  * @author zhaohw
  * @date 2018-03-08 13:34
  */

@@ -11,5 +11,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AccessTokenInfoRepository extends JpaRepository<AccessTokenInfo,Integer> {
 
-    AccessTokenInfo findFirstByIsValidOrderByCrtTimeDesc(Integer isvalid);
+    AccessTokenInfo findFirstByIsValidOrderByCrtTimeDesc(Integer isValid);
 }

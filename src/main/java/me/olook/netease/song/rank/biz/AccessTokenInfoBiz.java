@@ -14,9 +14,9 @@ import javax.annotation.Resource;
 public class AccessTokenInfoBiz {
 
     @Resource
-    private AccessTokenInfoRepository repository;
+    private AccessTokenInfoRepository accessTokenInfoRepository;
 
     public AccessTokenInfo getLatestValidToken(){
-        return repository.findFirstByIsValidOrderByCrtTimeDesc(1);
+        return accessTokenInfoRepository.findFirstByIsValidOrderByCrtTimeDesc(1);
     }
 }
