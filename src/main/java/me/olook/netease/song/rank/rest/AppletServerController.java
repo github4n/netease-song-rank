@@ -1,5 +1,6 @@
 package me.olook.netease.song.rank.rest;
 
+import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import me.olook.netease.song.rank.biz.UserRefJobBiz;
@@ -64,11 +65,22 @@ public class AppletServerController {
 
     @ApiOperation(value = "获取网易云用户")
     @GetMapping(value = "netease/user")
-    @ResponseBody
     public ResponseEntity getNeteaseUser(String keyWord,
                                          @RequestParam(defaultValue = "5") String limit,
                                          @RequestParam(defaultValue = "0") String offset) {
         List<NeteaseUserDTO> list = NetEaseUtil.searchUser(keyWord,limit,offset);
         return ResponseEntity.status(200).body(list);
     }
+
+//    @ApiOperation(value = "测试能否获取排行数据")
+//    @GetMapping(value = "rank/check")
+//    public ResponseEntity<String> checkSongRank(String userId) {
+//        JSONObject result = NetEaseUtil.getRecordRank(userId);
+//        if(result!=null){
+//            String code = result.get("code").toString();
+//            if("200".equals(code)){
+//                return ResponseEntity.status(200).body("true");
+//            }
+//        }
+//        return ResponseEntity.status(403).body("false");
 }
