@@ -44,6 +44,14 @@ public class SongRankData {
     @Column(name = "ratio")
     private String ratio;
 
+    @ApiModelProperty(value = "类型")
+    @Column(name = "genre")
+    private String genre;
+
+    @ApiModelProperty(value = "封面")
+    @Column(name = "pic_url")
+    private String picUrl;
+
     public SongRankData(String jobRecordId, Integer rank, String song, String singer, String ratio) {
         this.jobRecordId = jobRecordId;
         this.rank = rank;
@@ -52,4 +60,13 @@ public class SongRankData {
         this.ratio = ratio;
     }
 
+    public SongRankData(String jobRecordId, Integer rank, String song, String singer, String ratio, String genre, String picUrl) {
+        this.jobRecordId = jobRecordId;
+        this.rank = rank;
+        this.song = song;
+        this.singer = singer;
+        this.ratio = ratio;
+        this.genre = genre;
+        this.picUrl = picUrl;
+    }
 }

@@ -5,11 +5,14 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import me.olook.netease.song.rank.dto.NeteaseUserDTO;
 import me.olook.netease.song.rank.util.proxy.UserAgents;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -51,6 +54,21 @@ public class NetEaseUtil {
         return list;
     }
 
+    public static String getRecordRank(String userId){
+        Map<String,String> map = Maps.newHashMap();
+        map.put("type","1");
+        map.put("limit","1000");
+        map.put("offset","0");
+        map.put("total","true");
+        map.put("csrf_token","");
+        map.put("uid",userId);
+        String json = JSONObject.toJSONString(map);
+        // 参数加密
+        String params = NeteaseEncryptUtil.getUrlParams(json);
+        String url = NetEaseApiUrl.RECORD+params;
+        return post(url,null);
+    }
+
     /**
      * 网易云搜索请求
      * @param key 关键词
@@ -66,21 +84,42 @@ public class NetEaseUtil {
         map.put("limit",limit);
         map.put("offset",offset);
         map.put("total","true");
-        return post(NeteaseApiUrl.SEARCH,map);
+        return post(NetEaseApiUrl.SEARCH,map);
     }
 
+
     private static String post(String url , Map<String,String> params){
-        HttpClient httpClient = HttpClientBuilder.create().build();
+        return post(url,params,null);
+    }
+
+    private static String post(String url , Map<String,String> params,HttpHost proxy){
+        RequestConfig.Builder builder = RequestConfig.custom();
+        builder.setConnectTimeout(5000);
+        builder.setConnectionRequestTimeout(5000);
+        builder.setSocketTimeout(5000);
+        if(proxy!=null){
+            builder.setProxy(proxy);
+        }
+        RequestConfig proxyConfig = builder.build();
+        HttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(proxyConfig).build();
         HttpPost request = new HttpPost(url);
         addNetEaseHeader(request);
-        request.setEntity(new UrlEncodedFormEntity(addPostParam(params), Charsets.UTF_8));
+        if(params!=null){
+            request.setEntity(new UrlEncodedFormEntity(addPostParam(params), Charsets.UTF_8));
+        }
+        return httpRequest(httpClient,request);
+    }
+
+    private static String httpRequest(HttpClient httpClient,HttpRequestBase request){
         try {
             HttpResponse response = httpClient.execute(request);
             if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
                 return EntityUtils.toString(response.getEntity(),Charsets.UTF_8);
             }
+            log.error("post for {} return status code {}",request.getURI(),response.getStatusLine().getStatusCode());
         } catch (IOException e) {
-            log.error("post IOException for {} ",url);
+            e.printStackTrace();
+            log.error("post IOException for {} ",request.getURI());
         }
         return null;
     }
@@ -109,5 +148,11 @@ public class NetEaseUtil {
         String avatar = JSONObject.parseObject(json).get("avatarUrl").toString();
         String userId = JSONObject.parseObject(json).get("userId").toString();
         return new NeteaseUserDTO(userId, avatar, nickName);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(searchUser("半赫","5","0"));
+        System.out.println(getRecordRank("33255454"));
+
     }
 }
