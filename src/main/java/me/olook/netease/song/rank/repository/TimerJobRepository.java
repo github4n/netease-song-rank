@@ -11,4 +11,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TimerJobRepository extends JpaRepository<TimerJob,Integer> {
 
+    TimerJob findByTargetUserId(String targetUserId);
 }

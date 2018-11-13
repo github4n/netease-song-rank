@@ -41,7 +41,7 @@ public class TimerJob extends BaseCreateAndUpdateEntity {
     private String cronExpression;
 
     @ApiModelProperty(value = "目标用户id")
-    private String targetUserid;
+    private String targetUserId;
 
     @ApiModelProperty(value = "目标用户昵称")
     private String targetNickname;

@@ -54,7 +54,23 @@ public class NetEaseUtil {
         return list;
     }
 
-    public static String getRecordRank(String userId){
+    /**
+     * 检查能否获取排行榜数据
+     */
+    public static boolean checkRankAccess(String userId){
+        String recordRank = getRecordRank(userId);
+        return recordRank != null && JSON.parseObject(recordRank).getInteger("code").equals(200);
+    }
+
+    /**
+     * 获取排行榜数据
+     */
+    public static JSONObject getSongRankData(String userId){
+        String rankStr = getRecordRank(userId);
+        return rankStr == null ? null:JSON.parseObject(rankStr);
+    }
+
+    private static String getRecordRank(String userId){
         Map<String,String> map = Maps.newHashMap();
         map.put("type","1");
         map.put("limit","1000");
@@ -66,6 +82,7 @@ public class NetEaseUtil {
         // 参数加密
         String params = NeteaseEncryptUtil.getUrlParams(json);
         String url = NetEaseApiUrl.RECORD+params;
+        // todo   代理   zhaohw 2018/11/13 10:30
         return post(url,null);
     }
 
@@ -75,7 +92,6 @@ public class NetEaseUtil {
      * @param type 搜索类型 1002 用户
      * @param limit 限制
      * @param offset 偏移
-     * @return
      */
     private static String netEaseSearch(String key,String type,String limit,String offset){
         Map map = new HashMap<String,String>(4);
@@ -150,9 +166,4 @@ public class NetEaseUtil {
         return new NeteaseUserDTO(userId, avatar, nickName);
     }
 
-    public static void main(String[] args) {
-        System.out.println(searchUser("半赫","5","0"));
-        System.out.println(getRecordRank("33255454"));
-
-    }
 }
