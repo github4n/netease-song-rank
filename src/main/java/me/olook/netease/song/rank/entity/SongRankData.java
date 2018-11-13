@@ -52,12 +52,13 @@ public class SongRankData {
     @Column(name = "pic_url")
     private String picUrl;
 
-    public SongRankData(String jobRecordId, Integer rank, String song, String singer, String ratio) {
-        this.jobRecordId = jobRecordId;
+    public SongRankData(Integer rank, String song, String singer, String ratio, String genre, String picUrl) {
         this.rank = rank;
         this.song = song;
         this.singer = singer;
         this.ratio = ratio;
+        this.genre = genre;
+        this.picUrl = picUrl;
     }
 
     public SongRankData(String jobRecordId, Integer rank, String song, String singer, String ratio, String genre, String picUrl) {

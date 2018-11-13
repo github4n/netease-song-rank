@@ -3,8 +3,12 @@ package me.olook.netease.song.rank.rest;
 import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import me.olook.netease.song.rank.biz.SongRankDataDiffBiz;
+import me.olook.netease.song.rank.biz.TimerJobBiz;
 import me.olook.netease.song.rank.biz.UserRefJobBiz;
 import me.olook.netease.song.rank.dto.NeteaseUserDTO;
+import me.olook.netease.song.rank.entity.SongRankDataDiff;
+import me.olook.netease.song.rank.entity.TimerJob;
 import me.olook.netease.song.rank.entity.UserRefJob;
 import me.olook.netease.song.rank.properties.WxAppProperties;
 import me.olook.netease.song.rank.util.netease.NetEaseUtil;
@@ -14,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -32,11 +37,18 @@ public class AppletServerController {
 
     private final UserRefJobBiz userRefJobBiz;
 
+    private final TimerJobBiz timerJobBiz;
+
+    private final SongRankDataDiffBiz songRankDataDiffBiz;
+
     @Autowired
-    public AppletServerController(WxAppProperties wxAppProperties, RestTemplate restTemplate, UserRefJobBiz userRefJobBiz) {
+    public AppletServerController(WxAppProperties wxAppProperties, RestTemplate restTemplate,
+                                  UserRefJobBiz userRefJobBiz, TimerJobBiz timerJobBiz, SongRankDataDiffBiz songRankDataDiffBiz) {
         this.wxAppProperties = wxAppProperties;
         this.restTemplate = restTemplate;
         this.userRefJobBiz = userRefJobBiz;
+        this.timerJobBiz = timerJobBiz;
+        this.songRankDataDiffBiz = songRankDataDiffBiz;
     }
 
     @GetMapping(value = "session")
@@ -44,8 +56,6 @@ public class AppletServerController {
         String json = jsCodeToSession(jsCode);
         return ResponseEntity.status(200).body(json);
     }
-
-    // todo   整合微信请求工具类   zhaohw 2018/11/9 15:59
 
     private  String jsCodeToSession(String code){
         String params = "?appid=" + wxAppProperties.getAppId()
@@ -72,15 +82,30 @@ public class AppletServerController {
         return ResponseEntity.status(200).body(list);
     }
 
-//    @ApiOperation(value = "测试能否获取排行数据")
-//    @GetMapping(value = "rank/check")
-//    public ResponseEntity<String> checkSongRank(String userId) {
-//        JSONObject result = NetEaseUtil.getRecordRank(userId);
-//        if(result!=null){
-//            String code = result.get("code").toString();
-//            if("200".equals(code)){
-//                return ResponseEntity.status(200).body("true");
-//            }
-//        }
-//        return ResponseEntity.status(403).body("false");
+    @ApiOperation(value = "测试能否获取排行数据")
+    @GetMapping(value = "rank/check")
+    public ResponseEntity checkSongRank(String userId) {
+        boolean result = NetEaseUtil.checkRankAccess(userId);
+        if (result) {
+            return ResponseEntity.status(200).body(true);
+        }
+        return ResponseEntity.status(403).body(false);
+    }
+
+    @ApiOperation(value = "获取排行变化数据")
+    @GetMapping(value = "record/rank")
+    public ResponseEntity getSongRankRecord(String userId) {
+        TimerJob timerJob = timerJobBiz.findByTargetUserId(userId);
+        if(timerJob == null || timerJob.getStatus().equals(TimerJob.STATUS_STOP)){
+            return ResponseEntity.status(404).body("出错啦!建议取消再重新关注Ta.");
+        }
+        if(timerJob.getStatus().equals(TimerJob.STATUS_EXPIRED)){
+            return ResponseEntity.status(404).body("你的关注过期啦!建议取消再重新关注Ta.");
+        }
+        timerJob.setUpdTime(new Date());
+        timerJobBiz.save(timerJob);
+        //查出最近10条记录
+        List<SongRankDataDiff> dataDiffs = songRankDataDiffBiz.findLatestRecordRank(userId);
+        return ResponseEntity.status(200).body(dataDiffs);
+    }
 }
