@@ -29,10 +29,8 @@ public class TimerJobConfiguration implements ApplicationListener<ApplicationRea
         this.baseQuartzBiz = baseQuartzBiz;
     }
 
-
     @Override
     public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
-        log.info("QuartzStartup onApplicationEvent start!");
         AtomicInteger count = new AtomicInteger();
         timerJobBiz.findAll().stream()
                 .filter(p->p.getStatus().equals(TimerJob.STATUS_RUN))
