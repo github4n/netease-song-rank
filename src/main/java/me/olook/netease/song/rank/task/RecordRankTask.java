@@ -14,6 +14,6 @@ public class RecordRankTask implements Job {
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
-        System.out.println( context.getTrigger().getJobKey());
+        //System.out.println( context.getTrigger().getJobKey());
     }
 }

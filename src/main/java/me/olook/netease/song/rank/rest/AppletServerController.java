@@ -1,6 +1,5 @@
 package me.olook.netease.song.rank.rest;
 
-import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import me.olook.netease.song.rank.biz.SongRankDataDiffBiz;
@@ -10,13 +9,14 @@ import me.olook.netease.song.rank.dto.NeteaseUserDTO;
 import me.olook.netease.song.rank.entity.SongRankDataDiff;
 import me.olook.netease.song.rank.entity.TimerJob;
 import me.olook.netease.song.rank.entity.UserRefJob;
-import me.olook.netease.song.rank.properties.WxAppProperties;
-import me.olook.netease.song.rank.util.netease.NetEaseUtil;
+import me.olook.netease.song.rank.util.netease.NetEaseHttpClient;
+import me.olook.netease.song.rank.util.wechat.WeChatHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
 import java.util.List;
@@ -28,12 +28,7 @@ import java.util.List;
 @RestController
 @RequestMapping("wx")
 @Api(description = "微信服务器请求模块")
-@EnableConfigurationProperties(WxAppProperties.class)
 public class AppletServerController {
-
-    private final WxAppProperties wxAppProperties;
-
-    private final RestTemplate restTemplate;
 
     private final UserRefJobBiz userRefJobBiz;
 
@@ -41,14 +36,15 @@ public class AppletServerController {
 
     private final SongRankDataDiffBiz songRankDataDiffBiz;
 
+    private final WeChatHttpClient weChatHttpClient;
+
     @Autowired
-    public AppletServerController(WxAppProperties wxAppProperties, RestTemplate restTemplate,
-                                  UserRefJobBiz userRefJobBiz, TimerJobBiz timerJobBiz, SongRankDataDiffBiz songRankDataDiffBiz) {
-        this.wxAppProperties = wxAppProperties;
-        this.restTemplate = restTemplate;
+    public AppletServerController(UserRefJobBiz userRefJobBiz, TimerJobBiz timerJobBiz,
+                                  SongRankDataDiffBiz songRankDataDiffBiz, WeChatHttpClient weChatHttpClient) {
         this.userRefJobBiz = userRefJobBiz;
         this.timerJobBiz = timerJobBiz;
         this.songRankDataDiffBiz = songRankDataDiffBiz;
+        this.weChatHttpClient = weChatHttpClient;
     }
 
     @GetMapping(value = "session")
@@ -57,13 +53,8 @@ public class AppletServerController {
         return ResponseEntity.status(200).body(json);
     }
 
-    private  String jsCodeToSession(String code){
-        String params = "?appid=" + wxAppProperties.getAppId()
-                + "&secret=" + wxAppProperties.getAppSecret()
-                + "&js_code=" + code
-                + "&grant_type=" + wxAppProperties.getGrantType();
-        String url = "https://api.weixin.qq.com/sns/jscode2session" + params;
-        return restTemplate.getForEntity(url, String.class).getBody();
+    private String jsCodeToSession(String code){
+        return weChatHttpClient.jsCodeToSession(code);
     }
 
     @ApiOperation(value = "获取用户关联的任务")
@@ -78,14 +69,14 @@ public class AppletServerController {
     public ResponseEntity getNeteaseUser(String keyWord,
                                          @RequestParam(defaultValue = "5") String limit,
                                          @RequestParam(defaultValue = "0") String offset) {
-        List<NeteaseUserDTO> list = NetEaseUtil.searchUser(keyWord,limit,offset);
+        List<NeteaseUserDTO> list = NetEaseHttpClient.searchUser(keyWord,limit,offset);
         return ResponseEntity.status(200).body(list);
     }
 
     @ApiOperation(value = "测试能否获取排行数据")
     @GetMapping(value = "rank/check")
     public ResponseEntity checkSongRank(String userId) {
-        boolean result = NetEaseUtil.checkRankAccess(userId);
+        boolean result = NetEaseHttpClient.checkRankAccess(userId);
         if (result) {
             return ResponseEntity.status(200).body(true);
         }
