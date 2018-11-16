@@ -11,5 +11,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TimerJobRepository extends JpaRepository<TimerJob,Integer> {
 
+    /**
+     * 根据targetUserId查找爬虫任务
+     * 一个targetUserId最多应该只存在一个任务
+     */
     TimerJob findByTargetUserId(String targetUserId);
 }

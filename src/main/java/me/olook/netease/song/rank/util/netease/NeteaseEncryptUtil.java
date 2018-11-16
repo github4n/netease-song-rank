@@ -16,7 +16,7 @@ import java.net.URLEncoder;
  * @author zhaohw
  * @date 2018-03-06 18:42
  */
-public class NeteaseEncryptUtil {
+public class NetEaseEncryptUtil {
 
     /**
      * 获取加密后的参数Json
@@ -24,7 +24,7 @@ public class NeteaseEncryptUtil {
      */
     public static String getUrlParams(String json){
         try {
-            return "?params=" + URLEncoder.encode(NeteaseEncryptUtil.getParams(json), "UTF-8") + "&encSecKey=" + NeteaseEncryptUtil.getEncSecKey();
+            return "?params=" + URLEncoder.encode(NetEaseEncryptUtil.getParams(json), "UTF-8") + "&encSecKey=" + NetEaseEncryptUtil.getEncSecKey();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -38,9 +38,9 @@ public class NeteaseEncryptUtil {
         String firstKey = "0CoJUm6Qyw8W8jud";
         String secondKey = "FFFFFFFFFFFFFFFF";
         // 第一次加密 对json原文参数加密
-        String hEncText = NeteaseEncryptUtil.encrypt(text, firstKey);
+        String hEncText = NetEaseEncryptUtil.encrypt(text, firstKey);
         // 第二次加密 对第一次加密结果进行加密
-        hEncText = NeteaseEncryptUtil.encrypt(hEncText, secondKey);
+        hEncText = NetEaseEncryptUtil.encrypt(hEncText, secondKey);
         return hEncText;
     }
 

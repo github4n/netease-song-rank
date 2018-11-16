@@ -17,7 +17,7 @@ import java.util.List;
  * @date 2018-11-08 15:28
  */
 @RestController
-@RequestMapping("/notice")
+@RequestMapping("notice")
 @Api(description = "系统公告模块")
 public class AppNoticeController {
 
@@ -25,7 +25,7 @@ public class AppNoticeController {
     private AppNoticeBiz appNoticeBiz;
 
     @ApiOperation(value = "通过类型查询")
-    @GetMapping(value = "/type/{type}")
+    @GetMapping(value = "type/{type}")
     public List<AppNotice> findByType(@PathVariable String type){
         return appNoticeBiz.findByType(type);
     }

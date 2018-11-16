@@ -35,7 +35,7 @@ import java.util.Map;
  * @date 2018-03-05 21:36
  */
 @Slf4j
-public class NetEaseUtil {
+public class NetEaseHttpClient {
 
     /**
      * 搜索网易云用户
@@ -80,7 +80,7 @@ public class NetEaseUtil {
         map.put("uid",userId);
         String json = JSONObject.toJSONString(map);
         // 参数加密
-        String params = NeteaseEncryptUtil.getUrlParams(json);
+        String params = NetEaseEncryptUtil.getUrlParams(json);
         String url = NetEaseApiUrl.RECORD+params;
         // todo   代理   zhaohw 2018/11/13 10:30
         return post(url,null);
