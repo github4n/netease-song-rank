@@ -8,6 +8,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import me.olook.netease.song.rank.dto.NeteaseUserDTO;
+import me.olook.netease.song.rank.util.proxy.ProxyInfo;
 import me.olook.netease.song.rank.util.proxy.UserAgents;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -71,6 +72,10 @@ public class NetEaseHttpClient {
     }
 
     private static String getRecordRank(String userId){
+        return getRecordRank(userId,null);
+    }
+
+    private static String getRecordRank(String userId, ProxyInfo proxyInfo){
         Map<String,String> map = Maps.newHashMap();
         map.put("type","1");
         map.put("limit","1000");
@@ -82,8 +87,22 @@ public class NetEaseHttpClient {
         // 参数加密
         String params = NetEaseEncryptUtil.getUrlParams(json);
         String url = NetEaseApiUrl.RECORD+params;
-        // todo   代理   zhaohw 2018/11/13 10:30
-        return post(url,null);
+        HttpHost proxy = null;
+        if(proxyInfo!=null){
+            proxy = new HttpHost(proxyInfo.getIp(),proxyInfo.getPort());
+        }
+        return post(url,null,proxy);
+    }
+
+    public static boolean checkProxy(String ip,Integer port){
+        try{
+            ProxyInfo proxy = new ProxyInfo(ip,port);
+            String res = getRecordRank("33255454",proxy);
+            log.debug(res);
+            return res != null;
+        }catch (Exception e){
+            return false;
+        }
     }
 
     /**
@@ -134,7 +153,6 @@ public class NetEaseHttpClient {
             }
             log.error("post for {} return status code {}",request.getURI(),response.getStatusLine().getStatusCode());
         } catch (IOException e) {
-            e.printStackTrace();
             log.error("post IOException for {} ",request.getURI());
         }
         return null;

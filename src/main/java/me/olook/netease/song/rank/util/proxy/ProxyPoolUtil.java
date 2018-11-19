@@ -19,6 +19,23 @@ public class ProxyPoolUtil {
      *  不存在则添加
      *  存在则删除代理信息
      */
-    static ConcurrentLinkedQueue<ProxyInfo> failQueue = new ConcurrentLinkedQueue<ProxyInfo>();
+    private static ConcurrentLinkedQueue<ProxyInfo> failQueue = new ConcurrentLinkedQueue<ProxyInfo>();
 
+
+    public static ProxyInfo get(){
+        return workQueue.poll();
+    }
+
+    public static void restore(ProxyInfo proxy){
+        workQueue.offer(proxy);
+    }
+
+    public static void fail(ProxyInfo proxy){
+        if (failQueue.contains(proxy)){
+            failQueue.remove(proxy);
+        }else {
+            workQueue.offer(proxy);
+            failQueue.offer(proxy);
+        }
+    }
 }

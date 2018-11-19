@@ -1,6 +1,7 @@
 package me.olook.netease.song.rank.task;
 
 import lombok.extern.slf4j.Slf4j;
+import me.olook.netease.song.rank.biz.ProxyPoolBiz;
 import me.olook.netease.song.rank.biz.TemplateMessageBiz;
 import me.olook.netease.song.rank.biz.TimerJobBiz;
 import org.springframework.scheduling.annotation.Async;
@@ -17,7 +18,7 @@ import javax.annotation.Resource;
 @Slf4j
 @Component
 @EnableAsync
-public class InternalCleanTask {
+public class InternalTimerTask {
 
     @Resource
     private TimerJobBiz timerJobBiz;
@@ -25,17 +26,27 @@ public class InternalCleanTask {
     @Resource
     private TemplateMessageBiz templateMessageBiz;
 
+    @Resource
+    private ProxyPoolBiz proxyPoolBiz;
+
     @Async
-    @Scheduled(initialDelay = 1000*10 , fixedDelay = 1000 * 60 * 60 * 24 * 2)
+    @Scheduled(initialDelay = 1000*10 , fixedDelay = 1000 * 10 )
+    public void proxyPoolMaintain() {
+        proxyPoolBiz.fixProxyPool();
+    }
+
+    @Async
+    @Scheduled(initialDelay = 1000*15 , fixedDelay = 1000 * 60 * 60 * 24 * 2)
     public void cleanTimerJob() {
         int num = timerJobBiz.updateExpiredTimerJobs();
         log.info("expired timer jobs clean : [{}] ",num);
     }
 
     @Async
-    @Scheduled(initialDelay = 1000*10 , fixedDelay = 1000 * 60 * 60 * 24 * 2)
+    @Scheduled(initialDelay = 1000*20 , fixedDelay = 1000 * 60 * 60 * 24 * 2)
     public void cleanPushTemplate() {
         int num = templateMessageBiz.updateExpiredTemplates();
         log.info("expired push templates clean : [{}] ",num);
     }
+
 }
