@@ -47,7 +47,7 @@ public class UserTaskController {
     }
 
     @ApiOperation(value = "取消关注用户")
-    @DeleteMapping(value = "/{id}")
+    @DeleteMapping(value = "{id}")
     public ResponseEntity remove(@PathVariable Integer id){
         boolean result = userTaskBiz.removeTask(id);
         if(result){

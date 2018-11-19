@@ -4,6 +4,9 @@ import me.olook.netease.song.rank.entity.TimerJob;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
+import java.util.List;
+
 /**
  * @author zhaohw
  * @date 2018-11-08 17:39
@@ -16,4 +19,12 @@ public interface TimerJobRepository extends JpaRepository<TimerJob,Integer> {
      * 一个targetUserId最多应该只存在一个任务
      */
     TimerJob findByTargetUserId(String targetUserId);
+
+    /**
+     * 查询不活跃任务
+     * @param status 任务状态
+     * @param date 判定过期时间点
+     * @return timer job
+     */
+    List<TimerJob> findTimerJobsByStatusAndUpdTimeBefore(Integer status, Date date);
 }

@@ -24,4 +24,8 @@ public class UserRefJobBiz {
     public List<UserRefJob> findByOpenIdAndDelFlag(String openid,Integer delFlag){
         return userRefJobRepository.findByOpenIdAndDelFlag(openid,delFlag);
     }
+
+    public UserRefJob save(UserRefJob userRefJob){
+        return userRefJobRepository.save(userRefJob);
+    }
 }

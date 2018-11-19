@@ -2,6 +2,7 @@ package me.olook.netease.song.rank.base.entity;
 
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.persistence.MappedSuperclass;
 import java.util.Date;
 
 /**
@@ -10,6 +11,7 @@ import java.util.Date;
  * @author zhaohw
  * @date 2017-11-10 11:47
  */
+@MappedSuperclass
 public class BaseCreateAndUpdateEntity extends BaseCreateEntity {
 
     @ApiModelProperty(hidden = true)
