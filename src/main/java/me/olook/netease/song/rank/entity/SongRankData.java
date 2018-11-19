@@ -70,4 +70,14 @@ public class SongRankData {
         this.genre = genre;
         this.picUrl = picUrl;
     }
+
+    @Override
+    public String toString() {
+        return "SongRankData{" +
+                "rank=" + rank +
+                ", song='" + song + '\'' +
+                ", singer='" + singer + '\'' +
+                ", ratio='" + ratio + '\'' +
+                '}';
+    }
 }

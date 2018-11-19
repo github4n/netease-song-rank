@@ -31,7 +31,7 @@ public class InternalTimerTask {
 
     @Async
     @Scheduled(initialDelay = 1000*10 , fixedDelay = 1000 * 10 )
-    public void proxyPoolMaintain() {
+    public void fixProxyPool() {
         proxyPoolBiz.fixProxyPool();
     }
 

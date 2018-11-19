@@ -67,7 +67,11 @@ public class NetEaseHttpClient {
      * 获取排行榜数据
      */
     public static JSONObject getSongRankData(String userId){
-        String rankStr = getRecordRank(userId);
+       return getSongRankData(userId,null);
+    }
+
+    public static JSONObject getSongRankData(String userId,ProxyInfo proxy){
+        String rankStr = getRecordRank(userId,proxy);
         return rankStr == null ? null:JSON.parseObject(rankStr);
     }
 
