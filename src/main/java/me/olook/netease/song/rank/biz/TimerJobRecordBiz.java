@@ -1,10 +1,13 @@
 package me.olook.netease.song.rank.biz;
 
+import me.olook.netease.song.rank.entity.TimerJob;
 import me.olook.netease.song.rank.entity.TimerJobRecord;
 import me.olook.netease.song.rank.repository.TimerJobRecordRepository;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
+import java.util.UUID;
 
 /**
  * @author zhaohw
@@ -25,5 +28,22 @@ public class TimerJobRecordBiz {
 
     public TimerJobRecord save(TimerJobRecord timerJobRecord){
         return timerJobRecordRepository.save(timerJobRecord);
+    }
+
+    public void saveTimerJobRecord(TimerJob currentJob){
+        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+        this.saveTimerJobRecord(currentJob,uuid,"-1");
+    }
+
+    public void saveTimerJobRecord(TimerJob currentJob, String jobRecordId, String snapshot){
+        TimerJobRecord timerJobRecord = TimerJobRecord.builder()
+                .startTime(new Date())
+                .snapshot(snapshot)
+                .newData(1)
+                .id(jobRecordId)
+                .count(0)
+                .jobId(currentJob.getId())
+                .endTime(new Date()).build();
+        timerJobRecordRepository.save(timerJobRecord);
     }
 }

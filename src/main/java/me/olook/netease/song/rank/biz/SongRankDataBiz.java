@@ -3,6 +3,7 @@ package me.olook.netease.song.rank.biz;
 import me.olook.netease.song.rank.entity.SongRankData;
 import me.olook.netease.song.rank.repository.SongRankDataRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -25,7 +26,20 @@ public class SongRankDataBiz {
         return songRankDataRepository.save(songRankData);
     }
 
-    public void deleteLastSongRankData(String oldJobRecordId){
-        songRankDataRepository.deleteByJobRecordId(oldJobRecordId);
+    public void deleteByJobRecordId(String oldJobRecordId){
+        if(oldJobRecordId!=null) {
+            songRankDataRepository.deleteByJobRecordId(oldJobRecordId);
+        }
     }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void saveAndDeleteSongRankData(List<SongRankData> songRankDataList, String oldJobRecordId){
+        saveSongRankData(songRankDataList);
+        deleteByJobRecordId(oldJobRecordId);
+    }
+
+    private void saveSongRankData(List<SongRankData> songRankDataList){
+        songRankDataList.forEach(songRankDataRepository::save);
+    }
+
 }

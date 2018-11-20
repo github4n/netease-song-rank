@@ -3,15 +3,23 @@ package me.olook.netease.song.rank.core;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import me.olook.netease.song.rank.biz.*;
+import me.olook.netease.song.rank.dto.TemplateMsgKeyWord;
+import me.olook.netease.song.rank.dto.TemplateMsgParam;
 import me.olook.netease.song.rank.entity.*;
 import me.olook.netease.song.rank.util.netease.NetEaseHttpClient;
 import me.olook.netease.song.rank.util.proxy.ProxyInfo;
 import me.olook.netease.song.rank.util.proxy.ProxyPoolUtil;
+import me.olook.netease.song.rank.util.wechat.WeChatHttpClient;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * 核心流程
@@ -32,6 +40,9 @@ public class RecordRankService {
     private TimerJobRecordBiz timerJobRecordBiz;
 
     @Resource
+    private UserRefJobBiz userRefJobBiz;
+
+    @Resource
     private SongRankDataBiz songRankDataBiz;
 
     @Resource
@@ -39,6 +50,12 @@ public class RecordRankService {
 
     @Resource
     private TemplateMessageBiz templateMessageBiz;
+
+    @Resource
+    private AccessTokenInfoBiz accessTokenInfoBiz;
+
+    @Resource
+    private WeChatHttpClient weChatHttpClient;
 
     public void run(String targetUserId){
         TimerJob currentJob = timerJobBiz.findByTargetUserId(targetUserId);
@@ -58,7 +75,8 @@ public class RecordRankService {
         if(songRankDataList.size() == 0){
             log.debug("{} {} 执行结束,无周榜数据",currentJob.getTargetNickname(),currentJob.getTargetUserId());
             if(oldRecord == null){
-                saveTimerJobRecord(currentJob);
+                log.info("{} {} 初始空白数据",currentJob.getTargetNickname(),currentJob.getTargetUserId());
+                timerJobRecordBiz.saveTimerJobRecord(currentJob);
             }
             return;
         }
@@ -76,33 +94,19 @@ public class RecordRankService {
             if(oldRecord != null){
                 List<SongRankData> oldDataList = songRankDataBiz.getOldDataList(oldRecord.getId());
                 SongRankDataDiff saveResult = saveSongRankDataDiff(songRankDataList, oldDataList, uuid, targetUserId);
-                if(saveResult!=null && saveResult.getIsBatchUpdate()==0){
-                    //消息推送
+                if(saveResult!=null){
+                    log.info("{} {} 数据变更",currentJob.getTargetNickname(),targetUserId);
+                    if(saveResult.getIsBatchUpdate()==0){
+                        sendTemplates(saveResult);
+                    }
                 }
-                log.info("{} {} 数据变更",currentJob.getTargetNickname(),targetUserId);
             }else {
                 log.info("{} {} 初始数据",currentJob.getTargetNickname(),targetUserId);
             }
         }
-        saveAndDeleteSongRankData(songRankDataList,oldRecord==null?null:oldRecord.getId());
-        saveTimerJobRecord(currentJob,uuid,snapshot);
+        songRankDataBiz.saveAndDeleteSongRankData(songRankDataList,oldRecord==null?null:oldRecord.getId());
+        timerJobRecordBiz.saveTimerJobRecord(currentJob,uuid,snapshot);
 
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    void saveAndDeleteSongRankData(List<SongRankData> songRankDataList, String oldJobRecordId){
-        saveSongRankData(songRankDataList);
-        deleteOldSongRankData(oldJobRecordId);
-    }
-
-    private void saveSongRankData(List<SongRankData> songRankDataList){
-        songRankDataList.forEach(songRankDataBiz::save);
-    }
-
-    private void deleteOldSongRankData(String oldJobRecordId){
-        if(oldJobRecordId!=null){
-            songRankDataBiz.deleteLastSongRankData(oldJobRecordId);
-        }
     }
 
 
@@ -111,85 +115,66 @@ public class RecordRankService {
      */
     private SongRankDataDiff saveSongRankDataDiff(List<SongRankData> newList,List<SongRankData> oldList
                                                                 ,String jobRecordId ,String targetUserId){
-        List<SongRankDataDiff> addList = findSongRankDataDiff(newList, oldList);
+        List<SongRankDataDiff> addList = songRankDataDiffBiz.findSongRankDataDiffByRank(newList, oldList);
         int isBatch = 0;
         if(addList.size()==0){
-            // todo score变化 zhaohw 2018/11/20 16:58
+            addList = songRankDataDiffBiz.findSongRankDataDiffByScore(newList,oldList);
+        }
+        if(addList.size()==0){
+            return null;
         }
         if(addList.size()>3){
             isBatch = 1;
         }
         //如果时间为3~5点，判定为系统更新数据
-        Calendar c = Calendar.getInstance();
-        int hour = c.get(Calendar.HOUR_OF_DAY);
+        LocalDateTime localDateTime = LocalDateTime.now();
+        int hour = localDateTime.getHour();
         if(3 == hour||4 == hour||5 == hour){
             //日期减一天
-            c.add(Calendar.DAY_OF_MONTH,-1);
+            localDateTime.minus(1,ChronoUnit.DAYS);
             isBatch = 1;
         }
         int finalIsBatch = isBatch;
+        Date dateTime = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
         addList.forEach(p->{
             p.setTargetUserId(targetUserId);
             p.setJobRecordId(jobRecordId);
             p.setIsBatchUpdate(finalIsBatch);
+            p.setChangeTime(dateTime);
             songRankDataDiffBiz.save(p);
         });
         return addList.get(0);
     }
 
-    private List<SongRankDataDiff> findSongRankDataDiff(List<SongRankData> newList,List<SongRankData> oldList){
-        Map<Integer,SongRankData> oldMap = new HashMap<Integer, SongRankData>(oldList.size());
-        oldList.forEach(o->{
-            oldMap.put(o.getSongId(),o);
-        });
-        List<SongRankDataDiff> diffList = new ArrayList<>();
-        newList.forEach(n->{
-            if(!oldMap.containsKey(n.getSongId())){
-                SongRankDataDiff songRankDataDiff = buildDataDiff(n);
-                diffList.add(songRankDataDiff);
-            }
-            else if(n.getRank()>oldMap.get(n.getSongId()).getRank()){
-                SongRankDataDiff songRankDataDiff = buildDataDiff(n,oldMap.get(n.getSongId()).getRank()-n.getRank());
-                diffList.add(songRankDataDiff);
-            }
-        });
-        return diffList;
-    }
+    private void sendTemplates(SongRankDataDiff dataDiff){
+        List<TemplateMessage> templates = templateMessageBiz.findValidTemplates(dataDiff.getTargetUserId());
+        if(templates.size()==0){
+            return;
+        }
+        String validToken = accessTokenInfoBiz.getValidAccessToken();
+        if(validToken==null){
+            log.error("推送模板消息找不到可用 access token");
+            return;
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        TimerJob timerJob = timerJobBiz.findByTargetUserId(dataDiff.getTargetUserId());
+        for(TemplateMessage msg : templates){
 
-    private SongRankDataDiff buildDataDiff(SongRankData songRankData){
-        return this.buildDataDiff(songRankData,-1);
-    }
+            TemplateMsgParam param = new TemplateMsgParam();
+            param.setToUser(msg.getOpenid());
+            param.setTemplateId(msg.getTemplateId());
+            param.setPage(msg.getPage());
+            param.setFormId(msg.getFormId());
+            TemplateMsgKeyWord keyWord = new TemplateMsgKeyWord(dataDiff.getSong(),sdf.format(new Date()),timerJob.getTargetNickname());
+            param.setData(keyWord);
 
-    private SongRankDataDiff buildDataDiff(SongRankData songRankData,Integer rankChange){
-        return SongRankDataDiff.builder()
-                .songId(songRankData.getSongId())
-                .song(songRankData.getSong())
-                .singer(songRankData.getSinger())
-                .picUrl(songRankData.getPicUrl())
-                .rankChange(rankChange)
-                .build();
-    }
+            weChatHttpClient.sendPushTemplate(param, validToken);
 
-    private void saveTimerJobRecord(TimerJob currentJob){
-        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-        log.info("{} {} 初始空白数据",currentJob.getTargetNickname(),currentJob.getTargetUserId());
-        this.saveTimerJobRecord(currentJob,uuid,"-1");
-    }
+            msg.setIsValid(0);
+            msg.setUpdTime(new Date());
+            templateMessageBiz.save(msg);
+        }
 
-    private void saveTimerJobRecord(TimerJob currentJob,String jobRecordId, String snapshot){
-        TimerJobRecord timerJobRecord = TimerJobRecord.builder()
-                .startTime(new Date())
-                .snapshot(snapshot)
-                .newData(1)
-                .id(jobRecordId)
-                .count(0)
-                .jobId(currentJob.getId())
-                .endTime(new Date()).build();
-        timerJobRecordBiz.save(timerJobRecord);
-    }
-
-    private void sendTemplates(SongRankDataDiff songRankDataDiff){
-        List<TemplateMessage> validTemplates = templateMessageBiz.findValidTemplates(songRankDataDiff.getTargetUserId());
     }
 
     private boolean handleProxy(JSONObject data,ProxyInfo proxyInfo){
@@ -201,4 +186,5 @@ public class RecordRankService {
             return true;
         }
     }
+
 }

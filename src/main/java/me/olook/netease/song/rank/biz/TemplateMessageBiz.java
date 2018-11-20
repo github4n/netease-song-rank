@@ -43,4 +43,8 @@ public class TemplateMessageBiz {
     public List<TemplateMessage> findValidTemplates(String targetUserId){
         return templateMessageRepository.findByTargetUserIdAndIsValid(targetUserId,TemplateMessage.VALID);
     }
+
+    public TemplateMessage save(TemplateMessage templateMessage){
+        return templateMessageRepository.save(templateMessage);
+    }
 }
