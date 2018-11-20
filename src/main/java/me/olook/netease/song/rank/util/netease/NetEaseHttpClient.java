@@ -188,4 +188,7 @@ public class NetEaseHttpClient {
         return new NeteaseUserDTO(userId, avatar, nickName);
     }
 
+    public static void main(String[] args) {
+        System.out.println(getSongRankData("33255454"));
+    }
 }

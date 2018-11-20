@@ -21,4 +21,10 @@ public interface TemplateMessageRepository extends JpaRepository<TemplateMessage
      * @return 模板list
      */
     List<TemplateMessage> findByIsValidAndCrtTimeBefore(Integer isValid, Date date);
+
+    /**
+     * asd
+     * @return asd
+     */
+    List<TemplateMessage> findByTargetUserIdAndIsValid(String targetUserId,Integer isValid);
 }

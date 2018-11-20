@@ -39,4 +39,8 @@ public class TemplateMessageBiz {
         });
         return expiredTemplates.size();
     }
+
+    public List<TemplateMessage> findValidTemplates(String targetUserId){
+        return templateMessageRepository.findByTargetUserIdAndIsValid(targetUserId,TemplateMessage.VALID);
+    }
 }

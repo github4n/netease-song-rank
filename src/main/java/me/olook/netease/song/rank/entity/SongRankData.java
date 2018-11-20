@@ -1,6 +1,7 @@
 package me.olook.netease.song.rank.entity;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,6 +15,7 @@ import javax.persistence.Table;
  * @author zhaohw
  * @date 2018-02-08 15:01
  */
+@Builder
 @Data
 @Entity
 @NoArgsConstructor
@@ -44,40 +46,19 @@ public class SongRankData {
     @Column(name = "ratio")
     private String ratio;
 
-    @ApiModelProperty(value = "类型")
-    @Column(name = "genre")
-    private String genre;
-
     @ApiModelProperty(value = "封面")
     @Column(name = "pic_url")
     private String picUrl;
 
-    public SongRankData(Integer rank, String song, String singer, String ratio, String genre, String picUrl) {
-        this.rank = rank;
-        this.song = song;
-        this.singer = singer;
-        this.ratio = ratio;
-        this.genre = genre;
-        this.picUrl = picUrl;
-    }
+    @ApiModelProperty(value = "歌曲id")
+    @Column(name = "song_id")
+    private Integer songId;
 
-    public SongRankData(String jobRecordId, Integer rank, String song, String singer, String ratio, String genre, String picUrl) {
-        this.jobRecordId = jobRecordId;
-        this.rank = rank;
-        this.song = song;
-        this.singer = singer;
-        this.ratio = ratio;
-        this.genre = genre;
-        this.picUrl = picUrl;
-    }
-
+    /**
+     * 校验数据是否变更的要素
+     */
     @Override
     public String toString() {
-        return "SongRankData{" +
-                "rank=" + rank +
-                ", song='" + song + '\'' +
-                ", singer='" + singer + '\'' +
-                ", ratio='" + ratio + '\'' +
-                '}';
+        return songId + ratio;
     }
 }

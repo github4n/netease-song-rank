@@ -16,6 +16,9 @@ public class TimerJobRecordBiz {
     @Resource
     private TimerJobRecordRepository timerJobRecordRepository;
 
+    /**
+     * 获取最近一次该任务有数据变更的记录
+     */
     public TimerJobRecord getLatestRecord(Integer jobId){
         return timerJobRecordRepository.findByJobIdAndNewDataOrderByEndTimeDesc(jobId,1);
     }

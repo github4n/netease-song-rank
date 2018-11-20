@@ -51,6 +51,14 @@ public class SongRankDataDiff {
     @Column(name = "target_userid")
     private String targetUserId;
 
+    @ApiModelProperty(value = "封面")
+    @Column(name = "pic_url")
+    private String picUrl;
+
+    @ApiModelProperty(value = "歌曲id")
+    @Column(name = "song_id")
+    private Integer songId;
+
     @Transient
     private Integer count;
 

@@ -26,4 +26,8 @@ public class SongRankDataDiffBiz {
                 diffRepository.findByTargetUserIdOrderByChangeTimeDesc(userId, pageable);
         return recordRanks.getContent();
     }
+
+    public SongRankDataDiff save(SongRankDataDiff songRankDataDiff){
+        return diffRepository.save(songRankDataDiff);
+    }
 }
