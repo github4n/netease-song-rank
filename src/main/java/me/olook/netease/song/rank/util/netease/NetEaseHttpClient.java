@@ -157,7 +157,7 @@ public class NetEaseHttpClient {
             }
             log.error("post for {} return status code {}",request.getURI(),response.getStatusLine().getStatusCode());
         } catch (IOException e) {
-            log.error("post IOException for {} ",request.getURI());
+            log.error("post IOException for {} ",request.getURI().getPath());
         }
         return null;
     }

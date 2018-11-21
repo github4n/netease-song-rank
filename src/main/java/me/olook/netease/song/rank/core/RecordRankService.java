@@ -64,6 +64,7 @@ public class RecordRankService {
         JSONObject jsonObject =
                 NetEaseHttpClient.getSongRankData(currentJob.getTargetUserId(),proxyInfo);
 
+        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
         boolean dataValid = handleProxy(jsonObject, proxyInfo);
         if(!dataValid){
             return;
@@ -76,12 +77,10 @@ public class RecordRankService {
             log.debug("{} {} 执行结束,无周榜数据",currentJob.getTargetNickname(),currentJob.getTargetUserId());
             if(oldRecord == null){
                 log.info("{} {} 初始空白数据",currentJob.getTargetNickname(),currentJob.getTargetUserId());
-                timerJobRecordBiz.saveTimerJobRecord(currentJob);
+                timerJobRecordBiz.saveTimerJobRecord(currentJob,uuid);
             }
             return;
         }
-
-        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
         StringBuilder sb = new StringBuilder();
         for(SongRankData data : songRankDataList){
             sb.append(data.toString());
@@ -94,7 +93,7 @@ public class RecordRankService {
             if(oldRecord != null){
                 List<SongRankData> oldDataList = songRankDataBiz.getOldDataList(oldRecord.getId());
                 SongRankDataDiff saveResult = saveSongRankDataDiff(songRankDataList, oldDataList, uuid, targetUserId);
-                if(saveResult!=null){
+                if(saveResult != null){
                     log.info("{} {} 数据变更",currentJob.getTargetNickname(),targetUserId);
                     if(saveResult.getIsBatchUpdate()==0){
                         sendTemplates(saveResult);
@@ -103,9 +102,9 @@ public class RecordRankService {
             }else {
                 log.info("{} {} 初始数据",currentJob.getTargetNickname(),targetUserId);
             }
+            songRankDataBiz.saveAndDeleteSongRankData(songRankDataList,oldRecord==null?null:oldRecord.getId());
+            timerJobRecordBiz.saveTimerJobRecord(currentJob,uuid,snapshot);
         }
-        songRankDataBiz.saveAndDeleteSongRankData(songRankDataList,oldRecord==null?null:oldRecord.getId());
-        timerJobRecordBiz.saveTimerJobRecord(currentJob,uuid,snapshot);
 
     }
 

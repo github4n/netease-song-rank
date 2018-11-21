@@ -6,10 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * 排行榜数据
@@ -24,6 +21,7 @@ import javax.persistence.Table;
 @Table(name = "song_rank_data")
 public class SongRankData {
 
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     @ApiModelProperty(hidden = true)
     @Id
     private Integer id;
@@ -61,6 +59,6 @@ public class SongRankData {
      */
     @Override
     public String toString() {
-        return songId + ratio;
+        return songId + rank+ ratio;
     }
 }

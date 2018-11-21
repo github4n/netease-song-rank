@@ -2,6 +2,8 @@ package me.olook.netease.song.rank.base.entity;
 
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import java.util.Date;
@@ -14,6 +16,7 @@ import java.util.Date;
 @MappedSuperclass
 public class BaseCreateEntity {
 
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     @ApiModelProperty(hidden = true)
     @Id
     private Integer id;

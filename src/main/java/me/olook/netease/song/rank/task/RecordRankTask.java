@@ -6,6 +6,7 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -15,6 +16,7 @@ import java.util.Date;
  * @date 2018-11-13 15:19
  */
 @Slf4j
+@Component
 public class RecordRankTask implements Job {
 
     @Resource
@@ -22,7 +24,7 @@ public class RecordRankTask implements Job {
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
-
+        log.info("record rank task run");
         Date startTime = new Date();
         JobKey jobKey = context.getTrigger().getJobKey();
         recordRankService.run(jobKey.getName());

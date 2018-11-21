@@ -3,9 +3,7 @@ package me.olook.netease.song.rank.entity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -18,6 +16,7 @@ import java.util.Date;
 @Table(name = "access_token_info")
 public class AccessTokenInfo {
 
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     @ApiModelProperty(hidden = true)
     @Id
     private Integer id;

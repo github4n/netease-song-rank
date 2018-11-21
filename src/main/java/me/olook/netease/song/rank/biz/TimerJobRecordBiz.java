@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * @author zhaohw
@@ -23,15 +22,14 @@ public class TimerJobRecordBiz {
      * 获取最近一次该任务有数据变更的记录
      */
     public TimerJobRecord getLatestRecord(Integer jobId){
-        return timerJobRecordRepository.findByJobIdAndNewDataOrderByEndTimeDesc(jobId,1);
+        return timerJobRecordRepository.findFirstByJobIdAndNewDataOrderByEndTimeDesc(jobId,1);
     }
 
     public TimerJobRecord save(TimerJobRecord timerJobRecord){
         return timerJobRecordRepository.save(timerJobRecord);
     }
 
-    public void saveTimerJobRecord(TimerJob currentJob){
-        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+    public void saveTimerJobRecord(TimerJob currentJob,String uuid){
         this.saveTimerJobRecord(currentJob,uuid,"-1");
     }
 

@@ -3,9 +3,7 @@ package me.olook.netease.song.rank.entity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -17,6 +15,7 @@ import java.util.Date;
 @Entity
 public class UserRefJob {
 
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     @ApiModelProperty(hidden = true)
     @Id
     private Integer id;

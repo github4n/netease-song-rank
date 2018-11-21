@@ -28,8 +28,7 @@ public class TemplateMessageBiz {
      */
     @Transactional(rollbackFor = Exception.class)
     public int updateExpiredTemplates(){
-        Instant instant = Instant.now();
-        instant.minus(DAY_DIFF, ChronoUnit.DAYS);
+        Instant instant = Instant.now().minus(DAY_DIFF, ChronoUnit.DAYS);
         List<TemplateMessage> expiredTemplates =
                 templateMessageRepository.findByIsValidAndCrtTimeBefore(TemplateMessage.VALID, Date.from(instant));
         expiredTemplates.forEach(templateMessage -> {

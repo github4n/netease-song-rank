@@ -1,5 +1,6 @@
 package me.olook.netease.song.rank.biz;
 
+import lombok.extern.slf4j.Slf4j;
 import me.olook.netease.song.rank.constants.TimerJobUpdateNameEnum;
 import me.olook.netease.song.rank.entity.TimerJob;
 import me.olook.netease.song.rank.entity.UserRefJob;
@@ -21,6 +22,7 @@ import java.util.Optional;
  * @author zhaohw
  * @date 2018-11-16 14:30
  */
+@Slf4j
 @Service
 public class UserTaskBiz {
 
@@ -49,7 +51,7 @@ public class UserTaskBiz {
         if(jobs.size()>=jobLimit){
             throw new UserTaskException("您最多只能关注"+jobLimit+"名好友!");
         }
-        boolean isFollowed = jobs.stream().allMatch(p->userRefJob.getTargetUserId().equals(p.getTargetUserId()));
+        boolean isFollowed = jobs.stream().anyMatch(p->userRefJob.getTargetUserId().equals(p.getTargetUserId()));
         if(isFollowed){
             throw new UserTaskException("您已经关注过Ta了~");
         }
@@ -68,7 +70,10 @@ public class UserTaskBiz {
             timerJobRepository.save(timerJob);
             baseQuartzBiz.createTimerJob(timerJob);
         }
+        log.info("新增任务 {} - {}",userRefJob.getTargetNickname(),userRefJob.getTargetUserId());
         userRefJob.setCrtTime(new Date());
+        userRefJob.setUpdTime(new Date());
+        userRefJob.setDelFlag(0);
         userRefJobRepository.save(userRefJob);
         List<UserRefJob> followList = userRefJobRepository.findByTargetUserIdAndDelFlag(userRefJob.getTargetUserId(), 0);
         return followList.size();

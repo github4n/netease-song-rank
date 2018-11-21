@@ -22,10 +22,10 @@ import java.util.Date;
 @Table(name = "song_rank_data_diff")
 public class SongRankDataDiff {
 
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     @ApiModelProperty(hidden = true)
     @Id
     private Integer id;
-
 
     @ApiModelProperty(value = "定时任务记录id")
     @Column(name = "job_record_id")

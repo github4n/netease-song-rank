@@ -45,8 +45,7 @@ public class TimerJobBiz {
     }
 
     public List<TimerJob> findExpiredTimerJob(){
-        Instant instant = Instant.now();
-        instant.minus(DAY_DIFF, ChronoUnit.DAYS);
+        Instant instant = Instant.now().minus(DAY_DIFF, ChronoUnit.DAYS);
         return timerJobRepository.findTimerJobsByStatusAndUpdTimeBefore(TimerJob.STATUS_RUN, Date.from(instant));
     }
 

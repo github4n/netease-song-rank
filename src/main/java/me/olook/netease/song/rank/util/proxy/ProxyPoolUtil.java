@@ -1,11 +1,14 @@
 package me.olook.netease.song.rank.util.proxy;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * @author zhaohw
  * @date 2018-11-19 14:48
  */
+@Slf4j
 public class ProxyPoolUtil {
 
     /**
@@ -27,7 +30,9 @@ public class ProxyPoolUtil {
     }
 
     public static void restore(ProxyInfo proxy){
-        workQueue.offer(proxy);
+        if(proxy != null){
+            workQueue.offer(proxy);
+        }
     }
 
     public static void fail(ProxyInfo proxy){
@@ -37,5 +42,18 @@ public class ProxyPoolUtil {
             workQueue.offer(proxy);
             failQueue.offer(proxy);
         }
+    }
+
+    public static void debugInfo(){
+        log.debug("----------Proxy Pool Info------------");
+        log.debug("work queue size : {}",workQueue.size());
+        log.debug(workQueue.toString());
+        log.debug("fail queue size : {}",failQueue.size());
+        log.debug(failQueue.toString());
+        log.debug("-------------------------------------");
+    }
+
+    public static int activeSize(){
+        return workQueue.size()-failQueue.size();
     }
 }

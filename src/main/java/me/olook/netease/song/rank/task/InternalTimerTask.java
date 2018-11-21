@@ -30,19 +30,17 @@ public class InternalTimerTask {
     private ProxyPoolBiz proxyPoolBiz;
 
     @Async
-    @Scheduled(initialDelay = 1000*10 , fixedDelay = 1000 * 10 )
+    @Scheduled(initialDelay = 1000*5 , fixedDelay = 1000 * 10 )
     public void fixProxyPool() {
         proxyPoolBiz.fixProxyPool();
     }
 
-    @Async
     @Scheduled(initialDelay = 1000*15 , fixedDelay = 1000 * 60 * 60 * 24 * 2)
     public void cleanTimerJob() {
         int num = timerJobBiz.updateExpiredTimerJobs();
         log.info("expired timer jobs clean : [{}] ",num);
     }
 
-    @Async
     @Scheduled(initialDelay = 1000*20 , fixedDelay = 1000 * 60 * 60 * 24 * 2)
     public void cleanPushTemplate() {
         int num = templateMessageBiz.updateExpiredTemplates();

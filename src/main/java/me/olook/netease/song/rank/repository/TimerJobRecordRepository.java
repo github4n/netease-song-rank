@@ -11,5 +11,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TimerJobRecordRepository extends JpaRepository<TimerJobRecord,Integer> {
 
-    TimerJobRecord findByJobIdAndNewDataOrderByEndTimeDesc(Integer jobId,Integer newData);
+    TimerJobRecord findFirstByJobIdAndNewDataOrderByEndTimeDesc(Integer jobId,Integer newData);
 }

@@ -25,8 +25,13 @@ public class ProxyHttpClient {
     private RestTemplate restTemplate;
 
     public void fixProxyPool(){
-        while(ProxyPoolUtil.workQueue.size() < proxyProperties.getPoolSize()){
+        while(ProxyPoolUtil.activeSize() < proxyProperties.getPoolSize()){
             resolve(getProxy());
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
