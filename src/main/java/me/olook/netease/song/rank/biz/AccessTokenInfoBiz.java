@@ -22,10 +22,6 @@ public class AccessTokenInfoBiz {
     @Resource
     private WeChatHttpClient weChatHttpClient;
 
-    public AccessTokenInfo getLatestValidToken(){
-        return accessTokenInfoRepository.findFirstByIsValidOrderByCrtTimeDesc(1);
-    }
-
     public AccessTokenInfo save(AccessTokenInfo accessTokenInfo){
         return accessTokenInfoRepository.save(accessTokenInfo);
     }
@@ -54,5 +50,9 @@ public class AccessTokenInfoBiz {
             validToken = accessToken.getAccessToken();
         }
         return validToken;
+    }
+
+    private AccessTokenInfo getLatestValidToken(){
+        return accessTokenInfoRepository.findFirstByIsValidOrderByCrtTimeDesc(1);
     }
 }

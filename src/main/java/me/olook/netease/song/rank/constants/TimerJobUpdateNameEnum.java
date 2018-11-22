@@ -6,6 +6,8 @@ package me.olook.netease.song.rank.constants;
  */
 public interface TimerJobUpdateNameEnum {
 
+    String ADD = "add";
+
     String RERUN = "rerun";
 
     String QUERY = "query";

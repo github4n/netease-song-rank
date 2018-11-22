@@ -26,7 +26,10 @@ public class ProxyHttpClient {
 
     public void fixProxyPool(){
         while(ProxyPoolUtil.activeSize() < proxyProperties.getPoolSize()){
-            resolve(getProxy());
+            String res = getProxy();
+            if(null != res){
+                resolve(res);
+            }
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -39,7 +42,12 @@ public class ProxyHttpClient {
         String url = ProxyApiUrl.DA_XIANG
                 +"?tid="+proxyProperties.getOrderId()
                 +proxyProperties.getParams();
-        return restTemplate.getForEntity(url, String.class).getBody();
+        try{
+            return restTemplate.getForEntity(url, String.class).getBody();
+        }catch (Exception e){
+            log.error("http request for proxy error : {}",e.getMessage());
+            return null;
+        }
     }
 
     private void resolve(String multiProxyStr){

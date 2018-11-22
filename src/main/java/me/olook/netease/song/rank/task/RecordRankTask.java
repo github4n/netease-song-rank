@@ -9,7 +9,6 @@ import org.quartz.JobKey;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Date;
 
 /**
  * @author zhaohw
@@ -24,8 +23,6 @@ public class RecordRankTask implements Job {
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
-        log.info("record rank task run");
-        Date startTime = new Date();
         JobKey jobKey = context.getTrigger().getJobKey();
         recordRankService.run(jobKey.getName());
 

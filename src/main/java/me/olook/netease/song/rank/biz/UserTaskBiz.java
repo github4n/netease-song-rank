@@ -105,15 +105,13 @@ public class UserTaskBiz {
         String expression = LocalDateTime.now().getSecond()+" */1 * * * ?";
         newJob.setCronExpression(expression);
         newJob.setJobName(userRefJob.getTargetUserId());
-        newJob.setJobGroup("group1");
-        newJob.setStatus(1);
-        newJob.setJobType("听歌排行爬取任务");
+        newJob.setStatus(TimerJob.STATUS_RUN);
         newJob.setTargetUserId(userRefJob.getTargetUserId());
         newJob.setTargetNickname(userRefJob.getTargetNickname());
         newJob.setCrtUser(userRefJob.getOpenId());
         newJob.setCrtTime(new Date());
         newJob.setUpdTime(new Date());
-        newJob.setUpdName("new job");
+        newJob.setUpdName(TimerJobUpdateNameEnum.ADD);
         return newJob;
     }
 }

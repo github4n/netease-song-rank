@@ -32,10 +32,10 @@ public class TimerJob extends BaseCreateAndUpdateEntity {
     private String jobName;
 
     @ApiModelProperty(value = "任务组")
-    private String jobGroup;
+    private String jobGroup = "group1";
 
     @ApiModelProperty(value = "任务类型")
-    private String jobType;
+    private String jobType = "听歌排行爬取任务";
 
     @ApiModelProperty(value = "表达式")
     private String cronExpression;
