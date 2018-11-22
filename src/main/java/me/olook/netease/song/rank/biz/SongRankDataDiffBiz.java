@@ -49,7 +49,7 @@ public class SongRankDataDiffBiz {
                 SongRankDataDiff songRankDataDiff = buildDataDiff(n);
                 diffList.add(songRankDataDiff);
             }
-            else if(n.getRank()>oldMap.get(n.getSongId()).getRank()){
+            else if(n.getRank()<oldMap.get(n.getSongId()).getRank()){
                 SongRankDataDiff songRankDataDiff = buildDataDiff(n,oldMap.get(n.getSongId()).getRank()-n.getRank());
                 diffList.add(songRankDataDiff);
             }
