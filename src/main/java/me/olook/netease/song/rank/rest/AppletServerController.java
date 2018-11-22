@@ -75,8 +75,8 @@ public class AppletServerController {
 
     @ApiOperation(value = "测试能否获取排行数据")
     @GetMapping(value = "rank/check")
-    public ResponseEntity checkSongRank(String userId) {
-        boolean result = NetEaseHttpClient.checkRankAccess(userId);
+    public ResponseEntity checkSongRank(String targetUserId) {
+        boolean result = NetEaseHttpClient.checkRankAccess(targetUserId);
         if (result) {
             return ResponseEntity.status(200).body(true);
         }
@@ -85,8 +85,8 @@ public class AppletServerController {
 
     @ApiOperation(value = "获取排行变化数据")
     @GetMapping(value = "record/rank")
-    public ResponseEntity getSongRankRecord(String userId) {
-        TimerJob timerJob = timerJobBiz.findByTargetUserId(userId);
+    public ResponseEntity getSongRankRecord(String targetUserId) {
+        TimerJob timerJob = timerJobBiz.findByTargetUserId(targetUserId);
         if(timerJob == null || timerJob.getStatus().equals(TimerJob.STATUS_STOP)){
             return ResponseEntity.status(404).body("出错啦!建议取消再重新关注Ta.");
         }
@@ -96,7 +96,7 @@ public class AppletServerController {
         timerJob.setUpdTime(new Date());
         timerJobBiz.save(timerJob);
         //查出最近10条记录
-        List<SongRankDataDiff> dataDiffs = songRankDataDiffBiz.findLatestRecordRank(userId);
+        List<SongRankDataDiff> dataDiffs = songRankDataDiffBiz.findLatestRecordRank(targetUserId);
         return ResponseEntity.status(200).body(dataDiffs);
     }
 }

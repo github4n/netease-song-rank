@@ -24,10 +24,10 @@ public class SongRankDataDiffBiz {
     @Resource
     private SongRankDataDiffRepository diffRepository;
 
-    public List<SongRankDataDiff> findLatestRecordRank(String userId){
+    public List<SongRankDataDiff> findLatestRecordRank(String targetUserId){
         Pageable pageable = PageRequest.of(0,10);
         Page<SongRankDataDiff> recordRanks =
-                diffRepository.findByTargetUserIdOrderByChangeTimeDesc(userId, pageable);
+                diffRepository.findByTargetUserIdOrderByChangeTimeDesc(targetUserId, pageable);
         return recordRanks.getContent();
     }
 
