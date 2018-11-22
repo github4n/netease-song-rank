@@ -70,6 +70,9 @@ public class RecordRankService {
             return;
         }
         List<SongRankData> songRankDataList = RecordRankResolver.parseData(jsonObject);
+        if(songRankDataList == null){
+            return;
+        }
 
         TimerJobRecord oldRecord = timerJobRecordBiz.getLatestRecord(currentJob.getId());
 
