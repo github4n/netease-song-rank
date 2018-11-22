@@ -7,6 +7,7 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
+import me.olook.netease.song.rank.constants.RankRecordResponseCode;
 import me.olook.netease.song.rank.dto.NeteaseUserDTO;
 import me.olook.netease.song.rank.util.proxy.ProxyInfo;
 import me.olook.netease.song.rank.util.proxy.UserAgents;
@@ -60,7 +61,9 @@ public class NetEaseHttpClient {
      */
     public static boolean checkRankAccess(String userId){
         String recordRank = getRecordRank(userId);
-        return recordRank != null && JSON.parseObject(recordRank).getInteger("code").equals(200);
+        return recordRank != null &&
+                JSON.parseObject(recordRank).getInteger("code")
+                        .equals(RankRecordResponseCode.SUCCESS);
     }
 
     /**

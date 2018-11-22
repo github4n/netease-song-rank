@@ -12,4 +12,6 @@ public interface RankRecordResponseCode {
     int CHEAT = 403;
 
     int ROBOT = -406;
+
+    int DENIED = -2;
 }

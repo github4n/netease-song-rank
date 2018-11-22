@@ -12,7 +12,6 @@
 - 代码精简优化
 
 ## 错误排除
-
 1. songRankDiff插入整榜  
 SongRankData 的record id与最后一次record id不符合，导致查出SongRankData为空
 

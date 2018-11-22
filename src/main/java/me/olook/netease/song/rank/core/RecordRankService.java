@@ -58,13 +58,15 @@ public class RecordRankService {
     private WeChatHttpClient weChatHttpClient;
 
     public void run(String targetUserId){
+
+
+        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
         TimerJob currentJob = timerJobBiz.findByTargetUserId(targetUserId);
 
         ProxyInfo proxyInfo = ProxyPoolUtil.get();
         JSONObject jsonObject =
                 NetEaseHttpClient.getSongRankData(currentJob.getTargetUserId(),proxyInfo);
 
-        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
         boolean dataValid = handleProxy(jsonObject, proxyInfo);
         if(!dataValid){
             return;
@@ -133,7 +135,7 @@ public class RecordRankService {
         int hour = localDateTime.getHour();
         if(3 == hour||4 == hour||5 == hour){
             //日期减一天
-            localDateTime.minus(1,ChronoUnit.DAYS);
+            localDateTime = LocalDateTime.now().minus(1,ChronoUnit.DAYS);
             isBatch = 1;
         }
         int finalIsBatch = isBatch;
@@ -172,7 +174,7 @@ public class RecordRankService {
 
             weChatHttpClient.sendPushTemplate(param, validToken);
 
-            msg.setIsValid(0);
+            msg.setIsValid(TemplateMessage.INVALID);
             msg.setUpdTime(new Date());
             templateMessageBiz.save(msg);
         }
