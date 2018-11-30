@@ -1,4 +1,4 @@
-# netease-song-rank
+# netease-song-rank v1.0.0
 
 
 ## 更新内容
