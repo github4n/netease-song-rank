@@ -63,13 +63,18 @@ public class RecordRankService {
         String uuid = UUID.randomUUID().toString().replaceAll("-", "");
         TimerJob currentJob = timerJobBiz.findByTargetUserId(targetUserId);
 
+        // 使用代理请求数据
         ProxyInfo proxyInfo = ProxyPoolUtil.get();
         JSONObject jsonObject =
                 NetEaseHttpClient.getSongRankData(currentJob.getTargetUserId(),proxyInfo);
 
         boolean dataValid = handleProxy(jsonObject, proxyInfo);
         if(!dataValid){
-            return;
+            // 使用代理未获取到数据  不使用代理重试
+            jsonObject = NetEaseHttpClient.getSongRankData(currentJob.getTargetUserId());
+            if(jsonObject == null){
+                return;
+            }
         }
         List<SongRankData> songRankDataList = RecordRankResolver.parseData(jsonObject);
         if(songRankDataList == null){

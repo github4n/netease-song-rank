@@ -17,5 +17,9 @@ public class ProxyProperties {
 
     private String params;
 
+    /**
+     * 代理池活跃数量大小
+     * 为 0 则不使用代理
+     */
     private Integer poolSize;
 }

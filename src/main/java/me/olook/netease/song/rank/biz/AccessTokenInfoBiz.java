@@ -30,24 +30,24 @@ public class AccessTokenInfoBiz {
      * 获取可用的accessToken
      */
     public String getValidAccessToken(){
-        AccessTokenInfo accessToken = this.getLatestValidToken();
+        AccessTokenInfo accessTokenInfo = this.getLatestValidToken();
         String validToken = "";
-        if(accessToken==null||accessToken.getInvalidTime().getTime()<System.currentTimeMillis()){
+        if(accessTokenInfo==null||accessTokenInfo.getInvalidTime().getTime()<System.currentTimeMillis()){
             //重新获取token
             String token = weChatHttpClient.getAccessToken();
             if(token == null){
                 log.error("获取 access token 失败");
                 return null;
             }
-            if(accessToken!=null){
-                accessToken.setIsValid(0);
-                this.save(accessToken);
+            if(accessTokenInfo!=null){
+                accessTokenInfo.setIsValid(0);
+                this.save(accessTokenInfo);
             }
             AccessTokenInfo newTokenInfo = new AccessTokenInfo(token);
             this.save(newTokenInfo);
             validToken = token;
         }else {
-            validToken = accessToken.getAccessToken();
+            validToken = accessTokenInfo.getAccessToken();
         }
         return validToken;
     }
