@@ -84,7 +84,7 @@ public class AppletServerController {
     }
 
     @ApiOperation(value = "获取排行变化数据")
-    @GetMapping(value = "record/rank")
+    @GetMapping(value = "rank/record")
     public ResponseEntity getSongRankRecord(String targetUserId) {
         TimerJob timerJob = timerJobBiz.findByTargetUserId(targetUserId);
         if(timerJob == null || timerJob.getStatus().equals(TimerJob.STATUS_STOP)){

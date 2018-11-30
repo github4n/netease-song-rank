@@ -8,8 +8,14 @@
 - 修改排行榜变化查找算法，新增通过score查找方式
 - 任务清理、模板清理任务作为内置定时任务
 - 代理池算法及数据结构调整（双队列）
-- 减少不必要的api暴露
+- 新增系统健康监控api，减少不必要的api暴露
 - 代码精简优化
+
+## 表结构调整
+- wx_user 字段*nickName*、*avatarUrl*驼峰修改为下划线*nick_name*、*avatar_url*
+- song_rank_job 字段 *target_user_id*
+- song_rank_data 新增字段 *pic_url*、 *song_id*
+- song_rank_data_diff 新增字段 *pic_url*、 *song_id*
 
 ## 错误排除
 1. songRankDiff插入整榜  
