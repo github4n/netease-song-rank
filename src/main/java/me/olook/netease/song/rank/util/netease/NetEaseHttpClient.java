@@ -162,7 +162,7 @@ public class NetEaseHttpClient {
             if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
                 return EntityUtils.toString(response.getEntity(),Charsets.UTF_8);
             }
-            log.error("post for {} return status code {}",request.getURI().getPath(),response.getStatusLine().getStatusCode());
+            log.warn("post for {} return status code {}",request.getURI().getPath(),response.getStatusLine().getStatusCode());
         } catch (IOException e) {
             //log.error("post IOException for {} / {}",request.getURI().getPath());
         }
