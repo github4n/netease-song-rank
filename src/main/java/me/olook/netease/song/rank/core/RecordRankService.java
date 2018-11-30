@@ -73,8 +73,10 @@ public class RecordRankService {
             // 使用代理未获取到数据  不使用代理重试
             jsonObject = NetEaseHttpClient.getSongRankData(currentJob.getTargetUserId());
             if(jsonObject == null){
+                log.error("post for user[{}] retry failed",targetUserId);
                 return;
             }
+            log.debug("post for user[{}] retry success",targetUserId);
         }
         List<SongRankData> songRankDataList = RecordRankResolver.parseData(jsonObject);
         if(songRankDataList == null){

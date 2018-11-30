@@ -29,12 +29,23 @@ public class ProxyPoolUtil {
         return workQueue.poll();
     }
 
+    /**
+     * 请求成功是调用
+     *      归还代理至工作队列，若失败队列中存在，将它从失败队列删除
+     */
     public static void restore(ProxyInfo proxy){
         if(proxy != null){
             workQueue.offer(proxy);
+            failQueue.remove(proxy);
         }
+
     }
 
+    /**
+     * 请求失败时调用
+     *      失败队列中已存在，从失败队列中删除，直接舍弃
+     *      失败队列中不存在，添加到失败队列和工作队列，重新提供一次机会
+     */
     public static void fail(ProxyInfo proxy){
         if (failQueue.contains(proxy)){
             failQueue.remove(proxy);
@@ -55,5 +66,13 @@ public class ProxyPoolUtil {
 
     public static int activeSize(){
         return workQueue.size()-failQueue.size();
+    }
+
+    public static ConcurrentLinkedQueue<ProxyInfo> getWorkQueue() {
+        return workQueue;
+    }
+
+    public static ConcurrentLinkedQueue<ProxyInfo> getFailQueue() {
+        return failQueue;
     }
 }

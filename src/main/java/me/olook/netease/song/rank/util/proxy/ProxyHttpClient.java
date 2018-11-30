@@ -24,14 +24,14 @@ public class ProxyHttpClient {
     @Resource
     private RestTemplate restTemplate;
 
-    public void fixProxyPool(){
+    public synchronized void fixProxyPool(){
         while(ProxyPoolUtil.activeSize() < proxyProperties.getPoolSize()){
             String res = getProxy();
             if(null != res){
                 resolve(res);
             }
             try {
-                Thread.sleep(1000);
+                Thread.sleep(1500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -63,10 +63,10 @@ public class ProxyHttpClient {
                 ProxyInfo proxyInfo = new ProxyInfo(ip,port);
                 boolean isValid = NetEaseHttpClient.checkProxy(ip,port);
                 if(isValid){
-                    log.info("accept proxy {}:{}",ip,port);
+                    log.debug("accept proxy {}:{}",ip,port);
                     ProxyPoolUtil.workQueue.add(proxyInfo);
                 }else{
-                    log.warn("discard proxy {}:{}",ip,port);
+                    log.debug("discard proxy {}:{}",ip,port);
                 }
             }
         }
