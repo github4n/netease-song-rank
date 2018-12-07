@@ -6,7 +6,9 @@ package me.olook.netease.song.rank.util.netease;
  */
 public interface NetEaseApiUrl {
 
-    String SEARCH = "http://music.163.com/api/search/get/web";
+    String SEARCH = "https://music.163.com/api/search/get/web";
 
-    String RECORD = "http://music.163.com/weapi/v1/play/record";
+    String RECORD = "https://music.163.com/weapi/v1/play/record";
+
+    String SIGNED = "https://music.163.com/weapi/artist/list";
 }
