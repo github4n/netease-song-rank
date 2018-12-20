@@ -50,10 +50,10 @@ public class RecordRankController {
     public ResponseEntity getSongRankRecord(String targetUserId) {
         TimerJob timerJob = timerJobBiz.findByTargetUserId(targetUserId);
         if(timerJob == null || timerJob.getStatus().equals(TimerJob.STATUS_STOP)){
-            return ResponseEntity.status(404).body("出错啦!建议取消再重新关注Ta.");
+            return ResponseEntity.status(404).body("出错啦!建议取消再重新关注Ta");
         }
         if(timerJob.getStatus().equals(TimerJob.STATUS_EXPIRED)){
-            return ResponseEntity.status(404).body("你的关注过期啦!建议取消再重新关注Ta.");
+            return ResponseEntity.status(404).body("你的关注过期啦!建议取消再重新关注Ta");
         }
         timerJob.setUpdTime(new Date());
         timerJobBiz.save(timerJob);

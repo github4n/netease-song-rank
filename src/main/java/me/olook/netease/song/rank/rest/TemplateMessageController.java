@@ -29,8 +29,13 @@ public class TemplateMessageController {
 
     @ApiOperation(value = "新增")
     @PostMapping(value = "")
-    public ResponseEntity<String> add(@RequestBody TemplateMessage entity){
-        // todo  zhaohw 订阅/关注订阅列表 2018-12-20 17:14
-        return null;
+    public ResponseEntity add(@RequestBody TemplateMessage templateMessage){
+        TemplateMessage res = templateMessageBiz.addTemplates(templateMessage);
+        if(res == null){
+            return ResponseEntity.status(500).body("您已经订阅过Ta了");
+        }
+        return ResponseEntity.ok().body("订阅成功");
     }
+
+    // todo 订阅列表数据 zhaohw 2018-12-20 17:55
 }
