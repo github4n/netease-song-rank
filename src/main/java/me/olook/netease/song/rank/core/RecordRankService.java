@@ -106,7 +106,7 @@ public class RecordRankService {
                 List<SongRankData> oldDataList = songRankDataBiz.getOldDataList(oldRecord.getId());
                 SongRankDataDiff saveResult = saveSongRankDataDiff(songRankDataList, oldDataList, uuid, targetUserId);
                 if(saveResult != null){
-                    log.info("{} {} 数据变更",currentJob.getTargetNickname(),targetUserId);
+                    log.info("{} {} 数据变更: {}-{}",currentJob.getTargetNickname(),targetUserId,saveResult.getSong(),saveResult.getSinger());
                     if(saveResult.getIsBatchUpdate()==0){
                         sendTemplates(saveResult);
                     }

@@ -28,6 +28,8 @@ spring:
       pool-prepared-statements: true
       max-open-prepared-statements: 20
       driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    open-in-view: false
 
 wxapp:
   app-id:

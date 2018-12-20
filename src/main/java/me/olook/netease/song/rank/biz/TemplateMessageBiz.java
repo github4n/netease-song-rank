@@ -39,9 +39,13 @@ public class TemplateMessageBiz {
         return expiredTemplates.size();
     }
 
+    /**
+     * 找出某用户所有可用模板 用于推送
+     */
     public List<TemplateMessage> findValidTemplates(String targetUserId){
         return templateMessageRepository.findByTargetUserIdAndIsValid(targetUserId,TemplateMessage.VALID);
     }
+
 
     public TemplateMessage save(TemplateMessage templateMessage){
         return templateMessageRepository.save(templateMessage);

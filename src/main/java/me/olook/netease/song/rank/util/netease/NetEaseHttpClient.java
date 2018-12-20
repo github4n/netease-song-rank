@@ -39,10 +39,6 @@ import java.util.Map;
 @Slf4j
 public class NetEaseHttpClient {
 
-    private static Integer offset = 0;
-
-    private static Integer counter = 0;
-
     /**
      * 搜索网易云用户
      * @param keyWord 关键词
@@ -58,39 +54,6 @@ public class NetEaseHttpClient {
         }
         log.debug("用户搜素: {}",JSONObject.toJSONString(list));
         return list;
-    }
-
-    /**
-     * 获取签约歌手
-     * {categoryCode: "5001", offset: "180", total: "false", limit: "60", csrf_token: ""}
-     */
-    public static void getSignedSinger(Integer start){
-        Map<String,String> map = Maps.newHashMap();
-        map.put("categoryCode","5001");
-        map.put("offset",start.toString());
-        map.put("total","false");
-        map.put("limit","80");
-        map.put("csrf_token","");
-        String json = JSONObject.toJSONString(map);
-        String params = NetEaseEncryptUtil.getUrlParams(json);
-        String url = NetEaseApiUrl.SIGNED+params;
-        String postResult = post(url,null,null);
-        JSONObject jsonObject = JSONObject.parseObject(postResult);
-        JSONArray artists = jsonObject.getJSONArray("artists");
-
-        artists.forEach(p->{
-            JSONObject jsonObject1 = JSONObject.parseObject(p.toString());
-            if(checkRankAccess(jsonObject1.getString("accountId"))){
-                System.out.println(jsonObject1.getString("accountId")+" : " +jsonObject1.getString("name"));
-                counter += artists.size();
-            }
-        });
-        if(jsonObject.getBoolean("more")){
-            offset++;
-            getSignedSinger(offset*80);
-        }else{
-            System.out.println("共: "+(counter/80));
-        }
     }
 
     /**
@@ -171,11 +134,11 @@ public class NetEaseHttpClient {
     }
 
 
-    private static String post(String url , Map<String,String> params){
+    protected static String post(String url , Map<String,String> params){
         return post(url,params,null);
     }
 
-    private static String post(String url , Map<String,String> params,HttpHost proxy){
+    protected static String post(String url , Map<String,String> params,HttpHost proxy){
         RequestConfig.Builder builder = RequestConfig.custom();
         builder.setConnectTimeout(5000);
         builder.setConnectionRequestTimeout(5000);
@@ -234,6 +197,5 @@ public class NetEaseHttpClient {
 
     public static void main(String[] args) {
         //System.out.println(getSongRankData("33255454"));
-        //getSignedSinger(0);
     }
 }

@@ -2,6 +2,7 @@ package me.olook.netease.song.rank.rest;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import me.olook.netease.song.rank.biz.UserRefJobBiz;
 import me.olook.netease.song.rank.biz.UserTaskBiz;
 import me.olook.netease.song.rank.entity.UserRefJob;
 import me.olook.netease.song.rank.exception.UserTaskException;
@@ -24,11 +25,14 @@ import java.util.List;
 @Api(description = "用户任务模块")
 public class UserTaskController {
 
+    private final UserRefJobBiz userRefJobBiz;
+
     private final UserTaskBiz userTaskBiz;
 
     @Autowired
-    public UserTaskController(UserTaskBiz userTaskBiz) {
+    public UserTaskController(UserTaskBiz userTaskBiz, UserRefJobBiz userRefJobBiz) {
         this.userTaskBiz = userTaskBiz;
+        this.userRefJobBiz = userRefJobBiz;
     }
 
     @ApiOperation(value = "新增")
@@ -46,7 +50,7 @@ public class UserTaskController {
         }
     }
 
-    @ApiOperation(value = "取消关注用户")
+    @ApiOperation(value = "取消关注")
     @DeleteMapping(value = "{id}")
     public ResponseEntity remove(@PathVariable Integer id){
         boolean result = userTaskBiz.removeTask(id);
@@ -55,5 +59,12 @@ public class UserTaskController {
         }else{
             return ResponseEntity.status(500).body("删除失败");
         }
+    }
+
+    @ApiOperation(value = "获取任务")
+    @GetMapping(value = "")
+    public ResponseEntity getByOpenId(String openid) {
+        List<UserRefJob> jobList = userRefJobBiz.findByOpenIdAndDelFlag(openid,0);
+        return ResponseEntity.status(200).body(jobList);
     }
 }
