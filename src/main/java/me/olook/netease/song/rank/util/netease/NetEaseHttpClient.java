@@ -192,7 +192,8 @@ public class NetEaseHttpClient {
         String nickName = JSONObject.parseObject(json).get("nickname").toString();
         String avatar = JSONObject.parseObject(json).get("avatarUrl").toString();
         String userId = JSONObject.parseObject(json).get("userId").toString();
-        return new NeteaseUserDTO(userId, avatar, nickName);
+        String signature = JSONObject.parseObject(json).get("signature").toString();
+        return new NeteaseUserDTO(userId, avatar, nickName,signature);
     }
 
     public static void main(String[] args) {

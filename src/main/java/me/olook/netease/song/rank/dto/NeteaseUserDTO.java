@@ -18,4 +18,6 @@ public class NeteaseUserDTO {
     private String avatar;
 
     private String nickName;
+
+    private String signature;
 }

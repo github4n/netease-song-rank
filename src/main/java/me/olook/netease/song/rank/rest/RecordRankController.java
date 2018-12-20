@@ -36,9 +36,9 @@ public class RecordRankController {
     }
 
     @ApiOperation(value = "测试能否获取排行数据")
-    @GetMapping(value = "rank/check")
-    public ResponseEntity checkSongRank(String targetUserId) {
-        boolean result = NetEaseHttpClient.checkRankAccess(targetUserId);
+    @GetMapping(value = "check")
+    public ResponseEntity checkSongRank(String userId) {
+        boolean result = NetEaseHttpClient.checkRankAccess(userId);
         if (result) {
             return ResponseEntity.status(200).body(true);
         }
@@ -46,9 +46,9 @@ public class RecordRankController {
     }
 
     @ApiOperation(value = "获取排行变化数据")
-    @GetMapping(value = "rank/record")
-    public ResponseEntity getSongRankRecord(String targetUserId) {
-        TimerJob timerJob = timerJobBiz.findByTargetUserId(targetUserId);
+    @GetMapping(value = "record")
+    public ResponseEntity getSongRankRecord(String userId) {
+        TimerJob timerJob = timerJobBiz.findByTargetUserId(userId);
         if(timerJob == null || timerJob.getStatus().equals(TimerJob.STATUS_STOP)){
             return ResponseEntity.status(404).body("出错啦!建议取消再重新关注Ta");
         }
@@ -58,7 +58,7 @@ public class RecordRankController {
         timerJob.setUpdTime(new Date());
         timerJobBiz.save(timerJob);
         //查出最近10条记录
-        List<SongRankDataDiff> dataDiffs = songRankDataDiffBiz.findLatestRecordRank(targetUserId);
+        List<SongRankDataDiff> dataDiffs = songRankDataDiffBiz.findLatestRecordRank(userId);
         return ResponseEntity.status(200).body(dataDiffs);
     }
 }

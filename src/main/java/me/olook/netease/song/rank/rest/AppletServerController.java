@@ -36,8 +36,8 @@ public class AppletServerController {
 
     @ApiOperation(value = "获取会话信息")
     @GetMapping(value = "session")
-    public ResponseEntity<String> getWxUserInfo(String jsCode) {
-        String json = jsCodeToSession(jsCode);
+    public ResponseEntity<String> getWxUserInfo(String code) {
+        String json = jsCodeToSession(code);
         return ResponseEntity.status(200).body(json);
     }
 
