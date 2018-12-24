@@ -6,18 +6,20 @@ import lombok.NoArgsConstructor;
 
 /**
  * @author zhaohw
- * @date 2018-03-05 22:06
+ * @date 2018-12-24 14:31
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class NeteaseUserDTO {
+public class SubscribeNetEaseUserDTO{
 
     private String userId;
 
     private String avatar;
 
     private String nickName;
-
-    private String signature;
+    /**
+     * 可用模板消息数量
+     */
+    private Long subscribe;
 }

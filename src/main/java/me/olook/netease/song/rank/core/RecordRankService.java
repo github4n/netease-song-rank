@@ -158,7 +158,7 @@ public class RecordRankService {
     }
 
     private void sendTemplates(SongRankDataDiff dataDiff){
-        List<TemplateMessage> templates = templateMessageBiz.findValidTemplates(dataDiff.getTargetUserId());
+        List<TemplateMessage> templates = templateMessageBiz.findValidTemplatesByTargetUserId(dataDiff.getTargetUserId());
         if(templates.size()==0){
             return;
         }
@@ -169,22 +169,19 @@ public class RecordRankService {
         }
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         TimerJob timerJob = timerJobBiz.findByTargetUserId(dataDiff.getTargetUserId());
-        for(TemplateMessage msg : templates){
-
+        templates.forEach(msg -> {
             TemplateMsgParam param = new TemplateMsgParam();
             param.setToUser(msg.getOpenid());
             param.setTemplateId(msg.getTemplateId());
             param.setPage(msg.getPage());
             param.setFormId(msg.getFormId());
-            TemplateMsgKeyWord keyWord = new TemplateMsgKeyWord(dataDiff.getSong(),sdf.format(new Date()),timerJob.getTargetNickname());
+            TemplateMsgKeyWord keyWord = new TemplateMsgKeyWord(dataDiff.getSong(), sdf.format(new Date()), timerJob.getTargetNickname());
             param.setData(keyWord);
-
             weChatHttpClient.sendPushTemplate(param, validToken);
-
             msg.setIsValid(TemplateMessage.INVALID);
             msg.setUpdTime(new Date());
             templateMessageBiz.save(msg);
-        }
+        });
 
     }
 

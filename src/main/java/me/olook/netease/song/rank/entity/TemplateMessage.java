@@ -22,6 +22,8 @@ public class TemplateMessage {
 
     public final static int EXPIRED = 2;
 
+    public final static int DELETED = 3;
+
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     @ApiModelProperty(hidden = true)
     @Id
@@ -49,7 +51,7 @@ public class TemplateMessage {
     private Date updTime;
 
     /**
-     * 0:已用 1:可用 2:过期
+     * 0:已用 1:可用 2:过期 3:主动删除
      */
     @Column(name = "is_valid")
     private Integer isValid;

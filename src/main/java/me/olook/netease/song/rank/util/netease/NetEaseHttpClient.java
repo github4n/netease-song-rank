@@ -8,7 +8,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import me.olook.netease.song.rank.constants.RankRecordResponseCode;
-import me.olook.netease.song.rank.dto.NeteaseUserDTO;
+import me.olook.netease.song.rank.dto.NetEaseUserDTO;
 import me.olook.netease.song.rank.util.proxy.ProxyInfo;
 import me.olook.netease.song.rank.util.proxy.UserAgents;
 import org.apache.http.HttpHost;
@@ -44,10 +44,10 @@ public class NetEaseHttpClient {
      * @param keyWord 关键词
      * @return 用户列表
      */
-    public static List<NeteaseUserDTO> searchUser(String keyWord,String limit,String offset){
+    public static List<NetEaseUserDTO> searchUser(String keyWord, String limit, String offset){
         String json = netEaseSearch(keyWord,"1002",limit,offset);
         JSONObject jsonObject = JSON.parseObject(json);
-        List<NeteaseUserDTO> list = Lists.newArrayList();
+        List<NetEaseUserDTO> list = Lists.newArrayList();
         JSONArray array = jsonObject.getJSONObject("result").getJSONArray("userprofiles");
         for (Object anArray : array) {
             list.add(resolveUser(anArray.toString()));
@@ -188,12 +188,12 @@ public class NetEaseHttpClient {
         request.setHeader(HttpHeaders.USER_AGENT,UserAgents.randomUserAgent());
     }
 
-    private static NeteaseUserDTO resolveUser(String json){
+    private static NetEaseUserDTO resolveUser(String json){
         String nickName = JSONObject.parseObject(json).get("nickname").toString();
         String avatar = JSONObject.parseObject(json).get("avatarUrl").toString();
         String userId = JSONObject.parseObject(json).get("userId").toString();
         String signature = JSONObject.parseObject(json).get("signature").toString();
-        return new NeteaseUserDTO(userId, avatar, nickName,signature);
+        return new NetEaseUserDTO(userId, avatar, nickName,signature);
     }
 
     public static void main(String[] args) {

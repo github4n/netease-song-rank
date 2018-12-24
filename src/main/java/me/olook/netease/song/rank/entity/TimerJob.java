@@ -25,6 +25,8 @@ public class TimerJob extends BaseCreateAndUpdateEntity {
 
     public final static int STATUS_STOP = 0;
 
+    public final static String DEFAULT_GROUP = "group1";
+
     @ApiModelProperty(value = "任务状态：0暂停 1运行")
     private Integer status;
 
@@ -32,7 +34,7 @@ public class TimerJob extends BaseCreateAndUpdateEntity {
     private String jobName;
 
     @ApiModelProperty(value = "任务组")
-    private String jobGroup = "group1";
+    private String jobGroup = DEFAULT_GROUP;
 
     @ApiModelProperty(value = "任务类型")
     private String jobType = "听歌排行爬取任务";

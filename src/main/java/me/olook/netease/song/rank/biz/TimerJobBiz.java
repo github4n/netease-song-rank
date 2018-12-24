@@ -49,10 +49,15 @@ public class TimerJobBiz {
         return timerJobRepository.findTimerJobsByStatusAndUpdTimeBefore(TimerJob.STATUS_RUN, Date.from(instant));
     }
 
+    /**
+     * 清理过期定时任务
+     * 只清理DEFAULT_GROUP
+     */
     @Transactional(rollbackFor = Exception.class)
     public int updateExpiredTimerJobs(){
         List<TimerJob> expiredTimerJobs = this.findExpiredTimerJob();
-        expiredTimerJobs.forEach(p->{
+        expiredTimerJobs.stream().filter(job->TimerJob.DEFAULT_GROUP.equals(job.getJobGroup()))
+                .forEach(p->{
             baseQuartzBiz.deleteScheduleJob(p.getJobName(),p.getJobGroup());
             p.setStatus(TimerJob.STATUS_EXPIRED);
             p.setUpdTime(new Date());

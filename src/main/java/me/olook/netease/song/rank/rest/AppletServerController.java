@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import me.olook.netease.song.rank.biz.SongRankDataDiffBiz;
 import me.olook.netease.song.rank.biz.TimerJobBiz;
 import me.olook.netease.song.rank.biz.UserRefJobBiz;
-import me.olook.netease.song.rank.dto.NeteaseUserDTO;
+import me.olook.netease.song.rank.dto.NetEaseUserDTO;
 import me.olook.netease.song.rank.util.netease.NetEaseHttpClient;
 import me.olook.netease.song.rank.util.wechat.WeChatHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +50,7 @@ public class AppletServerController {
     public ResponseEntity getNeteaseUser(String keyWord,
                                          @RequestParam(defaultValue = "5") String limit,
                                          @RequestParam(defaultValue = "0") String offset) {
-        List<NeteaseUserDTO> list = NetEaseHttpClient.searchUser(keyWord,limit,offset);
+        List<NetEaseUserDTO> list = NetEaseHttpClient.searchUser(keyWord,limit,offset);
         return ResponseEntity.status(200).body(list);
     }
 

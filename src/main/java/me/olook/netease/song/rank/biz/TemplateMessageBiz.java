@@ -10,8 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author zhaohw
@@ -23,6 +23,8 @@ public class TemplateMessageBiz {
     private final static int DAY_DIFF = 7;
 
     private final static String TEMPLATE_ID = "AIL1AXTIKfmmifc4uPpCthIiNi-AMgMSxXBvXihnPOg";
+
+    private final static int TEMPLATE_LIMIT = 2;
 
     @Resource
     private UserRefJobRepository userRefJobRepository;
@@ -47,20 +49,32 @@ public class TemplateMessageBiz {
     }
 
     /**
-     * 找出某用户所有可用模板 用于推送
+     * 找出某用户可用模板 用于推送
+     * 每个openid只找最早一个可用记录
      */
-    public List<TemplateMessage> findValidTemplates(String targetUserId){
-        return templateMessageRepository.findByTargetUserIdAndIsValid(targetUserId,TemplateMessage.VALID);
+    public List<TemplateMessage> findValidTemplatesByTargetUserId(String targetUserId){
+        List<TemplateMessage> messages = templateMessageRepository.findByTargetUserIdAndIsValid(targetUserId, TemplateMessage.VALID);
+        Map<String, List<TemplateMessage>> collect = messages.stream().collect(Collectors.groupingBy(TemplateMessage::getOpenid));
+        List<TemplateMessage> reduceList = new ArrayList<>();
+        collect.forEach((key,list)->{
+            Optional<TemplateMessage> min = list.stream().min((a, b) -> {
+                return a.getCrtTime().compareTo(b.getCrtTime());
+            });
+            min.ifPresent(reduceList::add);
+        });
+        return reduceList;
     }
 
+    /**
+     * 新增订阅记录
+     */
     public TemplateMessage addTemplates(TemplateMessage templateMessage){
         //是否存在该微信用户对该网易云用户的可用推送模板
         List<TemplateMessage> templates =
                 templateMessageRepository.findByOpenidAndIsValid(templateMessage.getOpenid(), TemplateMessage.VALID);
-        final boolean exist = templates.stream().anyMatch(t -> {
-            return t.getTargetUserId().equals(templateMessage.getTargetUserId());
-        });
-        if(exist) return null;
+        long count = templates.stream().filter(t -> t.getTargetUserId().equals(templateMessage.getTargetUserId())).count();
+
+        if(count >= TEMPLATE_LIMIT) return null;
 
         templateMessage.setCrtTime(new Date());
         List<UserRefJob> userRefJobs =
@@ -76,6 +90,10 @@ public class TemplateMessageBiz {
 
     public TemplateMessage save(TemplateMessage templateMessage){
         return templateMessageRepository.save(templateMessage);
+    }
+
+    public List<TemplateMessage> findValidTemplatesByOpenid(String openid){
+        return templateMessageRepository.findByOpenidAndIsValid(openid, TemplateMessage.VALID);
     }
 
 }
