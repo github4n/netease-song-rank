@@ -72,4 +72,8 @@ public class TimerJobBiz {
         });
         return expiredTimerJobs.size();
     }
+
+    public List<TimerJob> findByJobGroupAndStatus(String jobGroup,Integer status){
+        return timerJobRepository.findByJobGroupAndStatusOrderByUpdTimeDesc(jobGroup,status);
+    }
 }

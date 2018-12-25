@@ -12,7 +12,7 @@
 - 代码精简优化
 
 ## 表结构调整
-- wx_user 字段*nickName*、*avatarUrl*驼峰修改为下划线*nick_name*、*avatar_url*
+- wx_user 字段*nickName*、*avatarUrl*驼峰修改为下划线*nick_name*、*avatar_url*，新增*push_interval*字段
 - song_rank_job 字段 *target_user_id*
 - song_rank_data 新增字段 *pic_url*、 *song_id*
 - song_rank_data_diff 新增字段 *pic_url*、 *song_id*

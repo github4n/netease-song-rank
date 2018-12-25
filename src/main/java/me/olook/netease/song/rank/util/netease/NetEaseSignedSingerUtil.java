@@ -59,7 +59,9 @@ public class NetEaseSignedSingerUtil {
         }else{
             signedSingerList.stream().sorted((x,y)->{
                 return y.getRankNum().compareTo(x.getRankNum());
-            }).forEach(System.out::println);
+            }).forEach(e->{
+                System.out.println(e.toSql());
+            });
             System.out.println("共: "+(counter/80));
         }
     }

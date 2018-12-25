@@ -8,9 +8,12 @@ import me.olook.netease.song.rank.entity.SongRankDataDiff;
 import me.olook.netease.song.rank.entity.TimerJob;
 import me.olook.netease.song.rank.util.netease.NetEaseHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
@@ -60,5 +63,15 @@ public class RecordRankController {
         //查出最近10条记录
         List<SongRankDataDiff> dataDiffs = songRankDataDiffBiz.findLatestRecordRank(userId);
         return ResponseEntity.status(200).body(dataDiffs);
+    }
+
+    @ApiOperation(value = "获取明星变化数据")
+    @GetMapping(value = "record/star")
+    public ResponseEntity getStarSongRankRecord(String jobGroup,
+                                                @RequestParam(defaultValue = "10") Integer limit,
+                                                @RequestParam(defaultValue = "0") Integer offset) {
+        Pageable pageable = PageRequest.of(offset,limit);
+        List<SongRankDataDiff> diffs = songRankDataDiffBiz.findByGroup(jobGroup, pageable);
+        return ResponseEntity.status(200).body(diffs);
     }
 }

@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.Max;
 import java.util.Date;
 
 /**
@@ -47,6 +48,14 @@ public class WxUser {
 
     @Column(name = "job_limit")
     private Integer jobLimit;
+
+    /**
+     * 推送时间间隔（分钟）
+     * 最大间隔为1天
+     */
+    @Max(value = 60*24)
+    @Column(name = "push_interval")
+    private Integer pushInterval;
 
     @ApiModelProperty(hidden = true)
     @Column(name = "crt_time")

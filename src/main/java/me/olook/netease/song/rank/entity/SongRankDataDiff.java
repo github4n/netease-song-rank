@@ -62,6 +62,9 @@ public class SongRankDataDiff {
     @Transient
     private Integer count;
 
+    @Transient
+    private String targetUserName;
+
     @ApiModelProperty(value = "是否系统批量更新")
     @Column(name = "is_batch_update")
     private Integer isBatchUpdate;

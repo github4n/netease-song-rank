@@ -2,8 +2,10 @@ package me.olook.netease.song.rank.rest;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import me.olook.netease.song.rank.biz.TimerJobBiz;
 import me.olook.netease.song.rank.biz.UserRefJobBiz;
 import me.olook.netease.song.rank.biz.UserTaskBiz;
+import me.olook.netease.song.rank.entity.TimerJob;
 import me.olook.netease.song.rank.entity.UserRefJob;
 import me.olook.netease.song.rank.exception.UserTaskException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 用户任务
@@ -29,10 +32,13 @@ public class UserTaskController {
 
     private final UserTaskBiz userTaskBiz;
 
+    private final TimerJobBiz timerJobBiz;
+
     @Autowired
-    public UserTaskController(UserTaskBiz userTaskBiz, UserRefJobBiz userRefJobBiz) {
+    public UserTaskController(UserTaskBiz userTaskBiz, UserRefJobBiz userRefJobBiz, TimerJobBiz timerJobBiz) {
         this.userTaskBiz = userTaskBiz;
         this.userRefJobBiz = userRefJobBiz;
+        this.timerJobBiz = timerJobBiz;
     }
 
     @ApiOperation(value = "新增")
@@ -66,5 +72,13 @@ public class UserTaskController {
     public ResponseEntity getByOpenId(String openid) {
         List<UserRefJob> jobList = userRefJobBiz.findByOpenIdAndDelFlag(openid,0);
         return ResponseEntity.status(200).body(jobList);
+    }
+
+    @ApiOperation(value = "获取分组任务")
+    @GetMapping(value = "group/{jobGroup}")
+    public ResponseEntity getByGroup(@PathVariable String jobGroup,@RequestParam(defaultValue = "10") Integer limit) {
+        List<TimerJob> jobList = timerJobBiz.findByJobGroupAndStatus(jobGroup,TimerJob.STATUS_RUN);
+        List<TimerJob> reduceList = jobList.stream().limit(limit).collect(Collectors.toList());
+        return ResponseEntity.status(200).body(reduceList);
     }
 }

@@ -27,4 +27,12 @@ public interface TimerJobRepository extends JpaRepository<TimerJob,Integer> {
      * @return timer job
      */
     List<TimerJob> findTimerJobsByStatusAndUpdTimeBefore(Integer status, Date date);
+
+    /**
+     * 通过分组及任务状态查找任务
+     * @param jobGroup 分组
+     * @param status 任务状态
+     * @return 任务列表
+     */
+    List<TimerJob> findByJobGroupAndStatusOrderByUpdTimeDesc(String jobGroup,Integer status);
 }

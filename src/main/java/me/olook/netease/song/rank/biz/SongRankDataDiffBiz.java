@@ -2,7 +2,9 @@ package me.olook.netease.song.rank.biz;
 
 import me.olook.netease.song.rank.entity.SongRankData;
 import me.olook.netease.song.rank.entity.SongRankDataDiff;
+import me.olook.netease.song.rank.entity.TimerJob;
 import me.olook.netease.song.rank.repository.SongRankDataDiffRepository;
+import me.olook.netease.song.rank.repository.TimerJobRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author zhaohw
@@ -20,6 +23,9 @@ import java.util.Map;
  */
 @Service
 public class SongRankDataDiffBiz {
+
+    @Resource
+    private TimerJobRepository timerJobRepository;
 
     @Resource
     private SongRankDataDiffRepository diffRepository;
@@ -91,5 +97,20 @@ public class SongRankDataDiffBiz {
                 .picUrl(songRankData.getPicUrl())
                 .rankChange(rankChange)
                 .build();
+    }
+
+    public List<SongRankDataDiff> findByGroup(String jobGroup, Pageable pageable){
+        List<TimerJob> timerJobs = timerJobRepository.findByJobGroupAndStatusOrderByUpdTimeDesc(jobGroup, TimerJob.STATUS_RUN);
+        List<String> targetUserIds = timerJobs.stream().map(TimerJob::getTargetUserId).collect(Collectors.toList());
+        HashMap<String,String> idNameMap = new HashMap<>(timerJobs.size());
+        timerJobs.forEach(p->{
+            idNameMap.put(p.getTargetUserId(),p.getTargetNickname());
+        });
+        Page<SongRankDataDiff> diffs = diffRepository.findByTargetUserIdInOrderByChangeTimeDesc(targetUserIds, pageable);
+        List<SongRankDataDiff> reduceList = diffs.getContent();
+        reduceList.forEach(diff->{
+            diff.setTargetUserName(idNameMap.get(diff.getTargetUserId()));
+        });
+        return reduceList;
     }
 }
