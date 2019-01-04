@@ -84,6 +84,7 @@ public class RecordRankService {
         }
         List<SongRankData> songRankDataList = RecordRankResolver.parseData(jsonObject);
         if(songRankDataList == null){
+            ProxyPoolUtil.fail(proxyInfo);
             return;
         }
 
