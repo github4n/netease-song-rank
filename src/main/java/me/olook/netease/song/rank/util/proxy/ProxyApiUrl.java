@@ -7,4 +7,8 @@ package me.olook.netease.song.rank.util.proxy;
 public interface ProxyApiUrl {
 
     String DA_XIANG = "http://tvp.daxiangdaili.com/ip/";
+
+    String GATHER = "http://www.gatherproxy.com/proxylist/anonymity/?t=Elite";
+
+    String GATHER_ZH = "http://www.gatherproxy.com/proxylist/country/?c=China";
 }

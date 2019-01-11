@@ -108,7 +108,7 @@ public class NetEaseHttpClient {
     public static boolean checkProxy(String ip,Integer port){
         try{
             ProxyInfo proxy = new ProxyInfo(ip,port);
-            String res = getRecordRank("33255454",proxy);
+            String res = getRecordRank("328199093",proxy);
             log.debug(res);
             return res != null;
         }catch (Exception e){

@@ -63,10 +63,10 @@ public class ProxyHttpClient {
                 ProxyInfo proxyInfo = new ProxyInfo(ip,port);
                 boolean isValid = NetEaseHttpClient.checkProxy(ip,port);
                 if(isValid){
-                    log.debug("accept proxy {}:{}",ip,port);
+                    log.info("accept proxy {}:{}",ip,port);
                     ProxyPoolUtil.workQueue.add(proxyInfo);
                 }else{
-                    log.debug("discard proxy {}:{}",ip,port);
+                    log.info("discard proxy {}:{}",ip,port);
                 }
             }
         }
