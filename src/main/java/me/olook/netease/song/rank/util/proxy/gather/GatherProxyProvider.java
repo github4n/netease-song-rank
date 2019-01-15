@@ -15,9 +15,11 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -32,7 +34,7 @@ public class GatherProxyProvider implements ProxyProvider {
 
     private HttpClient httpClient = HttpClientBuilder.create().build();
 
-    private HttpHost proxy = new HttpHost("127.0.0.1",8088);
+    private HttpHost proxy = new HttpHost("127.0.0.1",8081);
 
     private RequestConfig requestConfig = RequestConfig.custom().setProxy(proxy)
             .setConnectTimeout(3000).setSocketTimeout(3000).setConnectionRequestTimeout(3000)
@@ -44,7 +46,7 @@ public class GatherProxyProvider implements ProxyProvider {
         List<BasicNameValuePair> pairList = new ArrayList<BasicNameValuePair>();
         pairList.add(new BasicNameValuePair("Uptime", "0"));
         pairList.add(new BasicNameValuePair("Type", "elite"));
-        pairList.add(new BasicNameValuePair("PageIdx", "1"));
+        pairList.add(new BasicNameValuePair("PageIdx", "2"));
         request.setConfig(requestConfig);
         request.setEntity(new UrlEncodedFormEntity(pairList, Charsets.UTF_8));
         try {
@@ -63,17 +65,30 @@ public class GatherProxyProvider implements ProxyProvider {
         }
         Document parse = Jsoup.parse(payload);
         Elements trs = parse.select("tr");
-        trs.stream().filter(e->{
-            // todo 筛选 zhaohw 2019-01-11 17:56
-            return e.childNodeSize()==16;
+        List<Element> collect = trs.stream().filter(e -> {
+            try{
+                String script = e.childNode(3).childNode(0).nodeName();
+                return "script".equals(script);
+            }catch (Exception e1){
+                return false;
+            }
         }).collect(Collectors.toList());
-        return null;
+
+        return collect.stream().map(e -> {
+            String ip = e.child(1).data().replace("document.write('", "").replace("')", "");
+            String portStr = e.child(2).data().replace("document.write(gp.dep('", "").replace("'))", "");
+            Integer port = Integer.parseInt(portStr, 16);
+            return new ProxyInfo(ip, port, LocalDateTime.now());
+        }).collect(Collectors.toList());
     }
 
     public static void main(String[] args) {
+        for(int i=0;i<5;i++){
+
+        }
         ProxyProvider proxyProvider = new GatherProxyProvider();
         String s = proxyProvider.requestForPayload();
-        proxyProvider.resolveProxy(s);
-        System.out.println(s);
+        List<ProxyInfo> proxyInfos = proxyProvider.resolveProxy(s);
+        proxyInfos.forEach(System.out::println);
     }
 }
