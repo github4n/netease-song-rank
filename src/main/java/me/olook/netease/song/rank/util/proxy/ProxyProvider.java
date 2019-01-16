@@ -21,4 +21,9 @@ public interface ProxyProvider {
      * @return 代理信息
      */
     List<ProxyInfo> resolveProxy(String payload);
+
+    /**
+     * 填充代理池
+     */
+    void fixProxyPool();
 }

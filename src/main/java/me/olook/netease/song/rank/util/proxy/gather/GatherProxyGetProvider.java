@@ -45,6 +45,7 @@ public class GatherProxyGetProvider implements ProxyProvider {
         request.setConfig(requestConfig);
         try {
             HttpResponse response = httpClient.execute(request);
+            System.out.println("");
             return EntityUtils.toString(response.getEntity(), Charsets.UTF_8);
         } catch (IOException e) {
             log.error(e.getMessage());
@@ -72,6 +73,11 @@ public class GatherProxyGetProvider implements ProxyProvider {
         collect.forEach(json-> {
         });
         return list;
+    }
+
+    @Override
+    public void fixProxyPool() {
+
     }
 
     public static void main(String[] args) {

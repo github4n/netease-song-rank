@@ -2,7 +2,10 @@ package me.olook.netease.song.rank.util.proxy.gather;
 
 import com.google.common.base.Charsets;
 import lombok.extern.slf4j.Slf4j;
+import me.olook.netease.song.rank.util.netease.NetEaseHttpClient;
+import me.olook.netease.song.rank.util.proxy.ProxyCheckJob;
 import me.olook.netease.song.rank.util.proxy.ProxyInfo;
+import me.olook.netease.song.rank.util.proxy.ProxyPool;
 import me.olook.netease.song.rank.util.proxy.ProxyProvider;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -37,8 +40,10 @@ public class GatherProxyProvider implements ProxyProvider {
     private HttpHost proxy = new HttpHost("127.0.0.1",8081);
 
     private RequestConfig requestConfig = RequestConfig.custom().setProxy(proxy)
-            .setConnectTimeout(3000).setSocketTimeout(3000).setConnectionRequestTimeout(3000)
+            .setConnectTimeout(5000).setSocketTimeout(5000).setConnectionRequestTimeout(5000)
             .build();
+
+    private Integer page = 1;
 
     @Override
     public String requestForPayload() {
@@ -46,7 +51,7 @@ public class GatherProxyProvider implements ProxyProvider {
         List<BasicNameValuePair> pairList = new ArrayList<BasicNameValuePair>();
         pairList.add(new BasicNameValuePair("Uptime", "0"));
         pairList.add(new BasicNameValuePair("Type", "elite"));
-        pairList.add(new BasicNameValuePair("PageIdx", "2"));
+        pairList.add(new BasicNameValuePair("PageIdx", page.toString()));
         request.setConfig(requestConfig);
         request.setEntity(new UrlEncodedFormEntity(pairList, Charsets.UTF_8));
         try {
@@ -82,13 +87,26 @@ public class GatherProxyProvider implements ProxyProvider {
         }).collect(Collectors.toList());
     }
 
-    public static void main(String[] args) {
-        for(int i=0;i<5;i++){
-
+    @Override
+    public void fixProxyPool() {
+        for(int i = 1; i < 3; i++){
+            this.page = i;
+            String s = requestForPayload();
+            List<ProxyInfo> proxyInfos = resolveProxy(s);
+            log.info("request gather proxy list page : {}",this.page);
+            for(ProxyInfo proxyInfo: proxyInfos){
+                if(NetEaseHttpClient.checkProxy(proxyInfo.getIp(),proxyInfo.getPort())){
+                    ProxyPool.executors.submit(new ProxyCheckJob(proxyInfo));
+                    log.info("accept proxy {}",proxyInfo);
+                }else{
+                    log.warn("discard proxy {}",proxyInfo);
+                }
+            }
         }
+    }
+
+    public static void main(String[] args) {
         ProxyProvider proxyProvider = new GatherProxyProvider();
-        String s = proxyProvider.requestForPayload();
-        List<ProxyInfo> proxyInfos = proxyProvider.resolveProxy(s);
-        proxyInfos.forEach(System.out::println);
+        proxyProvider.fixProxyPool();
     }
 }
