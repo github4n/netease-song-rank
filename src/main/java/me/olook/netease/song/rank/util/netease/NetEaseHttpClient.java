@@ -99,8 +99,8 @@ public class NetEaseHttpClient {
             proxy = new HttpHost(proxyInfo.getIp(),proxyInfo.getPort());
         }
         String postResult = post(url,null,proxy);
-        if(postResult == null){
-            log.warn("post for user[{}] record rank error , proxy: {}",userId,proxyInfo);
+        if(postResult == null && !"328199093".equals(userId)){
+            log.debug("post for user[{}] record rank error , proxy: {}",userId,proxyInfo);
         }
         return postResult;
     }

@@ -63,7 +63,7 @@ public class RecordRankService {
 
     public void run(String targetUserId){
 
-        if(ProxyPool.activeSize()<10){
+        if(ProxyPool.activeSize()<15){
             return;
         }
         String uuid = UUID.randomUUID().toString().replaceAll("-", "");
@@ -77,12 +77,16 @@ public class RecordRankService {
         boolean dataValid = handleProxy(jsonObject, proxyInfo);
         if(!dataValid){
             // 使用代理未获取到数据  不使用代理重试
-            jsonObject = NetEaseHttpClient.getSongRankData(currentJob.getTargetUserId());
+            proxyInfo = ProxyPool.poll();
+            jsonObject = NetEaseHttpClient.getSongRankData(currentJob.getTargetUserId(),proxyInfo);
             if(jsonObject == null){
-                log.error("post for user[{}] retry failed",targetUserId);
-                return;
+                jsonObject = NetEaseHttpClient.getSongRankData(currentJob.getTargetUserId());
+                if(jsonObject == null){
+                    log.error("post for user [{}] retry 3 times error",targetUserId);
+                    return;
+                }
+                log.warn("post for user [{}] retry 3 times success",targetUserId);
             }
-            log.debug("post for user[{}] retry success",targetUserId);
         }
         List<SongRankData> songRankDataList = RecordRankResolver.parseData(jsonObject);
         if(songRankDataList == null){
