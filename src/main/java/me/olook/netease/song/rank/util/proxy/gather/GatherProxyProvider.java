@@ -2,7 +2,6 @@ package me.olook.netease.song.rank.util.proxy.gather;
 
 import com.google.common.base.Charsets;
 import lombok.extern.slf4j.Slf4j;
-import me.olook.netease.song.rank.util.netease.NetEaseHttpClient;
 import me.olook.netease.song.rank.util.proxy.ProxyCheckJob;
 import me.olook.netease.song.rank.util.proxy.ProxyInfo;
 import me.olook.netease.song.rank.util.proxy.ProxyPool;
@@ -89,18 +88,13 @@ public class GatherProxyProvider implements ProxyProvider {
 
     @Override
     public void fixProxyPool() {
-        for(int i = 1; i < 3; i++){
+        for(int i = 1; i < 4; i++){
             this.page = i;
             String s = requestForPayload();
             List<ProxyInfo> proxyInfos = resolveProxy(s);
             log.info("request gather proxy list page : {}",this.page);
             for(ProxyInfo proxyInfo: proxyInfos){
-                if(NetEaseHttpClient.checkProxy(proxyInfo.getIp(),proxyInfo.getPort())){
                     ProxyPool.executors.submit(new ProxyCheckJob(proxyInfo));
-                    log.info("accept proxy {}",proxyInfo);
-                }else{
-                    log.warn("discard proxy {}",proxyInfo);
-                }
             }
         }
     }

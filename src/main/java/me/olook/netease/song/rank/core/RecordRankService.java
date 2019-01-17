@@ -9,7 +9,7 @@ import me.olook.netease.song.rank.dto.TemplateMsgParam;
 import me.olook.netease.song.rank.entity.*;
 import me.olook.netease.song.rank.util.netease.NetEaseHttpClient;
 import me.olook.netease.song.rank.util.proxy.ProxyInfo;
-import me.olook.netease.song.rank.util.proxy.ProxyPoolUtil;
+import me.olook.netease.song.rank.util.proxy.ProxyPool;
 import me.olook.netease.song.rank.util.wechat.WeChatHttpClient;
 import org.springframework.stereotype.Service;
 
@@ -63,12 +63,14 @@ public class RecordRankService {
 
     public void run(String targetUserId){
 
-
+        if(ProxyPool.activeSize()<10){
+            return;
+        }
         String uuid = UUID.randomUUID().toString().replaceAll("-", "");
         TimerJob currentJob = timerJobBiz.findByTargetUserId(targetUserId);
 
         // 使用代理请求数据
-        ProxyInfo proxyInfo = ProxyPoolUtil.get();
+        ProxyInfo proxyInfo = ProxyPool.poll();
         JSONObject jsonObject =
                 NetEaseHttpClient.getSongRankData(currentJob.getTargetUserId(),proxyInfo);
 
@@ -84,7 +86,6 @@ public class RecordRankService {
         }
         List<SongRankData> songRankDataList = RecordRankResolver.parseData(jsonObject);
         if(songRankDataList == null){
-            ProxyPoolUtil.fail(proxyInfo);
             return;
         }
 
@@ -197,10 +198,9 @@ public class RecordRankService {
 
     private boolean handleProxy(JSONObject data,ProxyInfo proxyInfo){
         if(data == null){
-            ProxyPoolUtil.fail(proxyInfo);
             return false;
         }else {
-            ProxyPoolUtil.restore(proxyInfo);
+            ProxyPool.offer(proxyInfo);
             return true;
         }
     }

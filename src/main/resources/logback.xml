@@ -23,7 +23,26 @@
             <charset>${charset}</charset>
         </encoder>
     </appender>
+    <appender name="proxy_info" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 过滤器，只记录INFO级别的日志 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log_dir}/%d{yyyy-MM-dd}/proxy_info.log</fileNamePattern>
+            <maxHistory>${maxHistory}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%date %level [%thread] %logger{36} %msg%n</pattern>
+            <charset>${charset}</charset>
+        </encoder>
+    </appender>
+    <logger name="me.olook.netease.song.rank.util.proxy" level="DEBUG" additivity="false">
+        <appender-ref ref="proxy_info" />
+    </logger>
     <logger name="me.olook.netease.song.rank" level="INFO">
         <appender-ref ref="all_info" />
+    </logger>
+    <logger name="org.apache.http.impl.execchain" level="OFF">
     </logger>
 </configuration>

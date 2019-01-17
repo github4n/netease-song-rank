@@ -14,7 +14,7 @@ public class ProxyPool {
      */
     private static ConcurrentLinkedQueue<ProxyInfo> proxyQueue = new ConcurrentLinkedQueue<ProxyInfo>();
 
-    public static ExecutorService executors = new ThreadPoolExecutor(5, 5,0L,
+    public static ExecutorService executors = new ThreadPoolExecutor(6, 6,0L,
             TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
 
     /**
@@ -37,5 +37,9 @@ public class ProxyPool {
 
     public static void offer(List<ProxyInfo> proxyInfoList){
         proxyInfoList.forEach(p->proxyQueue.offer(p));
+    }
+
+    public static int activeSize(){
+        return proxyQueue.size();
     }
 }

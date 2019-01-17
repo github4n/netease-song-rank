@@ -100,7 +100,7 @@ public class NetEaseHttpClient {
         }
         String postResult = post(url,null,proxy);
         if(postResult == null){
-            log.debug("post for user[{}] record rank error , proxy: {}",userId,proxyInfo);
+            log.warn("post for user[{}] record rank error , proxy: {}",userId,proxyInfo);
         }
         return postResult;
     }
@@ -162,9 +162,9 @@ public class NetEaseHttpClient {
             if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
                 return EntityUtils.toString(response.getEntity(),Charsets.UTF_8);
             }
-            log.warn("post for {} return status code {}",request.getURI().getPath(),response.getStatusLine().getStatusCode());
+            log.debug("post status code {} , proxy {}",response.getStatusLine().getStatusCode());
         } catch (IOException e) {
-            //log.error("post IOException for {} / {}",request.getURI().getPath());
+            log.debug("post IOException for {} / {}",request.getURI().getPath());
         }
         return null;
     }

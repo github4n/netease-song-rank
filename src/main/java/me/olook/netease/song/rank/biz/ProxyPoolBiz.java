@@ -1,6 +1,8 @@
 package me.olook.netease.song.rank.biz;
 
 import me.olook.netease.song.rank.util.proxy.ProxyHttpClient;
+import me.olook.netease.song.rank.util.proxy.ProxyProvider;
+import me.olook.netease.song.rank.util.proxy.gather.GatherProxyProvider;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -16,6 +18,7 @@ public class ProxyPoolBiz {
     private ProxyHttpClient proxyHttpClient;
 
     public void fixProxyPool(){
-        proxyHttpClient.fixProxyPool();
+        ProxyProvider proxyProvider = new GatherProxyProvider();
+        proxyProvider.fixProxyPool();
     }
 }
