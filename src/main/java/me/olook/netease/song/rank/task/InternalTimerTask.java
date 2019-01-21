@@ -5,7 +5,6 @@ import me.olook.netease.song.rank.biz.ProxyPoolBiz;
 import me.olook.netease.song.rank.biz.TemplateMessageBiz;
 import me.olook.netease.song.rank.biz.TimerJobBiz;
 import me.olook.netease.song.rank.util.proxy.ProxyPool;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -30,8 +29,7 @@ public class InternalTimerTask {
     @Resource
     private ProxyPoolBiz proxyPoolBiz;
 
-    @Async
-    @Scheduled(initialDelay = 1000*5 , fixedDelay = 1000 * 60 * 5 )
+    @Scheduled(initialDelay = 1000*5 , fixedDelay = 1000 * 60 )
     public void fixProxyPool() {
         log.info("fix proxy pool , active size {}" , ProxyPool.activeSize());
         proxyPoolBiz.fixProxyPool();

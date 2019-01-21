@@ -14,7 +14,7 @@ public class ProxyPool {
      */
     private static ConcurrentLinkedQueue<ProxyInfo> proxyQueue = new ConcurrentLinkedQueue<ProxyInfo>();
 
-    public static ExecutorService executors = new ThreadPoolExecutor(6, 6,0L,
+    public static ThreadPoolExecutor executors = new ThreadPoolExecutor(5, 5,0L,
             TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(75),new ThreadPoolExecutor.DiscardOldestPolicy());
 
 

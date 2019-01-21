@@ -25,6 +25,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 /**
@@ -33,6 +37,8 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class GatherProxyProvider implements ProxyProvider {
+
+    public final static GatherProxyProvider INSTANCE = new GatherProxyProvider();
 
     private HttpClient httpClient = HttpClientBuilder.create().build();
 
@@ -88,13 +94,21 @@ public class GatherProxyProvider implements ProxyProvider {
 
     @Override
     public void fixProxyPool() {
+        log.info("proxy pool task {} ",ProxyPool.executors.getCompletedTaskCount());
         for(int i = 1; i < 4; i++){
             this.page = i;
             String s = requestForPayload();
             List<ProxyInfo> proxyInfos = resolveProxy(s);
             log.info("request gather proxy list page : {}",this.page);
             for(ProxyInfo proxyInfo: proxyInfos){
-                    ProxyPool.executors.submit(new ProxyCheckJob(proxyInfo));
+                Future f = ProxyPool.executors.submit(new ProxyCheckJob(proxyInfo));
+                try {
+                    f.get(5000, TimeUnit.MILLISECONDS);
+                } catch (InterruptedException | ExecutionException e) {
+                    log.warn("fixProxyPool exception {}",e.getMessage());
+                } catch (TimeoutException e) {
+                    f.cancel(true);
+                }
             }
         }
     }

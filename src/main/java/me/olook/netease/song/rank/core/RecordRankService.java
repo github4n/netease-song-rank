@@ -4,9 +4,11 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import me.olook.netease.song.rank.biz.*;
 import me.olook.netease.song.rank.cache.TemplateMessageCache;
+import me.olook.netease.song.rank.constants.RankRecordResponseCode;
 import me.olook.netease.song.rank.dto.TemplateMsgKeyWord;
 import me.olook.netease.song.rank.dto.TemplateMsgParam;
 import me.olook.netease.song.rank.entity.*;
+import me.olook.netease.song.rank.exception.DataResolveException;
 import me.olook.netease.song.rank.util.netease.NetEaseHttpClient;
 import me.olook.netease.song.rank.util.proxy.ProxyInfo;
 import me.olook.netease.song.rank.util.proxy.ProxyPool;
@@ -63,7 +65,7 @@ public class RecordRankService {
 
     public void run(String targetUserId){
 
-        if(ProxyPool.activeSize()<15){
+        if(ProxyPool.activeSize()<5){
             return;
         }
         String uuid = UUID.randomUUID().toString().replaceAll("-", "");
@@ -74,23 +76,36 @@ public class RecordRankService {
         JSONObject jsonObject =
                 NetEaseHttpClient.getSongRankData(currentJob.getTargetUserId(),proxyInfo);
 
-        boolean dataValid = handleProxy(jsonObject, proxyInfo);
-        if(!dataValid){
-            // 使用代理未获取到数据  不使用代理重试
+        if(jsonObject == null){
             proxyInfo = ProxyPool.poll();
             jsonObject = NetEaseHttpClient.getSongRankData(currentJob.getTargetUserId(),proxyInfo);
             if(jsonObject == null){
+                proxyInfo = null;
                 jsonObject = NetEaseHttpClient.getSongRankData(currentJob.getTargetUserId());
                 if(jsonObject == null){
-                    log.error("post for user [{}] retry 3 times error",targetUserId);
+                    log.error("post for user [{} {}] retry 3 times error",currentJob.getTargetNickname(),targetUserId);
                     return;
                 }
-                log.warn("post for user [{}] retry 3 times success",targetUserId);
+                log.warn("post for user [{} {}] retry 3 times success",currentJob.getTargetNickname(),targetUserId);
             }
         }
-        List<SongRankData> songRankDataList = RecordRankResolver.parseData(jsonObject);
+
+        List<SongRankData> songRankDataList = null;
+        try {
+            songRankDataList = RecordRankResolver.parseData(jsonObject);
+        } catch (DataResolveException e) {
+            if(RankRecordResponseCode.DENIED == e.getCode()){
+                log.error("权限不足,清理任务[{} {}]",currentJob.getTargetNickname(),targetUserId);
+            }
+            if(RankRecordResponseCode.ROBOT == e.getCode() || RankRecordResponseCode.CHEAT == e.getCode()){
+                log.warn("反爬执行,删除代理 {}",proxyInfo);
+            }
+        }
         if(songRankDataList == null){
             return;
+        }
+        if(proxyInfo != null){
+            ProxyPool.offer(proxyInfo);
         }
 
         TimerJobRecord oldRecord = timerJobRecordBiz.getLatestRecord(currentJob.getId());

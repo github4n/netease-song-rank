@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import me.olook.netease.song.rank.constants.RankRecordResponseCode;
 import me.olook.netease.song.rank.entity.SongRankData;
+import me.olook.netease.song.rank.exception.DataResolveException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,12 +21,11 @@ import java.util.stream.IntStream;
 @Slf4j
 public class RecordRankResolver {
 
-    public static List<SongRankData> parseData(JSONObject data){
+    public static List<SongRankData> parseData(JSONObject data) throws DataResolveException {
         List<SongRankData> songRankDataList;
         Integer code = data.getInteger("code");
         if(!code.equals(RankRecordResponseCode.SUCCESS)){
-            log.error(data.toString());
-            return null;
+            throw new DataResolveException(code);
         }
         JSONArray array = data.getJSONArray("weekData");
         songRankDataList = IntStream.range(0, array.size())
