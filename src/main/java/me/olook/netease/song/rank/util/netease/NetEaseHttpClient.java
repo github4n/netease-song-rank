@@ -13,11 +13,14 @@ import me.olook.netease.song.rank.util.proxy.ProxyInfo;
 import me.olook.netease.song.rank.util.proxy.UserAgents;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.config.SocketConfig;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
@@ -147,7 +150,9 @@ public class NetEaseHttpClient {
             builder.setProxy(proxy);
         }
         RequestConfig proxyConfig = builder.build();
-        HttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(proxyConfig).build();
+        CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(proxyConfig)
+                .setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(5000).build())
+                .setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy()).build();
         HttpPost request = new HttpPost(url);
         addNetEaseHeader(request);
         if(params!=null){
@@ -156,15 +161,32 @@ public class NetEaseHttpClient {
         return httpRequest(httpClient,request);
     }
 
-    private static String httpRequest(HttpClient httpClient,HttpRequestBase request){
+    private static String httpRequest(CloseableHttpClient httpClient,HttpRequestBase request){
+        HttpResponse response = null;
         try {
-            HttpResponse response = httpClient.execute(request);
+            response = httpClient.execute(request);
             if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
                 return EntityUtils.toString(response.getEntity(),Charsets.UTF_8);
             }
-            log.debug("post status code {} , proxy {}",response.getStatusLine().getStatusCode());
+            //log.debug("post status code {} ",response.getStatusLine().getStatusCode());
         } catch (IOException e) {
-            log.debug("post IOException for {} / {}",request.getURI().getPath());
+            //log.debug("post IOException for {} / {}",request.getURI().getPath(),e.getMessage());
+        }finally {
+            if(response!=null){
+                try {
+                    ((CloseableHttpResponse) response).close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(httpClient!=null){
+                try {
+                    httpClient.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            request.releaseConnection();
         }
         return null;
     }

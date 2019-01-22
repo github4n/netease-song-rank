@@ -107,7 +107,7 @@ public class RecordRankService {
         if(proxyInfo != null){
             ProxyPool.offer(proxyInfo);
         }
-
+        log.debug(currentJob.getTargetNickname()+" "+jsonObject);
         TimerJobRecord oldRecord = timerJobRecordBiz.getLatestRecord(currentJob.getId());
 
         if(songRankDataList.size() == 0){
