@@ -30,9 +30,9 @@ public class WeChatHttpClient {
     private RestTemplate restTemplate;
 
     public String getAccessToken(){
-        String url = WeChatApiUrl.ACCESS_TOKEN+"" +
-                        "grant_type=client_credential" +
-                        "&appid="+wxAppProperties.getAppId()+"" +
+        String url = WeChatApiUrl.ACCESS_TOKEN+
+                        "?grant_type=client_credential" +
+                        "&appid="+wxAppProperties.getAppId()+
                         "&secret="+wxAppProperties.getAppSecret();
         String wxJson = restTemplate.getForEntity(url, String.class).getBody();
         log.info("access-token 响应: {}",wxJson);
