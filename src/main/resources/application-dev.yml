@@ -28,9 +28,11 @@ spring:
       pool-prepared-statements: true
       max-open-prepared-statements: 20
       driver-class-name: com.mysql.cj.jdbc.Driver
+  jackson:
+    time-zone: GMT+8
   jpa:
     open-in-view: false
-
+    
 wxapp:
   app-id:
   app-secret:
