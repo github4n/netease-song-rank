@@ -68,7 +68,7 @@ public class RecordRankService {
         if(ProxyPool.activeSize()<5){
             return;
         }
-        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+        final String uuid = UUID.randomUUID().toString().replaceAll("-", "");
         TimerJob currentJob = timerJobBiz.findByTargetUserId(targetUserId);
 
         // 使用代理请求数据
@@ -132,15 +132,21 @@ public class RecordRankService {
                 SongRankDataDiff saveResult = saveSongRankDataDiff(songRankDataList, oldDataList, uuid, targetUserId);
                 if(saveResult != null){
                     log.info("{} {} 数据变更: {}-{}",currentJob.getTargetNickname(),targetUserId,saveResult.getSong(),saveResult.getSinger());
+                    log.info("{} -> {}",oldRecord.getId(),uuid);
+                    songRankDataBiz.saveAndDeleteSongRankData(songRankDataList,oldRecord.getId());
+                    TimerJobRecord saveRecord = timerJobRecordBiz.saveTimerJobRecord(currentJob, uuid, snapshot);
+                    log.info("new record {}",saveRecord.getId());
                     if(saveResult.getIsBatchUpdate()==0){
                         sendTemplates(saveResult);
                     }
                 }
             }else {
                 log.info("{} {} 初始数据",currentJob.getTargetNickname(),targetUserId);
+                songRankDataBiz.saveAndDeleteSongRankData(songRankDataList,null);
+                TimerJobRecord saveRecord = timerJobRecordBiz.saveTimerJobRecord(currentJob, uuid, snapshot);
+                log.info("new blank record {}",saveRecord.getId());
             }
-            songRankDataBiz.saveAndDeleteSongRankData(songRankDataList,oldRecord==null?null:oldRecord.getId());
-            timerJobRecordBiz.saveTimerJobRecord(currentJob,uuid,snapshot);
+            
         }
 
     }

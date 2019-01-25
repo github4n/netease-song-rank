@@ -29,11 +29,11 @@ public class TimerJobRecordBiz {
         return timerJobRecordRepository.save(timerJobRecord);
     }
 
-    public void saveTimerJobRecord(TimerJob currentJob,String uuid){
-        this.saveTimerJobRecord(currentJob,uuid,"-1");
+    public TimerJobRecord saveTimerJobRecord(TimerJob currentJob,String uuid){
+        return this.saveTimerJobRecord(currentJob,uuid,"-1");
     }
 
-    public void saveTimerJobRecord(TimerJob currentJob, String jobRecordId, String snapshot){
+    public TimerJobRecord saveTimerJobRecord(TimerJob currentJob, String jobRecordId, String snapshot){
         TimerJobRecord timerJobRecord = TimerJobRecord.builder()
                 .startTime(new Date())
                 .snapshot(snapshot)
@@ -42,6 +42,6 @@ public class TimerJobRecordBiz {
                 .count(0)
                 .jobId(currentJob.getId())
                 .endTime(new Date()).build();
-        timerJobRecordRepository.save(timerJobRecord);
+        return timerJobRecordRepository.save(timerJobRecord);
     }
 }

@@ -2,10 +2,7 @@ package me.olook.netease.song.rank.task;
 
 import lombok.extern.slf4j.Slf4j;
 import me.olook.netease.song.rank.core.RecordRankService;
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
-import org.quartz.JobKey;
+import org.quartz.*;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -16,6 +13,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @Component
+@DisallowConcurrentExecution
 public class RecordRankTask implements Job {
 
     @Resource
