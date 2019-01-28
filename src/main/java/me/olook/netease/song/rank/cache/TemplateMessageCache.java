@@ -30,13 +30,16 @@ public class TemplateMessageCache {
      * 是否满足推送条件
      */
     public static boolean checkCache(String targetUserId,String openid,Integer interval){
+        if(interval == null){
+            interval = 0;
+        }
         String key = targetUserId+CONNECTOR+openid;
         if(!cacheMap.containsKey(key)){
             initCache(key);
             return true;
         }
         LocalDateTime lastTime = cacheMap.get(key);
-        Duration duration = Duration.between(LocalDateTime.now(),lastTime);
+        Duration duration = Duration.between(lastTime,LocalDateTime.now());
         long minutes = duration.toMinutes();
         return minutes > interval;
     }
@@ -57,4 +60,5 @@ public class TemplateMessageCache {
     public static ConcurrentHashMap info(){
         return cacheMap;
     }
+
 }

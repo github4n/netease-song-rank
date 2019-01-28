@@ -55,7 +55,7 @@ public class WxUser {
      */
     @Max(value = 60*24)
     @Column(name = "push_interval")
-    private Integer pushInterval;
+    private Integer pushInterval = 10;
 
     @ApiModelProperty(hidden = true)
     @Column(name = "crt_time")

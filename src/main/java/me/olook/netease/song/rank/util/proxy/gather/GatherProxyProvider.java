@@ -94,10 +94,6 @@ public class GatherProxyProvider implements ProxyProvider {
 
     @Override
     public void fixProxyPool() {
-        if(ProxyPool.activeSize() > 50){
-            log.debug("proxy pool health , size {}",ProxyPool.activeSize());
-            return;
-        }
         log.info("proxy pool task {} ",ProxyPool.executors.getCompletedTaskCount());
         for(int i = 1; i < 4; i++){
             this.page = i;

@@ -132,10 +132,10 @@ public class RecordRankService {
                 SongRankDataDiff saveResult = saveSongRankDataDiff(songRankDataList, oldDataList, uuid, targetUserId);
                 if(saveResult != null){
                     log.info("{} {} 数据变更: {}-{}",currentJob.getTargetNickname(),targetUserId,saveResult.getSong(),saveResult.getSinger());
-                    log.info("{} -> {}",oldRecord.getId(),uuid);
+                    log.debug("{} -> {}",oldRecord.getId(),uuid);
                     songRankDataBiz.saveAndDeleteSongRankData(songRankDataList,oldRecord.getId());
                     TimerJobRecord saveRecord = timerJobRecordBiz.saveTimerJobRecord(currentJob, uuid, snapshot);
-                    log.info("new record {}",saveRecord.getId());
+                    log.debug("new record {}",saveRecord.getId());
                     if(saveResult.getIsBatchUpdate()==0){
                         sendTemplates(saveResult);
                     }
@@ -144,7 +144,7 @@ public class RecordRankService {
                 log.info("{} {} 初始数据",currentJob.getTargetNickname(),targetUserId);
                 songRankDataBiz.saveAndDeleteSongRankData(songRankDataList,null);
                 TimerJobRecord saveRecord = timerJobRecordBiz.saveTimerJobRecord(currentJob, uuid, snapshot);
-                log.info("new blank record {}",saveRecord.getId());
+                log.debug("new blank record {}",saveRecord.getId());
             }
             
         }
