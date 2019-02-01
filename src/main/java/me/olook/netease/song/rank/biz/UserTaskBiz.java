@@ -88,7 +88,9 @@ public class UserTaskBiz {
                     userRefJobRepository.findByTargetUserIdAndDelFlag(userRefJob.getTargetUserId(), 0);
             if(userRefJobs.size() == 1){
                 TimerJob timerJob = timerJobRepository.findByTargetUserId(userRefJob.getTargetUserId());
+                timerJob.setUpdName(TimerJobUpdateNameEnum.DELETE);
                 timerJob.setStatus(TimerJob.STATUS_STOP);
+                timerJob.setUpdTime(new Date());
                 timerJobRepository.save(timerJob);
                 baseQuartzBiz.deleteScheduleJob(timerJob.getJobName(),timerJob.getJobGroup());
             }

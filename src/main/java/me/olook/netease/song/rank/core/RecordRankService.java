@@ -46,6 +46,9 @@ public class RecordRankService {
     private TimerJobRecordBiz timerJobRecordBiz;
 
     @Resource
+    private UserTaskBiz userTaskBiz;
+
+    @Resource
     private UserRefJobBiz userRefJobBiz;
 
     @Resource
@@ -96,9 +99,14 @@ public class RecordRankService {
         } catch (DataResolveException e) {
             if(RankRecordResponseCode.DENIED == e.getCode()){
                 log.error("权限不足,清理任务[{} {}]",currentJob.getTargetNickname(),targetUserId);
+                List<UserRefJob> userJobs = userRefJobBiz.findByTargetUserIdAndDelFlag(targetUserId, 0);
+                userJobs.forEach(job->{
+                    userTaskBiz.removeTask(job.getId());
+                });
             }
             if(RankRecordResponseCode.ROBOT == e.getCode() || RankRecordResponseCode.CHEAT == e.getCode()){
                 log.warn("反爬执行,删除代理 {}",proxyInfo);
+                return;
             }
         }
         if(songRankDataList == null){

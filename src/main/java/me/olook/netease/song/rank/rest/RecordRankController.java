@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import me.olook.netease.song.rank.biz.SongRankDataDiffBiz;
 import me.olook.netease.song.rank.biz.TimerJobBiz;
+import me.olook.netease.song.rank.constants.TimerJobUpdateNameEnum;
 import me.olook.netease.song.rank.entity.SongRankDataDiff;
 import me.olook.netease.song.rank.entity.TimerJob;
 import me.olook.netease.song.rank.util.netease.NetEaseHttpClient;
@@ -58,6 +59,7 @@ public class RecordRankController {
         if(timerJob.getStatus().equals(TimerJob.STATUS_EXPIRED)){
             return ResponseEntity.status(404).body("你的关注过期啦!建议取消再重新关注Ta");
         }
+        timerJob.setUpdName(TimerJobUpdateNameEnum.QUERY);
         timerJob.setUpdTime(new Date());
         timerJobBiz.save(timerJob);
         //查出最近10条记录

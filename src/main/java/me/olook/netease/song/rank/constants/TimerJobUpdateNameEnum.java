@@ -13,4 +13,6 @@ public interface TimerJobUpdateNameEnum {
     String QUERY = "query";
 
     String CLEAN = "clean";
+
+    String DELETE = "delete";
 }

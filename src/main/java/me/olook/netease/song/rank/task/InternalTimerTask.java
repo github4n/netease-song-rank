@@ -32,10 +32,10 @@ public class InternalTimerTask {
     @Scheduled(initialDelay = 1000*5 , fixedDelay = 1000 * 60 )
     public void fixProxyPool() {
         if(ProxyPool.activeSize() > 50){
-            log.info("proxy pool health , active size {}",ProxyPool.activeSize());
+            log.debug("proxy pool health , active size {}",ProxyPool.activeSize());
             return;
         }
-        log.info("fix proxy pool , active size {}" , ProxyPool.activeSize());
+        log.debug("fix proxy pool , active size {}" , ProxyPool.activeSize());
         proxyPoolBiz.fixProxyPool();
     }
 
