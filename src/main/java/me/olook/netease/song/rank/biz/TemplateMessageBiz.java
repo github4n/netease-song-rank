@@ -24,7 +24,7 @@ public class TemplateMessageBiz {
 
     private final static String TEMPLATE_ID = "AIL1AXTIKfmmifc4uPpCthIiNi-AMgMSxXBvXihnPOg";
 
-    private final static int TEMPLATE_LIMIT = 2;
+    private final static int TEMPLATE_LIMIT = 3;
 
     @Resource
     private UserRefJobRepository userRefJobRepository;

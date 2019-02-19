@@ -32,7 +32,15 @@ spring:
     time-zone: GMT+8
   jpa:
     open-in-view: false
-    
+  quartz:
+    properties:
+      org:
+        quartz:
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            threadCount: 30
+            threadPriority: 5
+            threadsInheritContextClassLoaderOfInitializingThread: true
 wxapp:
   app-id:
   app-secret:

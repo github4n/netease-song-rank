@@ -2,3 +2,5 @@ org:
   quartz:
     jobStore:
       acquireTriggersWithinLock: true
+    threadPool:
+      threadCount: 30

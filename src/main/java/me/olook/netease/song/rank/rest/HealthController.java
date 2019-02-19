@@ -3,15 +3,16 @@ package me.olook.netease.song.rank.rest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import me.olook.netease.song.rank.cache.TemplateMessageCache;
+import me.olook.netease.song.rank.util.cache.TaskCacheUtil;
 import me.olook.netease.song.rank.util.proxy.ProxyPool;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author zhaohw
@@ -41,5 +42,34 @@ public class HealthController {
     public ResponseEntity cacheClean(){
         TemplateMessageCache.cleanCache();
         return ResponseEntity.status(200).body("");
+    }
+
+    @ApiOperation(value = "查询异常任务")
+    @GetMapping(value = "task/all")
+    public ResponseEntity allTask(){
+        ConcurrentHashMap startTime = TaskCacheUtil.getStartTime();
+        ConcurrentHashMap endTime = TaskCacheUtil.getEndTime();
+        Map<String,Object> map = new HashMap<>();
+        map.put("startTime",startTime);
+        map.put("endTime",endTime);
+        return ResponseEntity.status(200).body(map);
+    }
+
+    @ApiOperation(value = "查询异常任务")
+    @GetMapping(value = "task/exception")
+    public ResponseEntity exceptionTesk(){
+        Set<String> exception = TaskCacheUtil.findException();
+        return ResponseEntity.status(200).body(exception);
+    }
+
+    @ApiOperation(value = "查询单个任务状态")
+    @GetMapping(value = "task/{id}")
+    public ResponseEntity task(@PathVariable String id){
+        LocalDateTime startTime = TaskCacheUtil.getStartTime(id);
+        LocalDateTime endTime = TaskCacheUtil.getEndTime(id);
+        Map<String,Object> map = new HashMap<>();
+        map.put("startTime",startTime);
+        map.put("endTime",endTime);
+        return ResponseEntity.status(200).body(map);
     }
 }

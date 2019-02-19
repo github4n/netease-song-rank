@@ -3,7 +3,6 @@ package me.olook.netease.song.rank.core;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import me.olook.netease.song.rank.biz.*;
-import me.olook.netease.song.rank.cache.TemplateMessageCache;
 import me.olook.netease.song.rank.constants.RankRecordResponseCode;
 import me.olook.netease.song.rank.dto.TemplateMsgKeyWord;
 import me.olook.netease.song.rank.dto.TemplateMsgParam;
@@ -209,9 +208,9 @@ public class RecordRankService {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         TimerJob timerJob = timerJobBiz.findByTargetUserId(dataDiff.getTargetUserId());
         templates.forEach(msg -> {
-            WxUser wxUser = wxUserBiz.findByOpenId(msg.getOpenid());
-            boolean check = TemplateMessageCache.checkCache(msg.getTargetUserId(),msg.getOpenid(),wxUser.getPushInterval());
-            if(check){
+            //WxUser wxUser = wxUserBiz.findByOpenId(msg.getOpenid());
+            //boolean check = TemplateMessageCache.checkCache(msg.getTargetUserId(),msg.getOpenid(),wxUser.getPushInterval());
+            //if(check){
                 TemplateMsgParam param = new TemplateMsgParam();
                 param.setToUser(msg.getOpenid());
                 param.setTemplateId(msg.getTemplateId());
@@ -223,7 +222,7 @@ public class RecordRankService {
                 msg.setIsValid(TemplateMessage.INVALID);
                 msg.setUpdTime(new Date());
                 templateMessageBiz.save(msg);
-            }
+            //}
 
         });
 
